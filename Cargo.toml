@@ -1,0 +1,9 @@
+[package]
+
+name = "crc"
+version = "0.0.1"
+authors = ["mrhooray <code@mrhooray.com>"]
+description = "rust implementation of crc(32, 64)"
+keywords = ["crc", "crc32", "crc64"]
+repository= "https://github.com/mrhooray/crc-rs.git"
+license = "MIT"
