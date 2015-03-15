@@ -97,7 +97,7 @@ mod tests {
 
     fn verify_checksum(poly: u32, check_value: u32) {
         let mut digest = Digest::new(poly);
-        digest.write(String::from_str("123456789").as_bytes());
+        digest.write(&b"123456789");
         assert_eq!(digest.sum32(), check_value);
         digest.reset();
         for i in 1..10 {
