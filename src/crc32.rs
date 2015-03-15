@@ -58,29 +58,51 @@ impl Hasher32 for Digest {
     }
 }
 
-#[test]
-fn verify_castagnoli() {
-    verify_checksum(CASTAGNOLI, 0xe3069283);
-}
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use test::Bencher;
 
-#[test]
-fn verify_ieee() {
-    verify_checksum(IEEE, 0xcbf43926);
-}
-
-#[test]
-fn verify_koopman() {
-    verify_checksum(KOOPMAN, 0x2d3dd0ae);
-}
-
-#[allow(dead_code)]
-fn verify_checksum(poly: u32, check_value: u32) {
-    let mut digest = Digest::new(poly);
-    digest.write(String::from_str("123456789").as_bytes());
-    assert_eq!(digest.sum32(), check_value);
-    digest.reset();
-    for i in 1..10 {
-        digest.write(i.to_string().as_bytes());
+    #[test]
+    fn test_castagnoli() {
+        verify_checksum(CASTAGNOLI, 0xe3069283);
     }
-    assert_eq!(digest.sum32(), check_value);
+
+    #[test]
+    fn test_ieee() {
+        verify_checksum(IEEE, 0xcbf43926);
+    }
+
+    #[test]
+    fn test_koopman() {
+        verify_checksum(KOOPMAN, 0x2d3dd0ae);
+    }
+
+    #[bench]
+    fn bench_make_table(b: &mut Bencher) {
+        b.iter(|| make_table(IEEE));
+    }
+
+    #[bench]
+    fn bench_digest_new(b: &mut Bencher) {
+        b.iter(|| Digest::new(IEEE));
+    }
+
+    #[bench]
+    fn bench_digest_write_megabytes(b: &mut Bencher) {
+        let mut digest = Digest::new(IEEE);
+        let bytes = Box::new([0u8; 1_000_000]);
+        b.iter(|| digest.write(&*bytes));
+    }
+
+    fn verify_checksum(poly: u32, check_value: u32) {
+        let mut digest = Digest::new(poly);
+        digest.write(String::from_str("123456789").as_bytes());
+        assert_eq!(digest.sum32(), check_value);
+        digest.reset();
+        for i in 1..10 {
+            digest.write(i.to_string().as_bytes());
+        }
+        assert_eq!(digest.sum32(), check_value);
+    }
 }

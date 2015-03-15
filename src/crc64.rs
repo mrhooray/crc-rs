@@ -57,24 +57,46 @@ impl Hasher64 for Digest {
     }
 }
 
-#[test]
-fn verify_ecma() {
-    verify_checksum(ECMA, 0x995dc9bbdf1939fa);
-}
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use test::Bencher;
 
-#[test]
-fn verify_iso() {
-    verify_checksum(ISO, 0xb90956c775a41001);
-}
-
-#[allow(dead_code)]
-fn verify_checksum(poly: u64, check_value: u64) {
-    let mut digest = Digest::new(poly);
-    digest.write(String::from_str("123456789").as_bytes());
-    assert_eq!(digest.sum64(), check_value);
-    digest.reset();
-    for i in 1..10 {
-        digest.write(i.to_string().as_bytes());
+    #[test]
+    fn test_ecma() {
+        verify_checksum(ECMA, 0x995dc9bbdf1939fa);
     }
-    assert_eq!(digest.sum64(), check_value);
+
+    #[test]
+    fn test_iso() {
+        verify_checksum(ISO, 0xb90956c775a41001);
+    }
+
+    #[bench]
+    fn bench_make_table(b: &mut Bencher) {
+        b.iter(|| make_table(ECMA));
+    }
+
+    #[bench]
+    fn bench_digest_new(b: &mut Bencher) {
+        b.iter(|| Digest::new(ECMA));
+    }
+
+    #[bench]
+    fn bench_digest_write_megabytes(b: &mut Bencher) {
+        let mut digest = Digest::new(ECMA);
+        let bytes = Box::new([0u8; 1_000_000]);
+        b.iter(|| digest.write(&*bytes));
+    }
+
+    fn verify_checksum(poly: u64, check_value: u64) {
+        let mut digest = Digest::new(poly);
+        digest.write(String::from_str("123456789").as_bytes());
+        assert_eq!(digest.sum64(), check_value);
+        digest.reset();
+        for i in 1..10 {
+            digest.write(i.to_string().as_bytes());
+        }
+        assert_eq!(digest.sum64(), check_value);
+    }
 }
