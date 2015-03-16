@@ -27,7 +27,7 @@ extern crate crc;
 Compute CRC32
 ```rust
 use crc::crc32;
-use crc::crc32::Hasher32;
+use crc::Hasher32;
 
 let mut digest = crc32::Digest::new(crc32::IEEE);
 digest.write(&b"123456789");
@@ -37,7 +37,7 @@ println!("{:x}", digest.sum32()); // -> 0xcbf43926
 Compute CRC64
 ```rust
 use crc::crc64;
-use crc::crc64::Hasher64;
+use crc::Hasher64;
 
 let mut digest = crc64::Digest::new(crc64::ECMA);
 digest.write(&b"123456789");
