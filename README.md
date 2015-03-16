@@ -4,6 +4,7 @@
 * [Crate](https://crates.io/crates/crc)
 * [Usage](#usage)
 * [Benchmark](#benchmark)
+* [TODO](#todo)
 * [License](#license)
 
 ##Usage
@@ -42,7 +43,7 @@ println!("{:x}", digest.sum64()); // -> 0x995dc9bbdf1939fa
 ```
 
 ##Benchmark
-`Cargo bench` with 2.3 GHz Intel Core i7 results ~385MB/s throughput as [expected](http://create.stephan-brumme.com/crc32/)
+`cargo bench` with 2.3 GHz Intel Core i7 results ~385MB/s throughput as [expected](http://create.stephan-brumme.com/crc32/)
 ```
 running 11 tests
 test crc32::tests::test_castagnoli ... ignored
@@ -59,6 +60,9 @@ test crc64::tests::bench_make_table             ... bench:      1275 ns/iter (+/
 
 test result: ok. 0 passed; 0 failed; 5 ignored; 6 measured
 ```
+
+##TODO
+- [ ] [Slicing-by-4/8/16](http://create.stephan-brumme.com/crc32/#slicing-by-8-overview) Implementation
 
 ##License
 MIT
