@@ -16,7 +16,7 @@ crc = "0.1.0"
 or
 ```toml
 [dependencies.crc]
-git = "https://github.com/mrhooray/crc"
+git = "https://github.com/mrhooray/crc-rs"
 ```
 
 Add this to crate root
@@ -27,6 +27,7 @@ extern crate crc;
 Compute CRC32
 ```rust
 use crc::crc32;
+use crc::crc32::Hasher32;
 
 let mut digest = crc32::Digest::new(crc32::IEEE);
 digest.write(&b"123456789");
@@ -36,6 +37,7 @@ println!("{:x}", digest.sum32()); // -> 0xcbf43926
 Compute CRC64
 ```rust
 use crc::crc64;
+use crc::crc64::Hasher64;
 
 let mut digest = crc64::Digest::new(crc64::ECMA);
 digest.write(&b"123456789");
@@ -43,7 +45,7 @@ println!("{:x}", digest.sum64()); // -> 0x995dc9bbdf1939fa
 ```
 
 ##Benchmark
-`cargo bench` with 2.3 GHz Intel Core i7 results ~385MB/s throughput as [expected](http://create.stephan-brumme.com/crc32/)
+`cargo bench` with 2.3 GHz Intel Core i7 results ~385MB/s throughput. [Comparison](http://create.stephan-brumme.com/crc32/)
 ```
 running 11 tests
 test crc32::tests::test_castagnoli ... ignored
@@ -62,6 +64,7 @@ test result: ok. 0 passed; 0 failed; 5 ignored; 6 measured
 ```
 
 ##TODO
+- [ ] rustdoc
 - [ ] [Slicing-by-4/8/16](http://create.stephan-brumme.com/crc32/#slicing-by-8-overview) Implementation
 
 ##License
