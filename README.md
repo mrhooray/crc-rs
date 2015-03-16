@@ -1,6 +1,7 @@
 # crc
 > Rust implementation of CRC(32, 64)
 
+* [Crate](https://crates.io/crates/crc)
 * [Usage](#usage)
 * [Benchmark](#benchmark)
 * [License](#license)
