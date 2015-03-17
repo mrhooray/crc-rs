@@ -1,6 +1,11 @@
 pub const ECMA: u64 = 0xc96c5795d7870f42;
 pub const ISO: u64 = 0xd800000000000000;
 
+lazy_static! {
+    static ref ECMA_TABLE: [u64; 256] = make_table(ECMA);
+    static ref ISO_TABLE: [u64; 256] = make_table(ISO);
+}
+
 pub struct Digest {
     table: [u64; 256],
     value: u64
@@ -36,6 +41,14 @@ pub fn update(mut value: u64, table: &[u64; 256], bytes: &[u8]) -> u64 {
     !value
 }
 
+pub fn checksum_ecma(bytes: &[u8]) -> u64 {
+    return update(0, &ECMA_TABLE, bytes);
+}
+
+pub fn checksum_iso(bytes: &[u8]) -> u64 {
+    return update(0, &ISO_TABLE, bytes);
+}
+
 impl Digest {
     pub fn new(poly: u64) -> Digest {
         Digest {
@@ -62,14 +75,27 @@ mod tests {
     use super::*;
     use test::Bencher;
 
+    const ECMA_CHECK_VALUE: u64 = 0x995dc9bbdf1939fa;
+    const ISO_CHECK_VALUE: u64 = 0xb90956c775a41001;
+
     #[test]
-    fn test_ecma() {
-        verify_checksum(ECMA, 0x995dc9bbdf1939fa);
+    fn test_checksum_ecma() {
+        assert_eq!(checksum_ecma(&b"123456789"), ECMA_CHECK_VALUE)
     }
 
     #[test]
-    fn test_iso() {
-        verify_checksum(ISO, 0xb90956c775a41001);
+    fn test_checksum_iso() {
+        assert_eq!(checksum_iso(&b"123456789"), ISO_CHECK_VALUE)
+    }
+
+    #[test]
+    fn test_digest_ecma() {
+        verify_checksum(ECMA, ECMA_CHECK_VALUE);
+    }
+
+    #[test]
+    fn test_digest_iso() {
+        verify_checksum(ISO, ISO_CHECK_VALUE);
     }
 
     #[bench]
@@ -78,15 +104,10 @@ mod tests {
     }
 
     #[bench]
-    fn bench_digest_new(b: &mut Bencher) {
-        b.iter(|| Digest::new(ECMA));
-    }
-
-    #[bench]
-    fn bench_digest_write_megabytes(b: &mut Bencher) {
-        let mut digest = Digest::new(ECMA);
+    fn bench_update_megabytes(b: &mut Bencher) {
+        let table = make_table(ECMA);
         let bytes = Box::new([0u8; 1_000_000]);
-        b.iter(|| digest.write(&*bytes));
+        b.iter(|| update(0, &table, &*bytes));
     }
 
     fn verify_checksum(poly: u64, check_value: u64) {

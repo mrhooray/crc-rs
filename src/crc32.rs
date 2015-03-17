@@ -2,6 +2,12 @@ pub const CASTAGNOLI: u32 = 0x82f63b78;
 pub const IEEE: u32 = 0xedb88320;
 pub const KOOPMAN: u32 = 0xeb31d82e;
 
+lazy_static! {
+    static ref IEEE_TABLE: [u32; 256] = make_table(IEEE);
+    static ref CASTAGNOLI_TABLE: [u32; 256] = make_table(CASTAGNOLI);
+    static ref KOOPMAN_TABLE: [u32; 256] = make_table(KOOPMAN);
+}
+
 pub struct Digest {
     table: [u32; 256],
     value: u32
@@ -37,6 +43,18 @@ pub fn update(mut value: u32, table: &[u32; 256], bytes: &[u8]) -> u32 {
     !value
 }
 
+pub fn checksum_ieee(bytes: &[u8]) -> u32 {
+    return update(0, &IEEE_TABLE, bytes);
+}
+
+pub fn checksum_castagnoli(bytes: &[u8]) -> u32 {
+    return update(0, &CASTAGNOLI_TABLE, bytes);
+}
+
+pub fn checksum_koopman(bytes: &[u8]) -> u32 {
+    return update(0, &KOOPMAN_TABLE, bytes);
+}
+
 impl Digest {
     pub fn new(poly: u32) -> Digest {
         Digest {
@@ -63,20 +81,40 @@ mod tests {
     use super::*;
     use test::Bencher;
 
+    const CASTAGNOLI_CHECK_VALUE: u32 = 0xe3069283;
+    const IEEE_CHECK_VALUE: u32 = 0xcbf43926;
+    const KOOPMAN_CHECK_VALUE: u32 = 0x2d3dd0ae;
+
     #[test]
-    fn test_castagnoli() {
-        verify_checksum(CASTAGNOLI, 0xe3069283);
+    fn test_checksum_castagnoli() {
+        assert_eq!(checksum_castagnoli(&b"123456789"), CASTAGNOLI_CHECK_VALUE)
     }
 
     #[test]
-    fn test_ieee() {
-        verify_checksum(IEEE, 0xcbf43926);
+    fn test_checksum_ieee() {
+        assert_eq!(checksum_ieee(&b"123456789"), IEEE_CHECK_VALUE)
     }
 
     #[test]
-    fn test_koopman() {
-        verify_checksum(KOOPMAN, 0x2d3dd0ae);
+    fn test_checksum_koopman() {
+        assert_eq!(checksum_koopman(&b"123456789"), KOOPMAN_CHECK_VALUE)
     }
+
+    #[test]
+    fn test_digest_castagnoli() {
+        verify_checksum(CASTAGNOLI, CASTAGNOLI_CHECK_VALUE);
+    }
+
+    #[test]
+    fn test_digest_ieee() {
+        verify_checksum(IEEE, IEEE_CHECK_VALUE);
+    }
+
+    #[test]
+    fn test_digest_koopman() {
+        verify_checksum(KOOPMAN, KOOPMAN_CHECK_VALUE);
+    }
+
 
     #[bench]
     fn bench_make_table(b: &mut Bencher) {
@@ -84,15 +122,10 @@ mod tests {
     }
 
     #[bench]
-    fn bench_digest_new(b: &mut Bencher) {
-        b.iter(|| Digest::new(IEEE));
-    }
-
-    #[bench]
-    fn bench_digest_write_megabytes(b: &mut Bencher) {
-        let mut digest = Digest::new(IEEE);
+    fn bench_update_megabytes(b: &mut Bencher) {
+        let table = make_table(IEEE);
         let bytes = Box::new([0u8; 1_000_000]);
-        b.iter(|| digest.write(&*bytes));
+        b.iter(|| update(0, &table, &*bytes));
     }
 
     fn verify_checksum(poly: u32, check_value: u32) {

@@ -1,5 +1,7 @@
 #![feature(test)]
 #[cfg(test)] extern crate test;
+#[macro_use]
+extern crate lazy_static;
 
 pub mod crc32;
 pub mod crc64;
