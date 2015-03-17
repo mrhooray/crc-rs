@@ -8,3 +8,6 @@ keywords = ["crc", "crc32", "crc64"]
 readme = "README.md"
 repository= "https://github.com/mrhooray/crc-rs.git"
 license = "MIT"
+
+[dependencies]
+lazy_static = "0.1.*"
