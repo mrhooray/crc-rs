@@ -87,17 +87,17 @@ mod tests {
 
     #[test]
     fn test_checksum_castagnoli() {
-        assert_eq!(checksum_castagnoli(&b"123456789"), CASTAGNOLI_CHECK_VALUE)
+        assert_eq!(checksum_castagnoli(b"123456789"), CASTAGNOLI_CHECK_VALUE)
     }
 
     #[test]
     fn test_checksum_ieee() {
-        assert_eq!(checksum_ieee(&b"123456789"), IEEE_CHECK_VALUE)
+        assert_eq!(checksum_ieee(b"123456789"), IEEE_CHECK_VALUE)
     }
 
     #[test]
     fn test_checksum_koopman() {
-        assert_eq!(checksum_koopman(&b"123456789"), KOOPMAN_CHECK_VALUE)
+        assert_eq!(checksum_koopman(b"123456789"), KOOPMAN_CHECK_VALUE)
     }
 
     #[test]
@@ -130,7 +130,7 @@ mod tests {
 
     fn verify_checksum(poly: u32, check_value: u32) {
         let mut digest = Digest::new(poly);
-        digest.write(&b"123456789");
+        digest.write(b"123456789");
         assert_eq!(digest.sum32(), check_value);
         digest.reset();
         for i in 1..10 {
