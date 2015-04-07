@@ -80,12 +80,12 @@ mod tests {
 
     #[test]
     fn test_checksum_ecma() {
-        assert_eq!(checksum_ecma(&b"123456789"), ECMA_CHECK_VALUE)
+        assert_eq!(checksum_ecma(b"123456789"), ECMA_CHECK_VALUE)
     }
 
     #[test]
     fn test_checksum_iso() {
-        assert_eq!(checksum_iso(&b"123456789"), ISO_CHECK_VALUE)
+        assert_eq!(checksum_iso(b"123456789"), ISO_CHECK_VALUE)
     }
 
     #[test]
@@ -112,7 +112,7 @@ mod tests {
 
     fn verify_checksum(poly: u64, check_value: u64) {
         let mut digest = Digest::new(poly);
-        digest.write(&b"123456789");
+        digest.write(b"123456789");
         assert_eq!(digest.sum64(), check_value);
         digest.reset();
         for i in 1..10 {
