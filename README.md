@@ -1,7 +1,8 @@
-# crc
+# crc [![Build Status](https://travis-ci.org/mrhooray/crc-rs.svg?branch=master)](https://travis-ci.org/mrhooray/crc-rs)
 > Rust implementation of CRC(32, 64)
 
 * [Crate](https://crates.io/crates/crc)
+* [Documentation](http://mrhooray.github.io/crc-rs/crc/index.html)
 * [Usage](#usage)
 * [Benchmark](#benchmark)
 * [TODO](#todo)
@@ -75,8 +76,7 @@ test result: ok. 0 passed; 0 failed; 10 ignored; 4 measured
 ```
 
 ##TODO
-- [ ] rustdoc
-- [ ] [Slicing-by-4/8/16](http://create.stephan-brumme.com/crc32/#slicing-by-8-overview) Implementation
+- [ ] [Slicing-by-4/8/16](http://create.stephan-brumme.com/crc32/#slicing-by-8-overview)
 
 ##License
 MIT
