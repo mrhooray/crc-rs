@@ -24,9 +24,9 @@ Add this to crate root
 extern crate crc;
 ```
 
-Compute CRC32
+###Compute CRC32
 ```rust
-use crc::crc32;
+use crc::{crc32, Hasher32};
 
 // CRC-32-IEEE is the most commonly used one
 println!("{:x}", crc32::checksum_ieee(b"123456789")); // -> 0xcbf43926
@@ -39,9 +39,9 @@ digest.write(b"123456789");
 println!("{:x}", digest.sum32()); // -> 0xcbf43926
 ```
 
-Compute CRC64
+###Compute CRC64
 ```rust
-use crc::crc64;
+use crc::{crc64, Hasher64};
 
 println!("{:x}", crc64::checksum_ecma(b"123456789")); // -> 0x995dc9bbdf1939fa
 println!("{:x}", crc64::checksum_iso(b"123456789")); // -> 0xb90956c775a41001
