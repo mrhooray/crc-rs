@@ -1,5 +1,5 @@
 # crc [![Build Status](https://travis-ci.org/mrhooray/crc-rs.svg?branch=master)](https://travis-ci.org/mrhooray/crc-rs)
-> Rust implementation of CRC(32, 64)
+> Rust implementation of CRC(32, 64) with support of various standards
 
 * [Crate](https://crates.io/crates/crc)
 * [Documentation](http://mrhooray.github.io/crc-rs/crc/index.html)
@@ -12,7 +12,7 @@
 Add `crc` to `Cargo.toml`
 ```toml
 [dependencies]
-crc = "0.3.0"
+crc = "^0.3.0"
 ```
 or
 ```toml
@@ -54,8 +54,11 @@ assert_eq!(digest.sum64(), 0x995dc9bbdf1939fa);
 ```
 
 ##Benchmark
-`cargo bench` with 2.3 GHz Intel Core i7 results ~400MB/s throughput. [Comparison](http://create.stephan-brumme.com/crc32/)
+`cargo bench` with 2.3 GHz Intel Core i7 results ~430MB/s throughput. [Comparison](http://create.stephan-brumme.com/crc32/)
 ```
+cargo bench
+     Running target/release/crc-ef3fd4a2422fe338
+
 running 14 tests
 test crc32::tests::test_checksum_castagnoli ... ignored
 test crc32::tests::test_checksum_ieee ... ignored
@@ -67,10 +70,10 @@ test crc64::tests::test_checksum_ecma ... ignored
 test crc64::tests::test_checksum_iso ... ignored
 test crc64::tests::test_digest_ecma ... ignored
 test crc64::tests::test_digest_iso ... ignored
-test crc32::tests::bench_make_table       ... bench:       447 ns/iter (+/- 81)
-test crc32::tests::bench_update_megabytes ... bench:   2479741 ns/iter (+/- 183031)
-test crc64::tests::bench_make_table       ... bench:      1166 ns/iter (+/- 93)
-test crc64::tests::bench_update_megabytes ... bench:   2478464 ns/iter (+/- 68731)
+test crc32::tests::bench_make_table       ... bench:      2511 ns/iter (+/- 1256)
+test crc32::tests::bench_update_megabytes ... bench:   2307480 ns/iter (+/- 483053)
+test crc64::tests::bench_make_table       ... bench:      2510 ns/iter (+/- 928)
+test crc64::tests::bench_update_megabytes ... bench:   2298012 ns/iter (+/- 78780)
 
 test result: ok. 0 passed; 0 failed; 10 ignored; 4 measured
 ```
