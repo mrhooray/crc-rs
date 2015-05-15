@@ -1,4 +1,7 @@
 language: rust
+rust:
+    - nightly
+    - stable
 sudo: false
 after_success: |
     [ $TRAVIS_BRANCH = master ] &&
