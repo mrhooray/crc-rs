@@ -73,7 +73,7 @@ impl Hasher64 for Digest {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use test::Bencher;
+    // use test::Bencher;
 
     const ECMA_CHECK_VALUE: u64 = 0x995dc9bbdf1939fa;
     const ISO_CHECK_VALUE: u64 = 0xb90956c775a41001;
@@ -98,17 +98,17 @@ mod tests {
         verify_checksum(ISO, ISO_CHECK_VALUE);
     }
 
-    #[bench]
-    fn bench_make_table(b: &mut Bencher) {
-        b.iter(|| make_table(ECMA));
-    }
+    // #[bench]
+    // fn bench_make_table(b: &mut Bencher) {
+    //     b.iter(|| make_table(ECMA));
+    // }
 
-    #[bench]
-    fn bench_update_megabytes(b: &mut Bencher) {
-        let table = make_table(ECMA);
-        let bytes = Box::new([0u8; 1_000_000]);
-        b.iter(|| update(0, &table, &*bytes));
-    }
+    // #[bench]
+    // fn bench_update_megabytes(b: &mut Bencher) {
+    //     let table = make_table(ECMA);
+    //     let bytes = Box::new([0u8; 1_000_000]);
+    //     b.iter(|| update(0, &table, &*bytes));
+    // }
 
     fn verify_checksum(poly: u64, check_value: u64) {
         let mut digest = Digest::new(poly);

@@ -79,7 +79,7 @@ impl Hasher32 for Digest {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use test::Bencher;
+    // use test::Bencher;
 
     const CASTAGNOLI_CHECK_VALUE: u32 = 0xe3069283;
     const IEEE_CHECK_VALUE: u32 = 0xcbf43926;
@@ -116,17 +116,17 @@ mod tests {
     }
 
 
-    #[bench]
-    fn bench_make_table(b: &mut Bencher) {
-        b.iter(|| make_table(IEEE));
-    }
+    // #[bench]
+    // fn bench_make_table(b: &mut Bencher) {
+    //     b.iter(|| make_table(IEEE));
+    // }
 
-    #[bench]
-    fn bench_update_megabytes(b: &mut Bencher) {
-        let table = make_table(IEEE);
-        let bytes = Box::new([0u8; 1_000_000]);
-        b.iter(|| update(0, &table, &*bytes));
-    }
+    // #[bench]
+    // fn bench_update_megabytes(b: &mut Bencher) {
+    //     let table = make_table(IEEE);
+    //     let bytes = Box::new([0u8; 1_000_000]);
+    //     b.iter(|| update(0, &table, &*bytes));
+    // }
 
     fn verify_checksum(poly: u32, check_value: u32) {
         let mut digest = Digest::new(poly);

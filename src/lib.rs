@@ -1,4 +1,4 @@
-#![cfg_attr(test, feature(test))]
+// #![cfg_attr(test, feature(test))]
 
 //! # crc
 //! Rust implementation of CRC(32, 64)
@@ -32,7 +32,7 @@
 //! assert_eq!(digest.sum64(), 0x995dc9bbdf1939fa);
 //! ```
 
-#[cfg(test)] extern crate test;
+// #[cfg(test)] extern crate test;
 #[macro_use]
 extern crate lazy_static;
 
