@@ -1,5 +1,4 @@
 [package]
-
 name = "crc"
 version = "0.3.1"
 authors = ["mrhooray <ruihu.pvt@gmail.com>"]
