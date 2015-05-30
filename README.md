@@ -54,34 +54,23 @@ assert_eq!(digest.sum64(), 0x995dc9bbdf1939fa);
 ```
 
 ##Benchmark
-> Bencher is unstable thus not available in Rust 1.0.0 release
+> Bencher is currently not available in Rust stable releases.
 
 `cargo bench` with 2.3 GHz Intel Core i7 results ~430MB/s throughput. [Comparison](http://create.stephan-brumme.com/crc32/)
 ```
 cargo bench
-     Running target/release/crc-ef3fd4a2422fe338
+     Running target/release/bench-5c82e94dab3e9c79
 
-running 14 tests
-test crc32::tests::test_checksum_castagnoli ... ignored
-test crc32::tests::test_checksum_ieee ... ignored
-test crc32::tests::test_checksum_koopman ... ignored
-test crc32::tests::test_digest_castagnoli ... ignored
-test crc32::tests::test_digest_ieee ... ignored
-test crc32::tests::test_digest_koopman ... ignored
-test crc64::tests::test_checksum_ecma ... ignored
-test crc64::tests::test_checksum_iso ... ignored
-test crc64::tests::test_digest_ecma ... ignored
-test crc64::tests::test_digest_iso ... ignored
-test crc32::tests::bench_make_table       ... bench:      2511 ns/iter (+/- 1256)
-test crc32::tests::bench_update_megabytes ... bench:   2307480 ns/iter (+/- 483053)
-test crc64::tests::bench_make_table       ... bench:      2510 ns/iter (+/- 928)
-test crc64::tests::bench_update_megabytes ... bench:   2298012 ns/iter (+/- 78780)
+running 4 tests
+test bench_crc32_make_table       ... bench:       439 ns/iter (+/- 82)
+test bench_crc32_update_megabytes ... bench:   2327803 ns/iter (+/- 138845)
+test bench_crc64_make_table       ... bench:      1200 ns/iter (+/- 223)
+test bench_crc64_update_megabytes ... bench:   2322472 ns/iter (+/- 92870)
 
-test result: ok. 0 passed; 0 failed; 10 ignored; 4 measured
+test result: ok. 0 passed; 0 failed; 0 ignored; 4 measured
 ```
 
 ##TODO
-- [ ] [Slicing-by-4/8/16](http://create.stephan-brumme.com/crc32/#slicing-by-8-overview)
 
 ##License
 MIT
