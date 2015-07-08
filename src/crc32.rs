@@ -62,6 +62,13 @@ impl Digest {
             value: 0,
         }
     }
+
+    pub fn new_with_value(poly: u32, value: u32) -> Digest {
+        Digest {
+            table: make_table(poly),
+            value: value,
+        }
+    }
 }
 
 impl Hasher32 for Digest {
