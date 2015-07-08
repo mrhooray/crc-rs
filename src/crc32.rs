@@ -10,6 +10,7 @@ lazy_static! {
 
 pub struct Digest {
     table: [u32; 256],
+    initial: u32,
     value: u32
 }
 
@@ -59,14 +60,23 @@ impl Digest {
     pub fn new(poly: u32) -> Digest {
         Digest {
             table: make_table(poly),
-            value: 0,
+            initial: 0,
+            value: 0
+        }
+    }
+
+    pub fn new_with_initial(poly: u32, initial: u32) -> Digest {
+        Digest {
+            table: make_table(poly),
+            initial: initial,
+            value: initial
         }
     }
 }
 
 impl Hasher32 for Digest {
     fn reset(&mut self) {
-        self.value = 0;
+        self.value = self.initial;
     }
     fn write(&mut self, bytes: &[u8]) {
         self.value = update(self.value, &self.table, bytes);

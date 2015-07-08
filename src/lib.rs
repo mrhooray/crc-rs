@@ -15,6 +15,11 @@
 //! let mut digest = crc32::Digest::new(crc32::IEEE);
 //! digest.write(b"123456789");
 //! assert_eq!(digest.sum32(), 0xcbf43926);
+//!
+//! // with initial
+//! let mut digest = crc32::Digest::new_with_initial(crc32::IEEE, 0u32);
+//! digest.write(b"123456789");
+//! assert_eq!(digest.sum32(), 0xcbf43926);
 //! ```
 //!
 //! ### Compute CRC64
@@ -26,6 +31,11 @@
 //!
 //! // use provided or custom polynomial
 //! let mut digest = crc64::Digest::new(crc64::ECMA);
+//! digest.write(b"123456789");
+//! assert_eq!(digest.sum64(), 0x995dc9bbdf1939fa);
+//!
+//! // with initial
+//! let mut digest = crc64::Digest::new_with_initial(crc64::ECMA, 0u64);
 //! digest.write(b"123456789");
 //! assert_eq!(digest.sum64(), 0x995dc9bbdf1939fa);
 //! ```
