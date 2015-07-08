@@ -1,6 +1,6 @@
 [package]
 name = "crc"
-version = "1.0.0"
+version = "1.1.0"
 authors = ["mrhooray <ruihu.pvt@gmail.com>"]
 description = "Rust implementation of CRC(32, 64) with support of various standards"
 keywords = ["crc", "crc32", "crc64", "hash", "checksum"]
