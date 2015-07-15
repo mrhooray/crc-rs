@@ -2,7 +2,7 @@ language: rust
 rust:
     - nightly
     - stable
-sudo: false
+sudo: true
 after_success: |
     [ $TRAVIS_BRANCH = master ] &&
     [ $TRAVIS_PULL_REQUEST = false ] &&
