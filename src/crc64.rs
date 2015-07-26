@@ -2,8 +2,8 @@ pub const ECMA: u64 = 0xc96c5795d7870f42;
 pub const ISO: u64 = 0xd800000000000000;
 
 lazy_static! {
-    static ref ECMA_TABLE: [u64; 256] = make_table(ECMA);
-    static ref ISO_TABLE: [u64; 256] = make_table(ISO);
+    pub static ref ECMA_TABLE: [u64; 256] = make_table(ECMA);
+    pub static ref ISO_TABLE: [u64; 256] = make_table(ISO);
 }
 
 pub struct Digest {
