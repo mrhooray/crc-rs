@@ -3,9 +3,9 @@ pub const IEEE: u32 = 0xedb88320;
 pub const KOOPMAN: u32 = 0xeb31d82e;
 
 lazy_static! {
-    static ref IEEE_TABLE: [u32; 256] = make_table(IEEE);
-    static ref CASTAGNOLI_TABLE: [u32; 256] = make_table(CASTAGNOLI);
-    static ref KOOPMAN_TABLE: [u32; 256] = make_table(KOOPMAN);
+    pub static ref IEEE_TABLE: [u32; 256] = make_table(IEEE);
+    pub static ref CASTAGNOLI_TABLE: [u32; 256] = make_table(CASTAGNOLI);
+    pub static ref KOOPMAN_TABLE: [u32; 256] = make_table(KOOPMAN);
 }
 
 pub struct Digest {
