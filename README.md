@@ -5,7 +5,6 @@
 * [Documentation](http://mrhooray.github.io/crc-rs/crc/index.html)
 * [Usage](#usage)
 * [Benchmark](#benchmark)
-* [TODO](#todo)
 * [License](#license)
 
 ##Usage
@@ -79,8 +78,6 @@ test bench_crc64_update_megabytes ... bench:   2322472 ns/iter (+/- 92870)
 
 test result: ok. 0 passed; 0 failed; 0 ignored; 4 measured
 ```
-
-##TODO
 
 ##License
 MIT
