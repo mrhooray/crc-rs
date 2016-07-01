@@ -10,4 +10,4 @@ documentation = "http://mrhooray.github.io/crc-rs/crc/index.html"
 license = "MIT"
 
 [dependencies]
-lazy_static = "0.1.*"
+lazy_static = "0.2"
