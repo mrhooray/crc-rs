@@ -1,3 +1,5 @@
+use std::hash::Hasher;
+
 pub const ECMA: u64 = 0xc96c5795d7870f42;
 pub const ISO: u64 = 0xd800000000000000;
 
@@ -77,5 +79,16 @@ impl Hasher64 for Digest {
     }
     fn sum64(&self) -> u64 {
         self.value
+    }
+}
+
+/// Implementation of std::hash::Hasher so that types which #[derive(Hash)] can hash with Digest.
+impl Hasher for Digest {
+    fn write(&mut self, bytes: &[u8]) {
+        Hasher64::write(self, bytes);
+    }
+
+    fn finish(&self) -> u64 {
+        self.sum64()
     }
 }
