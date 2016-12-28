@@ -4,12 +4,18 @@ mod crc32 {
     use crc::{crc32, Hasher32};
 
     const CASTAGNOLI_CHECK_VALUE: u32 = 0xe3069283;
+    const LONG_CASTAGNOLI_CHECK_VALUE: u32 = 0x7f269791;
     const IEEE_CHECK_VALUE: u32 = 0xcbf43926;
     const KOOPMAN_CHECK_VALUE: u32 = 0x2d3dd0ae;
 
     #[test]
     fn checksum_castagnoli() {
         assert_eq!(crc32::checksum_castagnoli(b"123456789"), CASTAGNOLI_CHECK_VALUE)
+    }
+
+    #[test]
+    fn checksum_castagnoli_long_bytes() {
+        assert_eq!(crc32::checksum_castagnoli(b"1234567890ABCDEF"), LONG_CASTAGNOLI_CHECK_VALUE)
     }
 
     #[test]

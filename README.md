@@ -7,24 +7,30 @@
 * [Benchmark](#benchmark)
 * [License](#license)
 
-##Usage
+## Usage
+
 Add `crc` to `Cargo.toml`
+
 ```toml
 [dependencies]
 crc = "^1.0.0"
 ```
+
 or
+
 ```toml
 [dependencies.crc]
 git = "https://github.com/mrhooray/crc-rs"
 ```
 
 Add this to crate root
+
 ```rust
 extern crate crc;
 ```
 
 ### Compute CRC32
+
 ```rust
 use crc::{crc32, Hasher32};
 
@@ -45,6 +51,7 @@ assert_eq!(digest.sum32(), 0xcbf43926);
 ```
 
 ### Compute CRC64
+
 ```rust
 use crc::{crc64, Hasher64};
 
@@ -62,10 +69,16 @@ digest.write(b"123456789");
 assert_eq!(digest.sum64(), 0x995dc9bbdf1939fa);
 ```
 
-##Benchmark
+## accelalate by x86intrin
+
+We can use intel crc32 instruction by `RUSTFLAGS="-C target-feature=+sse4.2" cargo build --features=simd-accel`.
+
+## Benchmark
+
 > Bencher is currently not available in Rust stable releases.
 
 `cargo bench` with 2.3 GHz Intel Core i7 results ~430MB/s throughput. [Comparison](http://create.stephan-brumme.com/crc32/)
+
 ```
 cargo bench
      Running target/release/bench-5c82e94dab3e9c79
@@ -79,5 +92,6 @@ test bench_crc64_update_megabytes ... bench:   2322472 ns/iter (+/- 92870)
 test result: ok. 0 passed; 0 failed; 0 ignored; 4 measured
 ```
 
-##License
+## License
+
 MIT

@@ -11,3 +11,7 @@ license = "MIT"
 
 [dependencies]
 lazy_static = "0.2"
+x86intrin = { version = "0.4.1", optional = true }
+
+[features]
+simd-accel = ["x86intrin"]
