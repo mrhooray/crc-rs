@@ -69,10 +69,6 @@ digest.write(b"123456789");
 assert_eq!(digest.sum64(), 0x995dc9bbdf1939fa);
 ```
 
-## accelalate by x86intrin
-
-We can use intel crc32 instruction by `RUSTFLAGS="-C target-feature=+sse4.2" cargo build --features=simd-accel`.
-
 ## Benchmark
 
 > Bencher is currently not available in Rust stable releases.
@@ -90,6 +86,58 @@ test bench_crc64_make_table       ... bench:      1200 ns/iter (+/- 223)
 test bench_crc64_update_megabytes ... bench:   2322472 ns/iter (+/- 92870)
 
 test result: ok. 0 passed; 0 failed; 0 ignored; 4 measured
+```
+
+## accelalate by x86intrin
+
+We can use intel crc32 instruction by `RUSTFLAGS="-C target-feature=+sse4.2" cargo build --features=simd-accel`.
+
+`cargo bench` with 2 GHz Intel Core i7 shows,
+
+```
+$ cargo bench
+   Compiling crc v1.3.0 (file:///Users/hiroki.noda/dev/rust/crc-rs)
+warning: field is never used: `poly`, #[warn(dead_code)] on by default
+  --> src/crc32.rs:17:5
+   |
+17 |     poly: u32
+   |     ^^^^^^^^^
+
+warning: field is never used: `poly`, #[warn(dead_code)] on by default
+  --> src/crc32.rs:17:5
+   |
+17 |     poly: u32
+   |     ^^^^^^^^^
+
+    Finished release [optimized] target(s) in 0.93 secs
+     Running target/release/deps/bench-4ba45ff23227a84d
+
+running 5 tests
+test bench_crc32_castagnoli_update_megabytes ... bench:   2,918,740 ns/iter (+/- 825,319)
+test bench_crc32_ieee_make_table             ... bench:       1,566 ns/iter (+/- 410)
+test bench_crc32_ieee_update_megabytes       ... bench:   2,877,057 ns/iter (+/- 629,496)
+test bench_crc64_make_table                  ... bench:       1,461 ns/iter (+/- 722)
+test bench_crc64_update_megabytes            ... bench:   2,948,650 ns/iter (+/- 701,852)
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 5 measured
+
+$ RUSTFLAGS="-C target-feature=+sse4.2" cargo bench --features=simd-accel
+   Compiling lazy_static v0.2.2
+   Compiling crc v1.3.0 (file:///Users/hiroki.noda/dev/rust/crc-rs)
+    Finished release [optimized] target(s) in 1.19 secs
+     Running target/release/deps/bench-ea8b558d9102b890
+
+running 5 tests
+test bench_crc32_castagnoli_update_megabytes ... bench:     553,989 ns/iter (+/- 46,970)
+test bench_crc32_ieee_make_table             ... bench:       1,369 ns/iter (+/- 278)
+test bench_crc32_ieee_update_megabytes       ... bench:   2,540,502 ns/iter (+/- 191,396)
+test bench_crc64_make_table                  ... bench:       1,411 ns/iter (+/- 319)
+test bench_crc64_update_megabytes            ... bench:   2,534,612 ns/iter (+/- 134,457)
+     Running target/release/deps/crc-af46900232260aeb
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured
 ```
 
 ## License
