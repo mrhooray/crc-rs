@@ -65,7 +65,7 @@ fn update_specialized_sse42(mut value: u32, bytes: &[u8]) -> u32 {
             value = mm_crc32_u8(value, bytes[e]);
         }
 
-        // Process 4 bytes at a time.
+        // Process 8 bytes at a time.
         while i + 8 <= bytes.len() {
             let v = [  bytes[i], bytes[i+1], bytes[i+2], bytes[i+3],
                      bytes[i+4], bytes[i+5], bytes[i+6], bytes[i+7]];
