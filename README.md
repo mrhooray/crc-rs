@@ -122,17 +122,19 @@ test bench_crc64_update_megabytes            ... bench:   2,948,650 ns/iter (+/-
 test result: ok. 0 passed; 0 failed; 0 ignored; 5 measured
 
 $ RUSTFLAGS="-C target-feature=+sse4.2" cargo bench --features=simd-accel
-   Compiling lazy_static v0.2.2
    Compiling crc v1.3.0 (file:///Users/hiroki.noda/dev/rust/crc-rs)
-    Finished release [optimized] target(s) in 1.19 secs
+    Finished release [optimized] target(s) in 1.1 secs
      Running target/release/deps/bench-ea8b558d9102b890
 
 running 5 tests
-test bench_crc32_castagnoli_update_megabytes ... bench:     553,989 ns/iter (+/- 46,970)
-test bench_crc32_ieee_make_table             ... bench:       1,369 ns/iter (+/- 278)
-test bench_crc32_ieee_update_megabytes       ... bench:   2,540,502 ns/iter (+/- 191,396)
-test bench_crc64_make_table                  ... bench:       1,411 ns/iter (+/- 319)
-test bench_crc64_update_megabytes            ... bench:   2,534,612 ns/iter (+/- 134,457)
+test bench_crc32_castagnoli_update_megabytes ... bench:     431,005 ns/iter (+/- 35,214)
+test bench_crc32_ieee_make_table             ... bench:       1,370 ns/iter (+/- 358)
+test bench_crc32_ieee_update_megabytes       ... bench:   2,529,986 ns/iter (+/- 161,018)
+test bench_crc64_make_table                  ... bench:       1,408 ns/iter (+/- 144)
+test bench_crc64_update_megabytes            ... bench:   2,532,715 ns/iter (+/- 231,801)
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 5 measured
+
      Running target/release/deps/crc-af46900232260aeb
 
 running 0 tests
