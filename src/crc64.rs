@@ -9,7 +9,7 @@ lazy_static! {
 pub struct Digest {
     table: [u64; 256],
     initial: u64,
-    value: u64
+    value: u64,
 }
 
 pub trait Hasher64 {
@@ -55,7 +55,7 @@ impl Digest {
         Digest {
             table: make_table(poly),
             initial: 0,
-            value: 0
+            value: 0,
         }
     }
 
@@ -63,7 +63,7 @@ impl Digest {
         Digest {
             table: make_table(poly),
             initial: initial,
-            value: initial
+            value: initial,
         }
     }
 }

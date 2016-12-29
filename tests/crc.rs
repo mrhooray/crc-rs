@@ -10,12 +10,14 @@ mod crc32 {
 
     #[test]
     fn checksum_castagnoli() {
-        assert_eq!(crc32::checksum_castagnoli(b"123456789"), CASTAGNOLI_CHECK_VALUE)
+        assert_eq!(crc32::checksum_castagnoli(b"123456789"),
+                   CASTAGNOLI_CHECK_VALUE)
     }
 
     #[test]
     fn checksum_castagnoli_long_bytes() {
-        assert_eq!(crc32::checksum_castagnoli(b"1234567890ABCDEF"), LONG_CASTAGNOLI_CHECK_VALUE)
+        assert_eq!(crc32::checksum_castagnoli(b"1234567890ABCDEF"),
+                   LONG_CASTAGNOLI_CHECK_VALUE)
     }
 
     #[test]
