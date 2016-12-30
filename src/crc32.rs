@@ -1,3 +1,5 @@
+use std::hash::Hasher;
+
 pub const CASTAGNOLI: u32 = 0x82f63b78;
 pub const IEEE: u32 = 0xedb88320;
 pub const KOOPMAN: u32 = 0xeb31d82e;
@@ -83,5 +85,16 @@ impl Hasher32 for Digest {
     }
     fn sum32(&self) -> u32 {
         self.value
+    }
+}
+
+/// Implementation of std::hash::Hasher so that types which #[derive(Hash)] can hash with Digest.
+impl Hasher for Digest {
+    fn write(&mut self, bytes: &[u8]) {
+        Hasher32::write(self, bytes);
+    }
+
+    fn finish(&self) -> u64 {
+        self.sum32() as u64
     }
 }
