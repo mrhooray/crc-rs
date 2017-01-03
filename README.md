@@ -5,26 +5,33 @@
 * [Documentation](http://mrhooray.github.io/crc-rs/crc/index.html)
 * [Usage](#usage)
 * [Benchmark](#benchmark)
+* [accelerate by crc32 intruction](#accelerate by crc32 intruction)
 * [License](#license)
 
-##Usage
+## Usage
+
 Add `crc` to `Cargo.toml`
+
 ```toml
 [dependencies]
 crc = "^1.0.0"
 ```
+
 or
+
 ```toml
 [dependencies.crc]
 git = "https://github.com/mrhooray/crc-rs"
 ```
 
 Add this to crate root
+
 ```rust
 extern crate crc;
 ```
 
 ### Compute CRC32
+
 ```rust
 use crc::{crc32, Hasher32};
 
@@ -45,6 +52,7 @@ assert_eq!(digest.sum32(), 0xcbf43926);
 ```
 
 ### Compute CRC64
+
 ```rust
 use crc::{crc64, Hasher64};
 
@@ -62,10 +70,12 @@ digest.write(b"123456789");
 assert_eq!(digest.sum64(), 0x995dc9bbdf1939fa);
 ```
 
-##Benchmark
+## Benchmark
+
 > Bencher is currently not available in Rust stable releases.
 
 `cargo bench` with 2.3 GHz Intel Core i7 results ~430MB/s throughput. [Comparison](http://create.stephan-brumme.com/crc32/)
+
 ```
 cargo bench
      Running target/release/bench-5c82e94dab3e9c79
@@ -79,5 +89,60 @@ test bench_crc64_update_megabytes ... bench:   2322472 ns/iter (+/- 92870)
 test result: ok. 0 passed; 0 failed; 0 ignored; 4 measured
 ```
 
-##License
+## accelerate by crc32 intruction
+
+We can use intel crc32 instruction by `RUSTFLAGS="-C target-feature=+sse4.2" cargo build --features=simd-accel`.
+
+`cargo bench` with 2 GHz Intel Core i7 shows,
+
+```
+$ cargo bench
+   Compiling crc v1.3.0 (file:///Users/hiroki.noda/dev/rust/crc-rs)
+warning: field is never used: `poly`, #[warn(dead_code)] on by default
+  --> src/crc32.rs:17:5
+   |
+17 |     poly: u32
+   |     ^^^^^^^^^
+
+warning: field is never used: `poly`, #[warn(dead_code)] on by default
+  --> src/crc32.rs:17:5
+   |
+17 |     poly: u32
+   |     ^^^^^^^^^
+
+    Finished release [optimized] target(s) in 0.93 secs
+     Running target/release/deps/bench-4ba45ff23227a84d
+
+running 5 tests
+test bench_crc32_castagnoli_update_megabytes ... bench:   2,918,740 ns/iter (+/- 825,319)
+test bench_crc32_ieee_make_table             ... bench:       1,566 ns/iter (+/- 410)
+test bench_crc32_ieee_update_megabytes       ... bench:   2,877,057 ns/iter (+/- 629,496)
+test bench_crc64_make_table                  ... bench:       1,461 ns/iter (+/- 722)
+test bench_crc64_update_megabytes            ... bench:   2,948,650 ns/iter (+/- 701,852)
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 5 measured
+
+$ RUSTFLAGS="-C target-feature=+sse4.2" cargo bench --features=simd-accel
+   Compiling crc v1.3.0 (file:///Users/hiroki.noda/dev/rust/crc-rs)
+    Finished release [optimized] target(s) in 1.1 secs
+     Running target/release/deps/bench-ea8b558d9102b890
+
+running 5 tests
+test bench_crc32_castagnoli_update_megabytes ... bench:     431,005 ns/iter (+/- 35,214)
+test bench_crc32_ieee_make_table             ... bench:       1,370 ns/iter (+/- 358)
+test bench_crc32_ieee_update_megabytes       ... bench:   2,529,986 ns/iter (+/- 161,018)
+test bench_crc64_make_table                  ... bench:       1,408 ns/iter (+/- 144)
+test bench_crc64_update_megabytes            ... bench:   2,532,715 ns/iter (+/- 231,801)
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 5 measured
+
+     Running target/release/deps/crc-af46900232260aeb
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured
+```
+
+## License
+
 MIT
