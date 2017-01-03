@@ -5,6 +5,7 @@
 * [Documentation](http://mrhooray.github.io/crc-rs/crc/index.html)
 * [Usage](#usage)
 * [Benchmark](#benchmark)
+* [accelerate by crc32 intruction](#accelerate by crc32 intruction)
 * [License](#license)
 
 ## Usage
@@ -88,7 +89,7 @@ test bench_crc64_update_megabytes ... bench:   2322472 ns/iter (+/- 92870)
 test result: ok. 0 passed; 0 failed; 0 ignored; 4 measured
 ```
 
-## accelalate by x86intrin
+## accelerate by crc32 intruction
 
 We can use intel crc32 instruction by `RUSTFLAGS="-C target-feature=+sse4.2" cargo build --features=simd-accel`.
 
