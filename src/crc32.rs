@@ -1,5 +1,6 @@
 use std::hash::Hasher;
-use std::mem;
+
+use byteorder::{ByteOrder, NativeEndian};
 
 pub const CASTAGNOLI: u32 = 0x82f63b78;
 pub const IEEE: u32 = 0xedb88320;
@@ -53,10 +54,8 @@ pub fn update(mut value: u32, table: &[[u32; 256]; 8], bytes: &[u8]) -> u32 {
     value = !value;
     let mut i = 0;
     while bytes.len() - i >= 8 {
-        let v1 = [bytes[i], bytes[i+1], bytes[i+2], bytes[i+3]];
-        let v2 = [bytes[i+4], bytes[i+5], bytes[i+6], bytes[i+7]];
-        let one = unsafe { mem::transmute::<[u8; 4], u32>(v1) } ^ value;
-        let two = unsafe { mem::transmute::<[u8; 4], u32>(v2) };
+        let one: u32 = NativeEndian::read_u32(&bytes[i..i+4]) ^ value;
+        let two: u32 = NativeEndian::read_u32(&bytes[i+4..i+8]);
         value =
             table[0][(two >> 24) as usize] ^
             table[1][((two >> 16) & 0xFF) as usize] ^

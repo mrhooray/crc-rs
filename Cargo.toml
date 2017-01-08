@@ -11,3 +11,4 @@ license = "MIT"
 
 [dependencies]
 lazy_static = "0.2"
+byteorder = "1"

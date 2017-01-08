@@ -40,6 +40,7 @@
 //! assert_eq!(digest.sum64(), 0x995dc9bbdf1939fa);
 //! ```
 
+extern crate byteorder;
 #[macro_use]
 extern crate lazy_static;
 
