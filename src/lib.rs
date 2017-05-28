@@ -40,6 +40,8 @@
 //! assert_eq!(digest.sum64(), 0x995dc9bbdf1939fa);
 //! ```
 
+#![cfg_attr(feature = "no_std", no_std)]
+
 #[macro_use]
 extern crate lazy_static;
 
