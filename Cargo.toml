@@ -11,3 +11,6 @@ license = "MIT"
 
 [dependencies]
 lazy_static = "0.2"
+
+[features]
+no_std = ["lazy_static/spin_no_std"]

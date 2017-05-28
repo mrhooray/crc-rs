@@ -1,3 +1,6 @@
+#[cfg(feature = "no_std")]
+use core::hash::Hasher;
+#[cfg(not(feature = "no_std"))]
 use std::hash::Hasher;
 
 pub const CASTAGNOLI: u32 = 0x82f63b78;

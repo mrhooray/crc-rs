@@ -1,3 +1,6 @@
+#[cfg(feature = "no_std")]
+use core::hash::Hasher;
+#[cfg(not(feature = "no_std"))]
 use std::hash::Hasher;
 
 pub const ECMA: u64 = 0xc96c5795d7870f42;
