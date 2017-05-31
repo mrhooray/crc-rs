@@ -40,10 +40,10 @@
 //! assert_eq!(digest.sum64(), 0x995dc9bbdf1939fa);
 //! ```
 
-#![cfg_attr(feature = "no_std", no_std)]
+#![cfg_attr(not(feature = "std"), no_std)]
 
 #[macro_use]
-extern crate lazy_static;
+extern crate build_const;
 
 pub mod crc32;
 pub mod crc64;
