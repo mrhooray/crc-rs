@@ -1,15 +1,17 @@
-#[cfg(feature = "no_std")]
-use core::hash::Hasher;
-#[cfg(not(feature = "no_std"))]
+#[cfg(feature = "std")]
 use std::hash::Hasher;
+#[cfg(not(feature = "std"))]
+use core::hash::Hasher;
 
-pub const ECMA: u64 = 0xc96c5795d7870f42;
-pub const ISO: u64 = 0xd800000000000000;
+//pub const ECMA: u64 = 0xc96c5795d7870f42;
+//pub const ISO: u64 = 0xd800000000000000;
 
-lazy_static! {
-    pub static ref ECMA_TABLE: [u64; 256] = make_table(ECMA);
-    pub static ref ISO_TABLE: [u64; 256] = make_table(ISO);
-}
+//lazy_static! {
+//    pub static ref ECMA_TABLE: [u64; 256] = make_table(ECMA);
+//    pub static ref ISO_TABLE: [u64; 256] = make_table(ISO);
+//}
+
+build_const!("crc64_constants");
 
 pub struct Digest {
     table: [u64; 256],
