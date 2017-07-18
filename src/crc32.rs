@@ -1,14 +1,9 @@
+#[cfg(feature = "std")]
 use std::hash::Hasher;
+#[cfg(not(feature = "std"))]
+use core::hash::Hasher;
 
-pub const CASTAGNOLI: u32 = 0x82f63b78;
-pub const IEEE: u32 = 0xedb88320;
-pub const KOOPMAN: u32 = 0xeb31d82e;
-
-lazy_static! {
-    pub static ref IEEE_TABLE: [u32; 256] = make_table(IEEE);
-    pub static ref CASTAGNOLI_TABLE: [u32; 256] = make_table(CASTAGNOLI);
-    pub static ref KOOPMAN_TABLE: [u32; 256] = make_table(KOOPMAN);
-}
+build_const!("crc32_constants");
 
 pub struct Digest {
     table: [u32; 256],

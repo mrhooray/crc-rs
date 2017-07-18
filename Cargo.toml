@@ -10,4 +10,14 @@ documentation = "http://mrhooray.github.io/crc-rs/crc/index.html"
 license = "MIT"
 
 [dependencies]
-lazy_static = "0.2"
+
+[dependencies.build_const]
+version = "0.2"
+default-features = false
+
+[build-dependencies]
+build_const = "0.2"
+
+[features]
+std = []
+default = ["std"]
