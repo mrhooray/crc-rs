@@ -44,6 +44,7 @@
 
 #[macro_use]
 extern crate build_const;
+extern crate util;
 
 pub mod crc32;
 pub mod crc64;
