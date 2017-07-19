@@ -62,7 +62,7 @@ digest.write(b"123456789");
 assert_eq!(digest.sum64(), 0x995dc9bbdf1939fa);
 ```
 
-##Benchmark
+## Benchmark
 > Bencher is currently not available in Rust stable releases.
 
 `cargo bench` with 2.3 GHz Intel Core i7 results ~430MB/s throughput. [Comparison](http://create.stephan-brumme.com/crc32/)
@@ -79,5 +79,5 @@ test bench_crc64_update_megabytes ... bench:   2322472 ns/iter (+/- 92870)
 test result: ok. 0 passed; 0 failed; 0 ignored; 4 measured
 ```
 
-##License
+## License
 MIT
