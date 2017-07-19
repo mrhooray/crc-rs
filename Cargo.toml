@@ -9,12 +9,11 @@ repository = "https://github.com/mrhooray/crc-rs.git"
 license = "MIT"
 
 [dependencies]
-
-[dependencies.build_const]
-version = "0.2"
-default-features = false
+util = { path = "./src/util" }
+build_const = { version = "0.2", default-features = false }
 
 [build-dependencies]
+util = { path = "./src/util" }
 build_const = "0.2"
 
 [features]

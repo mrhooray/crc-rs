@@ -3,6 +3,8 @@ use std::hash::Hasher;
 #[cfg(not(feature = "std"))]
 use core::hash::Hasher;
 
+pub use util::make_table_crc32 as make_table;
+
 build_const!("crc32_constants");
 
 pub struct Digest {
@@ -15,22 +17,6 @@ pub trait Hasher32 {
     fn reset(&mut self);
     fn write(&mut self, bytes: &[u8]);
     fn sum32(&self) -> u32;
-}
-
-pub fn make_table(poly: u32) -> [u32; 256] {
-    let mut table = [0u32; 256];
-    for i in 0..256 {
-        let mut value = i as u32;
-        for _ in 0..8 {
-            value = if (value & 1) == 1 {
-                (value >> 1) ^ poly
-            } else {
-                value >> 1
-            }
-        }
-        table[i] = value;
-    }
-    table
 }
 
 pub fn update(mut value: u32, table: &[u32; 256], bytes: &[u8]) -> u32 {
