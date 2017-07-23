@@ -6,6 +6,7 @@ mod crc32 {
     const CASTAGNOLI_CHECK_VALUE: u32 = 0xe3069283;
     const IEEE_CHECK_VALUE: u32 = 0xcbf43926;
     const KOOPMAN_CHECK_VALUE: u32 = 0x2d3dd0ae;
+    const LINUX_CHECK_VALUE: u32 = 0xe8c7bb34;
 
     #[test]
     fn checksum_castagnoli() {
@@ -20,6 +21,11 @@ mod crc32 {
     #[test]
     fn checksum_koopman() {
         assert_eq!(crc32::checksum_koopman(b"123456789"), KOOPMAN_CHECK_VALUE)
+    }
+
+    #[test]
+    pub fn checksum_linux () {
+        assert_eq! (crc32::checksum_linux (b"123456789"), LINUX_CHECK_VALUE)
     }
 
     #[test]
