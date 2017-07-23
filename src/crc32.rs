@@ -39,6 +39,10 @@ pub fn checksum_koopman(bytes: &[u8]) -> u32 {
     return update(0, &KOOPMAN_TABLE, bytes);
 }
 
+pub fn checksum_linux(bytes: &[u8]) -> u32 {
+    return ! update(1, &CASTAGNOLI_TABLE, bytes);
+}
+
 impl Digest {
     pub fn new(poly: u32) -> Digest {
         Digest {
