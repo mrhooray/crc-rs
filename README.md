@@ -2,7 +2,7 @@
 > Rust implementation of CRC(32, 64) with support of various standards
 
 * [Crate](https://crates.io/crates/crc)
-* [Documentation](http://mrhooray.github.io/crc-rs/crc/index.html)
+* [Documentation](https://docs.rs/crc/)
 * [Usage](#usage)
 * [Benchmark](#benchmark)
 * [License](#license)
