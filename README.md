@@ -7,7 +7,7 @@
 * [Benchmark](#benchmark)
 * [License](#license)
 
-##Usage
+## Usage
 Add `crc` to `Cargo.toml`
 ```toml
 [dependencies]
