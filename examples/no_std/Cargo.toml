@@ -1,0 +1,7 @@
+[package]
+name = "no_std"
+version = "0.1.0"
+authors = ["mrhooray <ruihu.pvt@gmail.com>"]
+
+[dependencies]
+crc = { path = "../../", default-features = false }
