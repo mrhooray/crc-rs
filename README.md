@@ -11,7 +11,7 @@
 Add `crc` to `Cargo.toml`
 ```toml
 [dependencies]
-crc = "^1.0.0"
+crc = "1.5.0"
 ```
 or
 ```toml
