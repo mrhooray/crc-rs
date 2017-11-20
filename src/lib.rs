@@ -44,10 +44,10 @@
 
 #[macro_use]
 extern crate build_const;
-extern crate crc_core;
 
 pub mod crc32;
 pub mod crc64;
+mod util;
 
 pub use self::crc32::Hasher32;
 pub use self::crc64::Hasher64;

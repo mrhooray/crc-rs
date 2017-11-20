@@ -9,11 +9,9 @@ repository = "https://github.com/mrhooray/crc-rs.git"
 license = "MIT"
 
 [dependencies]
-crc-core = "0.1"
 build_const = { version = "0.2", default-features = false }
 
 [build-dependencies]
-crc-core = "0.1"
 build_const = "0.2"
 
 [features]
