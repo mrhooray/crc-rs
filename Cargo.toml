@@ -1,12 +1,12 @@
 [package]
 name = "crc"
 version = "1.5.0"
-authors = ["mrhooray <code@mrhooray.com>"]
+authors = ["Rui Hu <code@mrhooray.com>"]
 description = "Rust implementation of CRC(32, 64) with support of various standards"
 keywords = ["crc", "crc32", "crc64", "hash", "checksum"]
 readme = "README.md"
 repository = "https://github.com/mrhooray/crc-rs.git"
-license = "MIT"
+license = "MIT OR Apache-2.0"
 
 [dependencies]
 build_const = { version = "0.2", default-features = false }
