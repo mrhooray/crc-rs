@@ -3,7 +3,7 @@ use std::hash::Hasher;
 #[cfg(not(feature = "std"))]
 use core::hash::Hasher;
 
-pub use crc_core::make_table_crc32 as make_table;
+pub use util::make_table_crc32 as make_table;
 
 build_const!("crc32_constants");
 
