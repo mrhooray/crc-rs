@@ -5,7 +5,7 @@ use core::hash::Hasher;
 
 pub use util::make_table_crc32 as make_table;
 
-build_const!("crc32_constants");
+include!(concat!(env!("OUT_DIR"), "/crc32_constants.rs"));
 
 pub struct Digest {
     table: [u32; 256],
