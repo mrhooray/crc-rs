@@ -42,9 +42,6 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
-#[macro_use]
-extern crate build_const;
-
 pub mod crc32;
 pub mod crc64;
 mod util;
