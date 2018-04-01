@@ -1,5 +1,43 @@
 extern crate crc;
 
+mod crc16 {
+    use crc::{crc16, Hasher16};
+
+    const X25_CHECK_VALUE: u16 = 0x906e;
+    const USB_CHECK_VALUE: u16 = 0xb4c8;
+
+    #[test]
+    fn checksum_x25() {
+        assert_eq!(crc16::checksum_x25(b"123456789"), X25_CHECK_VALUE)
+    }
+
+    #[test]
+    fn checksum_usb() {
+        assert_eq!(crc16::checksum_usb(b"123456789"), USB_CHECK_VALUE)
+    }
+
+    #[test]
+    fn digest_x25() {
+        verify_checksum(crc16::X25, X25_CHECK_VALUE);
+    }
+
+    #[test]
+    fn digest_usb() {
+        verify_checksum(crc16::USB, USB_CHECK_VALUE);
+    }
+
+    fn verify_checksum(poly: u16, check_value: u16) {
+        let mut digest = crc16::Digest::new(poly);
+        digest.write(b"123456789");
+        assert_eq!(digest.sum16(), check_value);
+        digest.reset();
+        for i in 1..10 {
+            digest.write(i.to_string().as_bytes());
+        }
+        assert_eq!(digest.sum16(), check_value);
+    }
+}
+
 mod crc32 {
     use crc::{crc32, Hasher32};
 
