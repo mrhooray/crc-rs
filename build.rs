@@ -22,15 +22,15 @@ fn create_constants() {
         .finish_dependencies();
     let CASTAGNOLI: u32 = 0x82f63b78;
     crc32.add_value("CASTAGNOLI", "u32", CASTAGNOLI);
-    crc32.add_array("CASTAGNOLI_TABLE", "u32", &make_table_crc32(CASTAGNOLI));
+    crc32.add_array("CASTAGNOLI_TABLE", "u32", &make_table_crc32(CASTAGNOLI, true));
 
     let IEEE: u32 = 0xedb88320;
     crc32.add_value("IEEE", "u32", IEEE);
-    crc32.add_array("IEEE_TABLE", "u32", &make_table_crc32(IEEE));
+    crc32.add_array("IEEE_TABLE", "u32", &make_table_crc32(IEEE, true));
 
     let KOOPMAN: u32 = 0xeb31d82e;
     crc32.add_value("KOOPMAN", "u32", KOOPMAN);
-    crc32.add_array("KOOPMAN_TABLE", "u32", &make_table_crc32(KOOPMAN));
+    crc32.add_array("KOOPMAN_TABLE", "u32", &make_table_crc32(KOOPMAN, true));
 
     crc32.finish();
 
