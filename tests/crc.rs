@@ -76,7 +76,7 @@ mod crc32 {
     }
 
     fn verify_checksum(poly: u32, check_value: u32) {
-        let mut digest = crc32::Digest::new(poly);
+        let mut digest = crc32::Digest::new_with_initial_and_final(poly, 0xFFFFFFFF, true, 0xFFFFFFFF);
         digest.write(b"123456789");
         assert_eq!(digest.sum32(), check_value);
         digest.reset();

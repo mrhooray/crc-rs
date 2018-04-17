@@ -20,15 +20,15 @@ fn create_constants() {
     let mut crc32 = build_const::ConstWriter::for_build("crc32_constants")
         .unwrap()
         .finish_dependencies();
-    let CASTAGNOLI: u32 = 0x82f63b78;
+    let CASTAGNOLI: u32 = 0x1EDC6F41;
     crc32.add_value("CASTAGNOLI", "u32", CASTAGNOLI);
     crc32.add_array("CASTAGNOLI_TABLE", "u32", &make_table_crc32(CASTAGNOLI, true));
 
-    let IEEE: u32 = 0xedb88320;
+    let IEEE: u32 = 0x04C11DB7;
     crc32.add_value("IEEE", "u32", IEEE);
     crc32.add_array("IEEE_TABLE", "u32", &make_table_crc32(IEEE, true));
 
-    let KOOPMAN: u32 = 0xeb31d82e;
+    let KOOPMAN: u32 = 0x741B8CD7;
     crc32.add_value("KOOPMAN", "u32", KOOPMAN);
     crc32.add_array("KOOPMAN_TABLE", "u32", &make_table_crc32(KOOPMAN, true));
 
