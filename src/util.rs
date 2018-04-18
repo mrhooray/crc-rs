@@ -1,4 +1,4 @@
-/// Builds a CRC64 table using the reverse, reflected method
+/// Builds a CRC16 table using the reverse, reflected method
 pub fn make_table_crc16(poly: u16) -> [u16; 256] {
     let mut table = [0u16; 256];
     for i in 0..256 {
@@ -16,6 +16,7 @@ pub fn make_table_crc16(poly: u16) -> [u16; 256] {
 }
 
 /// Builds a CRC32 table using the standard CRC method
+/// If reflect==true, flip the individual byte bitwise, then flip the 32bit table value bitwise
 pub fn make_table_crc32(poly: u32, rfl: bool) -> [u32; 256] {
     let mut table = [0u32; 256];
     let mut byte: u32;
@@ -25,10 +26,10 @@ pub fn make_table_crc32(poly: u32, rfl: bool) -> [u32; 256] {
 
         if true == rfl { byte = reflect_byte(i); }else{ byte = i; }
         
-        //Shift the cuttent table value "i" to the top byte in the long
+        // Shift the cuttent table value "i" to the top byte in the long
         let mut value: u32 = byte << 24;   //24=32 bit - 8
         
-        //Step through all the bits in the byte
+        // Step through all the bits in the byte
         for _ in 0..8 {
             if (value & top_bit) != 0 {
                 value = (value << 1) ^ poly
@@ -90,22 +91,3 @@ pub fn reflect_byte(input: u32) -> u32
     }
     reflection
 }
-
-/*
-use std::ops::{Shl, Shr, BitAnd, BitOr, Sub};
-
-/// Reflects a value of a 8 bit number
-pub fn reflect_byte<T>(mut value: T, bits: u8) -> T::Output 
-    where T: Shl<Output = T> + Shr<Output = T> + Sub<Output=T> + BitAnd<Output=T> + BitOr
-{
-   	let mut reflection: T = 0x00;
-
-    for i in 0..bits {
-        if (value & 0x01) == 1{
-            reflection |= 1 << ((bits-1) -i)
-        }
-        value = value >> 1;
-    }
-    reflection
-}
-*/

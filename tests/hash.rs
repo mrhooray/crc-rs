@@ -10,9 +10,9 @@ mod hasher {
     #[test]
     fn checksum_hashcrc32() {
         let person = Person("John Smith", 34);
-        let mut hasher = crc32::Digest::new_with_initial_and_final(crc32::IEEE, 0xFFFFFFFF, true, 0xFFFFFFFF);
+        let mut hasher = crc32::Digest::new(crc32::IEEE);
         person.hash(&mut hasher);
-        assert_eq!(467823795u64, hasher.finish()); //0x1BE26CB3  //0x6037AADC
+        assert_eq!(467823795u64, hasher.finish());
     }
 
     #[test]
