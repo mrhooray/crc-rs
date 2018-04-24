@@ -6,6 +6,7 @@ description = "Rust implementation of CRC(32, 64) with support of various standa
 keywords = ["crc", "crc32", "crc64", "hash", "checksum"]
 readme = "README.md"
 repository = "https://github.com/mrhooray/crc-rs.git"
+documentation = "https://docs.rs/crc"
 license = "MIT OR Apache-2.0"
 
 [build-dependencies]
