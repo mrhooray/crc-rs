@@ -1,5 +1,5 @@
 //! # crc
-//! Rust implementation of CRC(32, 64)
+//! Rust implementation of CRC(16, 32, 64)
 //!
 //! ## Usage
 //! ### Compute CRC16
