@@ -1,7 +1,7 @@
 extern crate crc;
 
 mod crc16 {
-    use crc::{crc16, Hasher16};
+    use crc::{Hasher16, crc16};
 
     const X25_CHECK_VALUE: u16 = 0x906e;
     const USB_CHECK_VALUE: u16 = 0xb4c8;
@@ -39,7 +39,7 @@ mod crc16 {
 }
 
 mod crc32 {
-    use crc::{crc32, Hasher32};
+    use crc::{Hasher32, crc32};
 
     const CASTAGNOLI_CHECK_VALUE: u32 = 0xe3069283;
     const IEEE_CHECK_VALUE: u32 = 0xcbf43926;
@@ -47,7 +47,10 @@ mod crc32 {
 
     #[test]
     fn checksum_castagnoli() {
-        assert_eq!(crc32::checksum_castagnoli(b"123456789"), CASTAGNOLI_CHECK_VALUE)
+        assert_eq!(
+            crc32::checksum_castagnoli(b"123456789"),
+            CASTAGNOLI_CHECK_VALUE
+        )
     }
 
     #[test]
@@ -88,7 +91,7 @@ mod crc32 {
 }
 
 mod crc64 {
-    use crc::{crc64, Hasher64};
+    use crc::{Hasher64, crc64};
 
     const ECMA_CHECK_VALUE: u64 = 0x995dc9bbdf1939fa;
     const ISO_CHECK_VALUE: u64 = 0xb90956c775a41001;

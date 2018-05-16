@@ -38,7 +38,7 @@
 //! let mut digest = crc32::Digest::new_with_initial(crc32::IEEE, 0xFFFFFFFF);
 //! digest.write(b"123456789");
 //! assert_eq!(digest.sum32(), 0x340BC6D9);
-//! 
+//!
 //! // with initial, reflect, and XOR
 //! let mut digest = crc32::Digest::new_with_initial_and_final(crc32::IEEE, 0xFFFFFFFF, true, 0xFFFFFFFF);
 //! digest.write(b"123456789");

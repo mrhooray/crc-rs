@@ -1,7 +1,7 @@
-#[cfg(feature = "std")]
-use std::hash::Hasher;
 #[cfg(not(feature = "std"))]
 use core::hash::Hasher;
+#[cfg(feature = "std")]
+use std::hash::Hasher;
 
 pub use util::make_table_crc16 as make_table;
 
@@ -10,7 +10,7 @@ include!(concat!(env!("OUT_DIR"), "/crc16_constants.rs"));
 pub struct Digest {
     table: [u16; 256],
     initial: u16,
-    value: u16
+    value: u16,
 }
 
 pub trait Hasher16 {
@@ -40,7 +40,7 @@ impl Digest {
         Digest {
             table: make_table(poly),
             initial: 0,
-            value: 0
+            value: 0,
         }
     }
 
@@ -48,7 +48,7 @@ impl Digest {
         Digest {
             table: make_table(poly),
             initial: initial,
-            value: initial
+            value: initial,
         }
     }
 }

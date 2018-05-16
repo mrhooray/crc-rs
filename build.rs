@@ -22,7 +22,11 @@ fn create_constants() {
         .finish_dependencies();
     let CASTAGNOLI: u32 = 0x1EDC6F41;
     crc32.add_value("CASTAGNOLI", "u32", CASTAGNOLI);
-    crc32.add_array("CASTAGNOLI_TABLE", "u32", &make_table_crc32(CASTAGNOLI, true));
+    crc32.add_array(
+        "CASTAGNOLI_TABLE",
+        "u32",
+        &make_table_crc32(CASTAGNOLI, true),
+    );
 
     let IEEE: u32 = 0x04C11DB7;
     crc32.add_value("IEEE", "u32", IEEE);

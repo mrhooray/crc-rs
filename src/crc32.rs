@@ -1,7 +1,7 @@
-#[cfg(feature = "std")]
-use std::hash::Hasher;
 #[cfg(not(feature = "std"))]
 use core::hash::Hasher;
+#[cfg(feature = "std")]
+use std::hash::Hasher;
 
 pub use util::make_table_crc32 as make_table;
 
@@ -22,23 +22,21 @@ pub trait Hasher32 {
 }
 
 /// Caclulate the CRC of the byte string of values in correct, non-reflected order.
-/// 
+///
 /// Updates the current CRC *value* using the CRC table *table* using the byte array *bytes*.
 /// The parameter *rfl* will reflect the data.  *rfl=false* will calculate the CRC MSB first.
 /// *rfl=true* will calculate the CRC LSB first.
-/// 
+///
 /// # Examples
-/// 
+///
 /// call using Digest::write(&bytes)
 pub fn update(mut value: u32, table: &[u32; 256], bytes: &[u8], rfl: bool) -> u32 {
     let shift = 24;
-    
-    for &i in bytes.iter() {
 
+    for &i in bytes.iter() {
         if true == rfl {
             value = table[((value ^ (i as u32)) & 0xFF) as usize] ^ (value >> 8)
-        }
-        else{
+        } else {
             value = table[(((value >> shift) as u8) ^ i) as usize] ^ (value << 8);
         }
     }
@@ -62,14 +60,13 @@ pub fn checksum_koopman(bytes: &[u8]) -> u32 {
 }
 
 impl Digest {
-
     /// Creates a new table from the supplied polynomial and reflect parameter
-    /// 
+    ///
     /// *Note* new(crc32::IEEE) no longer produces the correct table.  
     /// See the implimentation of *new_with_initial_and_final()*
-    /// 
+    ///
     /// # Example
-    /// 
+    ///
     /// ```rust
     /// use crc::{crc32, Hasher32};
     /// let mut digest = crc32::Digest::new(crc32::IEEE);
@@ -87,9 +84,9 @@ impl Digest {
     }
 
     /// Creates a new table from the supplied polynomial, reflect parameter, and an initial value
-    /// 
+    ///
     /// # Example
-    /// 
+    ///
     /// ```rust
     /// use crc::{crc32, Hasher32};
     /// let mut digest = crc32::Digest::new_with_initial(crc32::IEEE, 0xFFFFFFFF);
@@ -105,21 +102,26 @@ impl Digest {
             final_xor: 0,
         }
     }
-    
+
     /// Creates a new table from the supplied polynomial, reflect parameter, initial value, and final XOR value
-    /// 
+    ///
     /// This should be the dafault way to generate a custom CRC32.  See default values here: *http://crccalc.com/*
     /// The example will generate a standard CRC32 table.
-    /// 
+    ///
     /// # Example
-    /// 
+    ///
     /// ```rust
     /// use crc::{crc32, Hasher32};
     /// let mut digest = crc32::Digest::new_with_initial_and_final(crc32::IEEE, 0xFFFFFFFF, true, 0xFFFFFFFF);
     /// digest.write(b"123456789");
     /// assert_eq!(digest.sum32(), 0xcbf43926);
     /// ```
-    pub fn new_with_initial_and_final(poly: u32, initial: u32, reflect: bool, final_xor: u32) -> Digest {
+    pub fn new_with_initial_and_final(
+        poly: u32,
+        initial: u32,
+        reflect: bool,
+        final_xor: u32,
+    ) -> Digest {
         Digest {
             table: make_table(poly, reflect),
             initial: initial,
@@ -131,7 +133,6 @@ impl Digest {
 }
 
 impl Hasher32 for Digest {
-
     /// Resets the current CRC to the initial value
     fn reset(&mut self) {
         self.value = self.initial;

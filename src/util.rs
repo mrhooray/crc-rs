@@ -23,12 +23,15 @@ pub fn make_table_crc32(poly: u32, rfl: bool) -> [u32; 256] {
     let top_bit = 1u32 << 31; //31 is 32bit - 1
 
     for i in 0..256 {
+        if true == rfl {
+            byte = reflect_byte(i);
+        } else {
+            byte = i;
+        }
 
-        if true == rfl { byte = reflect_byte(i); }else{ byte = i; }
-        
         // Shift the cuttent table value "i" to the top byte in the long
-        let mut value: u32 = byte << 24;   //24=32 bit - 8
-        
+        let mut value: u32 = byte << 24; //24=32 bit - 8
+
         // Step through all the bits in the byte
         for _ in 0..8 {
             if (value & top_bit) != 0 {
@@ -38,8 +41,10 @@ pub fn make_table_crc32(poly: u32, rfl: bool) -> [u32; 256] {
             }
         }
 
-        if true == rfl { value = reflect_long(value);}
-        
+        if true == rfl {
+            value = reflect_long(value);
+        }
+
         table[i as usize] = value;
     }
     table
@@ -64,12 +69,12 @@ pub fn make_table_crc64(poly: u64) -> [u64; 256] {
 
 /// Reflects a value of a 32 bit number
 pub fn reflect_long(mut value: u32) -> u32 {
-   	let mut reflection: u32 = 0u32;
+    let mut reflection: u32 = 0u32;
     let bits = 32;
 
     for i in 0..bits {
-        if (value & 0x01) == 1{
-            reflection |= 1 << ((bits-1) -i)
+        if (value & 0x01) == 1 {
+            reflection |= 1 << ((bits - 1) - i)
         }
         value = value >> 1;
     }
@@ -77,15 +82,14 @@ pub fn reflect_long(mut value: u32) -> u32 {
 }
 
 /// Reflects the lease significant byte.
-pub fn reflect_byte(input: u32) -> u32
-{
-   	let mut reflection: u32 = 0u32;
+pub fn reflect_byte(input: u32) -> u32 {
+    let mut reflection: u32 = 0u32;
     let bits = 8;
     let mut value = input;
 
     for i in 0..bits {
-        if (value & 0x01) == 1{
-            reflection |= 1 << ((bits-1) -i)
+        if (value & 0x01) == 1 {
+            reflection |= 1 << ((bits - 1) - i)
         }
         value = value >> 1;
     }
