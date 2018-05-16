@@ -1,5 +1,5 @@
 # crc [![Build Status](https://travis-ci.org/mrhooray/crc-rs.svg?branch=master)](https://travis-ci.org/mrhooray/crc-rs)
-> Rust implementation of CRC(32, 64) with support of various standards
+> Rust implementation of CRC(16, 32, 64) with support of various standards
 
 * [Crate](https://crates.io/crates/crc)
 * [Documentation](https://docs.rs/crc/)
