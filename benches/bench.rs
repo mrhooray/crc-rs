@@ -21,7 +21,7 @@ fn benchmarks(c: &mut Criterion) {
 
     let table2 = crc64::make_table(crc64::ECMA);
     let bytes2 = Box::new([0u8; 991_000]); // 1MB overflows the stack
-    let bench_crc64_mb = Fun::new("CRC 64 001kB", move |b, _i| {
+    let bench_crc64_mb = Fun::new("CRC 64 991kB", move |b, _i| {
         b.iter(|| crc64::update(0, &table2, &*bytes2))
     });
 
