@@ -42,13 +42,13 @@ fn create_constants() {
         .unwrap()
         .finish_dependencies();
 
-    let ECMA: u64 = 0xc96c5795d7870f42;
+    let ECMA: u64 = 0x42F0E1EBA9EA3693;
     crc64.add_value("ECMA", "u64", ECMA);
-    crc64.add_array("ECMA_TABLE", "u64", &make_table_crc64(ECMA));
+    crc64.add_array("ECMA_TABLE", "u64", &make_table_crc64(ECMA, true));
 
-    let ISO: u64 = 0xd800000000000000;
+    let ISO: u64 = 0x000000000000001B;
     crc64.add_value("ISO", "u64", ISO);
-    crc64.add_array("ISO_TABLE", "u64", &make_table_crc64(ISO));
+    crc64.add_array("ISO_TABLE", "u64", &make_table_crc64(ISO, true));
 
     crc64.finish();
 }

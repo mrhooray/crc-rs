@@ -11,6 +11,8 @@ pub struct Digest {
     table: [u64; 256],
     initial: u64,
     value: u64,
+    reflect: bool,
+    final_xor: u64,
 }
 
 pub trait Hasher64 {
@@ -19,36 +21,61 @@ pub trait Hasher64 {
     fn sum64(&self) -> u64;
 }
 
-pub fn update(mut value: u64, table: &[u64; 256], bytes: &[u8]) -> u64 {
-    value = !value;
+pub fn update(mut value: u64, table: &[u64; 256], bytes: &[u8], rfl: bool) -> u64 {
+    let shift = 56;
+
     for &i in bytes.iter() {
-        value = table[((value as u8) ^ i) as usize] ^ (value >> 8)
+        if true == rfl {
+            value = table[((value ^ (i as u64)) & 0xFF) as usize] ^ (value >> 8)
+        } else {
+            value = table[(((value >> shift) as u8) ^ i) as usize] ^ (value << 8);
+        }
     }
-    !value
+
+    value
 }
 
 pub fn checksum_ecma(bytes: &[u8]) -> u64 {
-    return update(0, &ECMA_TABLE, bytes);
+    return update(0, &ECMA_TABLE, bytes, true) ^ 0xFFFFFFFFFFFFFFFF;
 }
 
 pub fn checksum_iso(bytes: &[u8]) -> u64 {
-    return update(0, &ISO_TABLE, bytes);
+    return update(0, &ISO_TABLE, bytes, true) ^ 0xFFFFFFFFFFFFFFFF;
 }
 
 impl Digest {
     pub fn new(poly: u64) -> Digest {
         Digest {
-            table: make_table(poly),
-            initial: 0,
-            value: 0,
+            table: make_table(poly, true),
+            initial: 0xFFFFFFFFFFFFFFFF,
+            value: 0xFFFFFFFFFFFFFFFF,
+            reflect: true,
+            final_xor: 0xFFFFFFFFFFFFFFFF,
         }
     }
 
     pub fn new_with_initial(poly: u64, initial: u64) -> Digest {
         Digest {
-            table: make_table(poly),
+            table: make_table(poly, true),
             initial: initial,
             value: initial,
+            reflect: true,
+            final_xor: 0,
+        }
+    }
+
+    pub fn new_with_initial_and_final(
+        poly: u64,
+        initial: u64,
+        reflect: bool,
+        final_xor: u64,
+    ) -> Digest {
+        Digest {
+            table: make_table(poly, reflect),
+            initial: initial,
+            value: initial,
+            reflect: reflect,
+            final_xor: final_xor,
         }
     }
 }
@@ -58,10 +85,10 @@ impl Hasher64 for Digest {
         self.value = self.initial;
     }
     fn write(&mut self, bytes: &[u8]) {
-        self.value = update(self.value, &self.table, bytes);
+        self.value = update(self.value, &self.table, bytes, self.reflect);
     }
     fn sum64(&self) -> u64 {
-        self.value
+        self.value ^ self.final_xor
     }
 }
 
