@@ -61,11 +61,10 @@ impl Digest {
             value: initial,
             reflect: true,
             final_xor: 0xFFFFFFFFFFFFFFFF,
-
         }
     }
 
-        pub fn new_with_initial_and_final(
+    pub fn new_with_initial_and_final(
         poly: u64,
         initial: u64,
         reflect: bool,

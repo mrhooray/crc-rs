@@ -21,13 +21,13 @@ pub trait Hasher32 {
     fn sum32(&self) -> u32;
 }
 
-/// Caclulate the CRC of the byte string of values in correct, non-reflected order.
+/// Caclulate the CRC of the byte string of values.
 ///
 /// Updates the current CRC *value* using the CRC table *table* using the byte array *bytes*.
 /// The parameter *rfl* will reflect the data.  *rfl=false* will calculate the CRC MSB first.
 /// *rfl=true* will calculate the CRC LSB first.
 ///
-/// # Examples
+/// # Usage
 ///
 /// call using Digest::write(&bytes)
 pub fn update(mut value: u32, table: &[u32; 256], bytes: &[u8], rfl: bool) -> u32 {
