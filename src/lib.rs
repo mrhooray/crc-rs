@@ -15,7 +15,7 @@
 //! assert_eq!(digest.sum16(), 0x906e);
 //!
 //! // with initial
-//! let mut digest = crc16::Digest::new_with_initial(crc16::X25, 0u16);
+//! let mut digest = crc16::Digest::new_with_initial(crc16::X25, 0xFFFF);
 //! digest.write(b"123456789");
 //! assert_eq!(digest.sum16(), 0x906e);
 //! ```
@@ -37,7 +37,7 @@
 //! // with initial
 //! let mut digest = crc32::Digest::new_with_initial(crc32::IEEE, 0xFFFFFFFF);
 //! digest.write(b"123456789");
-//! assert_eq!(digest.sum32(), 0x340BC6D9);
+//! assert_eq!(digest.sum32(), 0xcbf43926);
 //!
 //! // with initial, reflect, and XOR
 //! let mut digest = crc32::Digest::new_with_initial_and_final(crc32::IEEE, 0xFFFFFFFF, true, 0xFFFFFFFF);
@@ -60,14 +60,14 @@
 //! // with initial
 //! let mut digest = crc64::Digest::new_with_initial(crc64::ECMA, 0xFFFFFFFFFFFFFFFF);
 //! digest.write(b"123456789");
-//! assert_eq!(digest.sum64(), 0x66A2364420E6C605);
+//! assert_eq!(digest.sum64(), 0x995dc9bbdf1939fa);
 //! 
 //! // with initial, reflect, and XOR
 //! let mut digest = crc64::Digest::new_with_initial_and_final(crc64::ECMA, 0xFFFFFFFFFFFFFFFF, true, 0xFFFFFFFFFFFFFFFF);
 //! digest.write(b"123456789");
 //! assert_eq!(digest.sum64(), 0x995dc9bbdf1939fa);
 //! ```
-
+ 
 #![cfg_attr(not(feature = "std"), no_std)]
 
 pub mod crc16;

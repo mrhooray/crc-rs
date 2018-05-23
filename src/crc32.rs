@@ -62,9 +62,6 @@ pub fn checksum_koopman(bytes: &[u8]) -> u32 {
 impl Digest {
     /// Creates a new table from the supplied polynomial and reflect parameter
     ///
-    /// *Note* new(crc32::IEEE) no longer produces the correct table.  
-    /// See the implimentation of *new_with_initial_and_final()*
-    ///
     /// # Example
     ///
     /// ```rust
@@ -91,7 +88,7 @@ impl Digest {
     /// use crc::{crc32, Hasher32};
     /// let mut digest = crc32::Digest::new_with_initial(crc32::IEEE, 0xFFFFFFFF);
     /// digest.write(b"123456789");
-    /// assert_eq!(!digest.sum32(), 0xcbf43926);
+    /// assert_eq!(digest.sum32(), 0xcbf43926);
     /// ```
     pub fn new_with_initial(poly: u32, initial: u32) -> Digest {
         Digest {
@@ -99,7 +96,7 @@ impl Digest {
             initial: initial,
             value: initial,
             reflect: true,
-            final_xor: 0,
+            final_xor: 0xFFFFFFFF,
         }
     }
 

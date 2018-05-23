@@ -11,6 +11,8 @@ pub struct Digest {
     table: [u16; 256],
     initial: u16,
     value: u16,
+    reflect: bool,
+    final_xor: u16,
 }
 
 pub trait Hasher16 {
@@ -19,36 +21,60 @@ pub trait Hasher16 {
     fn sum16(&self) -> u16;
 }
 
-pub fn update(mut value: u16, table: &[u16; 256], bytes: &[u8]) -> u16 {
-    value = !value;
+pub fn update(mut value: u16, table: &[u16; 256], bytes: &[u8], rfl: bool) -> u16 {
+    let shift = 8;
+
     for &i in bytes.iter() {
-        value = table[((value as u8) ^ i) as usize] ^ (value >> 8)
+        if true == rfl {
+            value = table[((value ^ (i as u16)) & 0xFF) as usize] ^ (value >> 8)
+        } else {
+            value = table[(((value >> shift) as u8) ^ i) as usize] ^ (value << 8);
+        }
     }
-    !value
+    value
 }
 
 pub fn checksum_x25(bytes: &[u8]) -> u16 {
-    return update(0, &X25_TABLE, bytes);
+    return update(0xFFFF, &X25_TABLE, bytes, true) ^ 0xFFFF;
 }
 
 pub fn checksum_usb(bytes: &[u8]) -> u16 {
-    return update(0, &USB_TABLE, bytes);
+    return update(0xFFFF, &USB_TABLE, bytes, true) ^ 0xFFFF;
 }
 
 impl Digest {
     pub fn new(poly: u16) -> Digest {
         Digest {
-            table: make_table(poly),
-            initial: 0,
-            value: 0,
+            table: make_table(poly, true),
+            initial: 0xFFFF,
+            value: 0xFFFF,
+            reflect: true,
+            final_xor: 0xFFFF,
         }
     }
 
     pub fn new_with_initial(poly: u16, initial: u16) -> Digest {
         Digest {
-            table: make_table(poly),
+            table: make_table(poly, true),
             initial: initial,
             value: initial,
+            reflect: true,
+            final_xor: 0xFFFF,
+        }
+    }
+
+    pub fn new_with_initial_and_final(
+        poly: u16,
+        initial: u16,
+        reflect: bool,
+        final_xor: u16,
+    ) -> Digest {
+        Digest {
+            table: make_table(poly, reflect),
+            initial: initial,
+            value: initial,
+            reflect: reflect,
+            final_xor: final_xor,
         }
     }
 }
@@ -58,10 +84,10 @@ impl Hasher16 for Digest {
         self.value = self.initial;
     }
     fn write(&mut self, bytes: &[u8]) {
-        self.value = update(self.value, &self.table, bytes);
+        self.value = update(self.value, &self.table, bytes, self.reflect);
     }
     fn sum16(&self) -> u16 {
-        self.value
+        self.value ^ self.final_xor
     }
 }
 

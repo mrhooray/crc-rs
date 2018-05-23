@@ -60,7 +60,7 @@ impl Digest {
             initial: initial,
             value: initial,
             reflect: true,
-            final_xor: 0,
+            final_xor: 0xFFFFFFFFFFFFFFFF,
 
         }
     }

@@ -95,20 +95,6 @@ mod crc64 {
 
     const ECMA_CHECK_VALUE: u64 = 0x995dc9bbdf1939fa;
     const ISO_CHECK_VALUE: u64 = 0xb90956c775a41001;
-/*
-10101111 AF
-10010011 93
-10010001 91
-11111101 FD
-10111011 BB
-10011100 9C
-11010101 D5
-10011001 99
-*/
-    //    const ISO_CHECK_VALUE: u64 = 0x0110a475c75609b9;
-
-//    const ECMA_CHECK_VALUE: u64 = 0xAF9391FDBB9CD599;
-//    const ISO_CHECK_VALUE: u64 = 0x10014A577C65909B;
 
     #[test]
     fn checksum_ecma() {
@@ -127,7 +113,7 @@ mod crc64 {
 
     #[test]
     fn digest_ecma_initial() {
-        verify_checksum2(crc64::ECMA, 0x66A2364420E6C605);
+        verify_checksum2(crc64::ECMA, ECMA_CHECK_VALUE);
     }
 
     #[test]
