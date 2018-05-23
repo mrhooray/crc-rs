@@ -58,7 +58,12 @@
 //! assert_eq!(digest.sum64(), 0x995dc9bbdf1939fa);
 //!
 //! // with initial
-//! let mut digest = crc64::Digest::new_with_initial(crc64::ECMA, 0u64);
+//! let mut digest = crc64::Digest::new_with_initial(crc64::ECMA, 0xFFFFFFFFFFFFFFFF);
+//! digest.write(b"123456789");
+//! assert_eq!(digest.sum64(), 0x66A2364420E6C605);
+//! 
+//! // with initial, reflect, and XOR
+//! let mut digest = crc64::Digest::new_with_initial_and_final(crc64::ECMA, 0xFFFFFFFFFFFFFFFF, true, 0xFFFFFFFFFFFFFFFF);
 //! digest.write(b"123456789");
 //! assert_eq!(digest.sum64(), 0x995dc9bbdf1939fa);
 //! ```

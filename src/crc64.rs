@@ -36,11 +36,11 @@ pub fn update(mut value: u64, table: &[u64; 256], bytes: &[u8], rfl: bool) -> u6
 }
 
 pub fn checksum_ecma(bytes: &[u8]) -> u64 {
-    return update(0, &ECMA_TABLE, bytes, true) ^ 0xFFFFFFFFFFFFFFFF;
+    return update(0xFFFFFFFFFFFFFFFF, &ECMA_TABLE, bytes, true) ^ 0xFFFFFFFFFFFFFFFF;
 }
 
 pub fn checksum_iso(bytes: &[u8]) -> u64 {
-    return update(0, &ISO_TABLE, bytes, true) ^ 0xFFFFFFFFFFFFFFFF;
+    return update(0xFFFFFFFFFFFFFFFF, &ISO_TABLE, bytes, true) ^ 0xFFFFFFFFFFFFFFFF;
 }
 
 impl Digest {
@@ -61,10 +61,11 @@ impl Digest {
             value: initial,
             reflect: true,
             final_xor: 0,
+
         }
     }
 
-    pub fn new_with_initial_and_final(
+        pub fn new_with_initial_and_final(
         poly: u64,
         initial: u64,
         reflect: bool,
@@ -99,6 +100,6 @@ impl Hasher for Digest {
     }
 
     fn finish(&self) -> u64 {
-        self.sum64()
+        self.sum64() as u64
     }
 }

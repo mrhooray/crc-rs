@@ -93,8 +93,8 @@ mod crc32 {
 mod crc64 {
     use crc::{Hasher64, crc64};
 
-    //    const ECMA_CHECK_VALUE: u64 = 0x995dc9bbdf1939fa;
-//    const ISO_CHECK_VALUE: u64 = 0xb90956c775a41001;
+    const ECMA_CHECK_VALUE: u64 = 0x995dc9bbdf1939fa;
+    const ISO_CHECK_VALUE: u64 = 0xb90956c775a41001;
 /*
 10101111 AF
 10010011 93
@@ -107,8 +107,8 @@ mod crc64 {
 */
     //    const ISO_CHECK_VALUE: u64 = 0x0110a475c75609b9;
 
-    const ECMA_CHECK_VALUE: u64 = 0xAF9391FDBB9CD599;
-    const ISO_CHECK_VALUE: u64 = 0x10014A577C65909B;
+//    const ECMA_CHECK_VALUE: u64 = 0xAF9391FDBB9CD599;
+//    const ISO_CHECK_VALUE: u64 = 0x10014A577C65909B;
 
     #[test]
     fn checksum_ecma() {
@@ -126,12 +126,44 @@ mod crc64 {
     }
 
     #[test]
+    fn digest_ecma_initial() {
+        verify_checksum2(crc64::ECMA, 0x66A2364420E6C605);
+    }
+
+    #[test]
+    fn digest_ecma_custom() {
+        verify_checksum3(crc64::ECMA, ECMA_CHECK_VALUE);
+    }
+
+    #[test]
     fn digest_iso() {
         verify_checksum(crc64::ISO, ISO_CHECK_VALUE);
     }
 
     fn verify_checksum(poly: u64, check_value: u64) {
         let mut digest = crc64::Digest::new(poly);
+        digest.write(b"123456789");
+        assert_eq!(digest.sum64(), check_value);
+        digest.reset();
+        for i in 1..10 {
+            digest.write(i.to_string().as_bytes());
+        }
+        assert_eq!(digest.sum64(), check_value);
+    }
+
+    fn verify_checksum2(poly: u64, check_value: u64) {
+        let mut digest = crc64::Digest::new_with_initial(poly, 0xFFFFFFFFFFFFFFFF);
+        digest.write(b"123456789");
+        assert_eq!(digest.sum64(), check_value);
+        digest.reset();
+        for i in 1..10 {
+            digest.write(i.to_string().as_bytes());
+        }
+        assert_eq!(digest.sum64(), check_value);
+    }
+
+    fn verify_checksum3(poly: u64, check_value: u64) {
+        let mut digest = crc64::Digest::new_with_initial_and_final(poly, 0xFFFFFFFFFFFFFFFF, true, 0xFFFFFFFFFFFFFFFF);
         digest.write(b"123456789");
         assert_eq!(digest.sum64(), check_value);
         digest.reset();

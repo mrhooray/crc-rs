@@ -12,13 +12,13 @@ license = "MIT OR Apache-2.0"
 [build-dependencies]
 build_const = "0.2"
 
-[dev-dependencies]
-criterion = "0.2.3"
+#[dev-dependencies]
+#criterion = "0.2.3"
 
 [features]
 std = []
 default = ["std"]
 
-[[bench]]
-name = "bench"
-harness = false
+#[[bench]]
+#name = "bench"
+#harness = false
