@@ -7,6 +7,19 @@ pub use util::make_table_crc32 as make_table;
 
 include!(concat!(env!("OUT_DIR"), "/crc32_constants.rs"));
 
+/// Structure that holds all of the important values for calculating a CRC
+///
+/// # Definitions
+///
+/// *table:* Holds the table values based on the supplied polynomial for the fast CRC calculations
+///
+/// *initial:* The initial inut value. AKA reflect_in
+///
+/// *value:* Holds the current value of the CRC
+///
+/// *reflect:* Chooses whether or not the CRC math is normal or reflected
+///
+/// *final_xor:* Final value to XOR with when calling Digest::sum32
 pub struct Digest {
     table: [u32; 256],
     initial: u32,

@@ -18,7 +18,7 @@
 //! let mut digest = crc16::Digest::new_with_initial(crc16::X25, 0xFFFF);
 //! digest.write(b"123456789");
 //! assert_eq!(digest.sum16(), 0x906e);
-//! 
+//!
 //! // with reflect bool and final XOR
 //! let mut digest = crc16::Digest::new_with_initial_and_final(crc16::X25, 0xFFFF, true, 0xFFFF);
 //! digest.write(b"123456789");
@@ -72,7 +72,6 @@
 //! digest.write(b"123456789");
 //! assert_eq!(digest.sum64(), 0x995dc9bbdf1939fa);
 //! ```
-
 #![cfg_attr(not(feature = "std"), no_std)]
 
 pub mod crc16;
