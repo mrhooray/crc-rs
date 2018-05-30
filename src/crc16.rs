@@ -11,15 +11,11 @@ include!(concat!(env!("OUT_DIR"), "/crc16_constants.rs"));
 ///
 /// # Definitions
 ///
-/// *table:* Holds the table values based on the supplied polynomial for the fast CRC calculations
-///
-/// *initial:* The initial inut value. AKA reflect_in
-///
-/// *value:* Holds the current value of the CRC
-///
-/// *reflect:* Chooses whether or not the CRC math is normal or reflected
-///
-/// *final_xor:* Final value to XOR with when calling Digest::sum16
+/// * **table:** Holds the table values based on the supplied polynomial for the fast CRC calculations
+/// * **initial:** The initial input value. AKA *reflect_in*
+/// * **value:** Holds the current value of the CRC
+/// * **reflect:** Chooses whether or not the CRC math is normal or reflected
+/// * **final_xor:** Final value to XOR with when calling Digest::sum16
 pub struct Digest {
     table: [u16; 256],
     initial: u16,
@@ -47,7 +43,7 @@ pub fn update(mut value: u16, table: &[u16; 256], bytes: &[u8], rfl: bool) -> u1
     let shift = 8;
 
     for &i in bytes.iter() {
-        if true == rfl {
+        if rfl {
             value = table[((value ^ (i as u16)) & 0xFF) as usize] ^ (value >> 8)
         } else {
             value = table[(((value >> shift) as u8) ^ i) as usize] ^ (value << 8);
@@ -67,7 +63,6 @@ pub fn checksum_usb(bytes: &[u8]) -> u16 {
 }
 
 impl Digest {
-    /// *Only works for reflected CRCs*
     /// Creates a new table from the supplied polynomial and reflect parameter
     ///
     /// # Example
@@ -118,16 +113,11 @@ impl Digest {
     ///
     /// ```rust
     /// use crc::{crc16, Hasher16};
-    /// let mut digest = crc16::Digest::new_with_initial_and_final(crc16::X25, 0xFFFF, true, 0xFFFF);
+    /// let mut digest = crc16::Digest::new_custom(crc16::X25, 0xFFFF, true, 0xFFFF);
     /// digest.write(b"123456789");
     /// assert_eq!(digest.sum16(), 0x906e);
     /// ```
-    pub fn new_with_initial_and_final(
-        poly: u16,
-        initial: u16,
-        reflect: bool,
-        final_xor: u16,
-    ) -> Digest {
+    pub fn new_custom(poly: u16, initial: u16, reflect: bool, final_xor: u16) -> Digest {
         Digest {
             table: make_table(poly, reflect),
             initial: initial,

@@ -1,12 +1,12 @@
 /// Builds a CRC16 table using the standard or reflected CRC method
-/// If reflect==true, flip the individual byte bitwise, then flip the 32bit table value bitwise
-pub fn make_table_crc16(poly: u16, rfl: bool) -> [u16; 256] {
+/// If reflect==true, flip the individual byte bitwise, then flip the 16bit table value bitwise
+pub fn make_table_crc16(poly: u16, reflect: bool) -> [u16; 256] {
     let mut table = [0u16; 256];
     let mut byte: u16;
     let top_bit = 1u16 << 15; //15 is 16bit - 1
 
     for i in 0..256 {
-        if true == rfl {
+        if reflect {
             byte = reflect_byte_16(i);
         } else {
             byte = i;
@@ -24,8 +24,8 @@ pub fn make_table_crc16(poly: u16, rfl: bool) -> [u16; 256] {
             }
         }
 
-        if true == rfl {
-            value = reflect_short(value);
+        if reflect {
+            value = reflect_value_16(value);
         }
 
         table[i as usize] = value;
@@ -35,14 +35,14 @@ pub fn make_table_crc16(poly: u16, rfl: bool) -> [u16; 256] {
 
 /// Builds a CRC32 table using the standard CRC method
 /// If reflect==true, flip the individual byte bitwise, then flip the 32bit table value bitwise
-pub fn make_table_crc32(poly: u32, rfl: bool) -> [u32; 256] {
+pub fn make_table_crc32(poly: u32, reflect: bool) -> [u32; 256] {
     let mut table = [0u32; 256];
     let mut byte: u32;
     let top_bit = 1u32 << 31; //31 is 32bit - 1
 
     for i in 0..256 {
-        if true == rfl {
-            byte = reflect_long_32(i);
+        if reflect {
+            byte = reflect_byte_32(i);
         } else {
             byte = i;
         }
@@ -59,8 +59,8 @@ pub fn make_table_crc32(poly: u32, rfl: bool) -> [u32; 256] {
             }
         }
 
-        if true == rfl {
-            value = reflect_long(value);
+        if reflect {
+            value = reflect_value_32(value);
         }
 
         table[i as usize] = value;
@@ -69,14 +69,14 @@ pub fn make_table_crc32(poly: u32, rfl: bool) -> [u32; 256] {
 }
 
 /// Builds a CRC64 table using the standard CRC method
-/// If reflect==true, flip the individual byte bitwise, then flip the 32bit table value bitwise
-pub fn make_table_crc64(poly: u64, rfl: bool) -> [u64; 256] {
+/// If reflect==true, flip the individual byte bitwise, then flip the 64bit table value bitwise
+pub fn make_table_crc64(poly: u64, reflect: bool) -> [u64; 256] {
     let mut table = [0u64; 256];
     let mut byte: u64;
     let top_bit = 1u64 << 63; //63 is 64bit - 1
 
     for i in 0..256 {
-        if true == rfl {
+        if reflect {
             byte = reflect_byte_64(i);
         } else {
             byte = i as u64;
@@ -94,8 +94,8 @@ pub fn make_table_crc64(poly: u64, rfl: bool) -> [u64; 256] {
             }
         }
 
-        if true == rfl {
-            value = reflect_long_long(value);
+        if reflect {
+            value = reflect_value_64(value);
         }
 
         table[i as usize] = value;
@@ -104,7 +104,7 @@ pub fn make_table_crc64(poly: u64, rfl: bool) -> [u64; 256] {
 }
 
 /// Reflects a value of a 16 bit number
-pub fn reflect_short(mut value: u16) -> u16 {
+fn reflect_value_16(mut value: u16) -> u16 {
     let mut reflection: u16 = 0u16;
     let bits = 16;
 
@@ -118,7 +118,7 @@ pub fn reflect_short(mut value: u16) -> u16 {
 }
 
 /// Reflects a value of a 32 bit number
-pub fn reflect_long(mut value: u32) -> u32 {
+fn reflect_value_32(mut value: u32) -> u32 {
     let mut reflection: u32 = 0u32;
     let bits = 32;
 
@@ -132,7 +132,7 @@ pub fn reflect_long(mut value: u32) -> u32 {
 }
 
 /// Reflects a value of a 64 bit number
-pub fn reflect_long_long(mut value: u64) -> u64 {
+fn reflect_value_64(mut value: u64) -> u64 {
     let mut reflection: u64 = 0u64;
     let bits = 64;
 
@@ -145,23 +145,8 @@ pub fn reflect_long_long(mut value: u64) -> u64 {
     reflection
 }
 
-/// Reflects the lease significant byte of a u32.
-pub fn reflect_long_32(input: u32) -> u32 {
-    let mut reflection: u32 = 0u32;
-    let bits = 8;
-    let mut value = input;
-
-    for i in 0..bits {
-        if (value & 0x01) == 1 {
-            reflection |= 1 << ((bits - 1) - i)
-        }
-        value = value >> 1;
-    }
-    reflection
-}
-
 /// Reflects the lease significant byte of a u16.
-pub fn reflect_byte_16(input: u16) -> u16 {
+fn reflect_byte_16(input: u16) -> u16 {
     let mut reflection: u16 = 0u16;
     let bits = 8;
     let mut value = input;
@@ -175,8 +160,23 @@ pub fn reflect_byte_16(input: u16) -> u16 {
     reflection
 }
 
+/// Reflects the lease significant byte of a u32.
+fn reflect_byte_32(input: u32) -> u32 {
+    let mut reflection: u32 = 0u32;
+    let bits = 8;
+    let mut value = input;
+
+    for i in 0..bits {
+        if (value & 0x01) == 1 {
+            reflection |= 1 << ((bits - 1) - i)
+        }
+        value = value >> 1;
+    }
+    reflection
+}
+
 /// Reflects the lease significant byte of a u64.
-pub fn reflect_byte_64(input: u64) -> u64 {
+fn reflect_byte_64(input: u64) -> u64 {
     let mut reflection: u64 = 0u64;
     let bits = 8;
     let mut value = input;

@@ -11,15 +11,15 @@ include!(concat!(env!("OUT_DIR"), "/crc64_constants.rs"));
 ///
 /// # Definitions
 ///
-/// *table:* Holds the table values based on the supplied polynomial for the fast CRC calculations
+/// **table:** Holds the table values based on the supplied polynomial for the fast CRC calculations
 ///
-/// *initial:* The initial inut value. AKA reflect_in
+/// **initial:** The initial input value. AKA *reflect_in*
 ///
-/// *value:* Holds the current value of the CRC
+/// **value:** Holds the current value of the CRC
 ///
-/// *reflect:* Chooses whether or not the CRC math is normal or reflected
+/// **reflect:** Chooses whether or not the CRC math is normal or reflected
 ///
-/// *final_xor:* Final value to XOR with when calling Digest::sum64
+/// **final_xor:** Final value to XOR with when calling Digest::sum64
 pub struct Digest {
     table: [u64; 256],
     initial: u64,
@@ -47,13 +47,12 @@ pub fn update(mut value: u64, table: &[u64; 256], bytes: &[u8], rfl: bool) -> u6
     let shift = 56;
 
     for &i in bytes.iter() {
-        if true == rfl {
+        if rfl {
             value = table[((value ^ (i as u64)) & 0xFF) as usize] ^ (value >> 8)
         } else {
             value = table[(((value >> shift) as u8) ^ i) as usize] ^ (value << 8);
         }
     }
-
     value
 }
 
@@ -117,16 +116,11 @@ impl Digest {
     ///
     /// ```rust
     /// use crc::{crc64, Hasher64};
-    /// let mut digest = crc64::Digest::new_with_initial_and_final(crc64::ECMA, 0xFFFFFFFFFFFFFFFF, true, 0xFFFFFFFFFFFFFFFF);
+    /// let mut digest = crc64::Digest::new_custom(crc64::ECMA, 0xFFFFFFFFFFFFFFFF, true, 0xFFFFFFFFFFFFFFFF);
     /// digest.write(b"123456789");
     /// assert_eq!(digest.sum64(), 0x995dc9bbdf1939fa);
     /// ```
-    pub fn new_with_initial_and_final(
-        poly: u64,
-        initial: u64,
-        reflect: bool,
-        final_xor: u64,
-    ) -> Digest {
+    pub fn new_custom(poly: u64, initial: u64, reflect: bool, final_xor: u64) -> Digest {
         Digest {
             table: make_table(poly, reflect),
             initial: initial,

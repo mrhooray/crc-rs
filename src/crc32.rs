@@ -10,16 +10,11 @@ include!(concat!(env!("OUT_DIR"), "/crc32_constants.rs"));
 /// Structure that holds all of the important values for calculating a CRC
 ///
 /// # Definitions
-///
-/// *table:* Holds the table values based on the supplied polynomial for the fast CRC calculations
-///
-/// *initial:* The initial inut value. AKA reflect_in
-///
-/// *value:* Holds the current value of the CRC
-///
-/// *reflect:* Chooses whether or not the CRC math is normal or reflected
-///
-/// *final_xor:* Final value to XOR with when calling Digest::sum32
+/// * **table:** Holds the table values based on the supplied polynomial for the fast CRC calculations
+/// * **initial:** The initial input value. AKA *reflect_in*
+/// * **value:** Holds the current value of the CRC
+/// * **reflect:** Chooses whether or not the CRC math is normal or reflected
+/// * **final_xor:** Final value to XOR with when calling Digest::sum32
 pub struct Digest {
     table: [u32; 256],
     initial: u32,
@@ -47,13 +42,12 @@ pub fn update(mut value: u32, table: &[u32; 256], bytes: &[u8], rfl: bool) -> u3
     let shift = 24;
 
     for &i in bytes.iter() {
-        if true == rfl {
+        if rfl {
             value = table[((value ^ (i as u32)) & 0xFF) as usize] ^ (value >> 8)
         } else {
             value = table[(((value >> shift) as u8) ^ i) as usize] ^ (value << 8);
         }
     }
-
     value
 }
 
@@ -122,16 +116,11 @@ impl Digest {
     ///
     /// ```rust
     /// use crc::{crc32, Hasher32};
-    /// let mut digest = crc32::Digest::new_with_initial_and_final(crc32::IEEE, 0xFFFFFFFF, true, 0xFFFFFFFF);
+    /// let mut digest = crc32::Digest::new_custom(crc32::IEEE, 0xFFFFFFFF, true, 0xFFFFFFFF);
     /// digest.write(b"123456789");
     /// assert_eq!(digest.sum32(), 0xcbf43926);
     /// ```
-    pub fn new_with_initial_and_final(
-        poly: u32,
-        initial: u32,
-        reflect: bool,
-        final_xor: u32,
-    ) -> Digest {
+    pub fn new_custom(poly: u32, initial: u32, reflect: bool, final_xor: u32) -> Digest {
         Digest {
             table: make_table(poly, reflect),
             initial: initial,

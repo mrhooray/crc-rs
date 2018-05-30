@@ -149,12 +149,8 @@ mod crc64 {
     }
 
     fn verify_checksum3(poly: u64, check_value: u64) {
-        let mut digest = crc64::Digest::new_with_initial_and_final(
-            poly,
-            0xFFFFFFFFFFFFFFFF,
-            true,
-            0xFFFFFFFFFFFFFFFF,
-        );
+        let mut digest =
+            crc64::Digest::new_custom(poly, 0xFFFFFFFFFFFFFFFF, true, 0xFFFFFFFFFFFFFFFF);
         digest.write(b"123456789");
         assert_eq!(digest.sum64(), check_value);
         digest.reset();
