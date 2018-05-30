@@ -40,14 +40,14 @@ pub trait Hasher16 {
 ///
 /// call using Digest::write(&bytes)
 pub fn update(mut value: u16, table: &[u16; 256], bytes: &[u8], rfl: bool) -> u16 {
-    let shift = 8;
-
-    for &i in bytes.iter() {
-        if rfl {
-            value = table[((value ^ (i as u16)) & 0xFF) as usize] ^ (value >> 8)
-        } else {
-            value = table[(((value >> shift) as u8) ^ i) as usize] ^ (value << 8);
-        }
+    if rfl {
+        value = bytes.iter().fold(value, |acc, &x| {
+            (acc >> 8) ^ (table[((acc ^ (u16::from(x))) & 0xFF) as usize])
+        });
+    } else {
+        value = bytes.iter().fold(value, |acc, &x| {
+            (acc << 8) ^ (table[((u16::from(x)) ^ (acc >> 8)) as usize])
+        });
     }
     value
 }

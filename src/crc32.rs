@@ -39,14 +39,14 @@ pub trait Hasher32 {
 ///
 /// call using Digest::write(&bytes)
 pub fn update(mut value: u32, table: &[u32; 256], bytes: &[u8], rfl: bool) -> u32 {
-    let shift = 24;
-
-    for &i in bytes.iter() {
-        if rfl {
-            value = table[((value ^ (i as u32)) & 0xFF) as usize] ^ (value >> 8)
-        } else {
-            value = table[(((value >> shift) as u8) ^ i) as usize] ^ (value << 8);
-        }
+    if rfl {
+        value = bytes.iter().fold(value, |acc, &x| {
+            (acc >> 8) ^ (table[((acc ^ (u32::from(x))) & 0xFF) as usize])
+        });
+    } else {
+        value = bytes.iter().fold(value, |acc, &x| {
+            (acc << 8) ^ (table[((u32::from(x)) ^ (acc >> 24)) as usize])
+        });
     }
     value
 }

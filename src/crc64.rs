@@ -10,16 +10,11 @@ include!(concat!(env!("OUT_DIR"), "/crc64_constants.rs"));
 /// Structure that holds all of the important values for calculating a CRC
 ///
 /// # Definitions
-///
-/// **table:** Holds the table values based on the supplied polynomial for the fast CRC calculations
-///
-/// **initial:** The initial input value. AKA *reflect_in*
-///
-/// **value:** Holds the current value of the CRC
-///
-/// **reflect:** Chooses whether or not the CRC math is normal or reflected
-///
-/// **final_xor:** Final value to XOR with when calling Digest::sum64
+/// * **table:** Holds the table values based on the supplied polynomial for the fast CRC calculations
+/// * **initial:** The initial input value. AKA *reflect_in*
+/// * **value:** Holds the current value of the CRC
+/// * **reflect:** Chooses whether or not the CRC math is normal or reflected
+/// * **final_xor:** Final value to XOR with when calling Digest::sum64
 pub struct Digest {
     table: [u64; 256],
     initial: u64,
@@ -44,14 +39,14 @@ pub trait Hasher64 {
 ///
 /// call using Digest::write(&bytes)
 pub fn update(mut value: u64, table: &[u64; 256], bytes: &[u8], rfl: bool) -> u64 {
-    let shift = 56;
-
-    for &i in bytes.iter() {
-        if rfl {
-            value = table[((value ^ (i as u64)) & 0xFF) as usize] ^ (value >> 8)
-        } else {
-            value = table[(((value >> shift) as u8) ^ i) as usize] ^ (value << 8);
-        }
+    if rfl {
+        value = bytes.iter().fold(value, |acc, &x| {
+            (acc >> 8) ^ (table[((acc ^ (u64::from(x))) & 0xFF) as usize])
+        });
+    } else {
+        value = bytes.iter().fold(value, |acc, &x| {
+            (acc << 8) ^ (table[((u64::from(x)) ^ (acc >> 56)) as usize])
+        });
     }
     value
 }
