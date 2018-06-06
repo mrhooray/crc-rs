@@ -9,6 +9,7 @@ pub use util::CalcType;
 include!(concat!(env!("OUT_DIR"), "/crc16_constants.rs"));
 
 /// Structure that holds all of the important values for calculating a CRC.
+/// ### Details
 /// - **table**: Holds the table values based on the supplied polynomial for the fast CRC calculations
 /// - **initial**: The initial input value. AKA *reflect_in*
 /// - **value**: Holds the current value of the CRC
@@ -115,7 +116,7 @@ impl Digest {
 
     /// Creates a new table from the supplied polynomial, reflect parameter, initial value, and final XOR value.
     /// ### Details
-    /// This should be the dafault way to generate a custom CRC16.  See default values here: *http://crccalc.com/*
+    /// This should be the dafault way to generate a custom CRC16.  See default values here: *http://crccalc.com/*.
     /// The example will generate a standard CRC16 table.
     ///
     /// # Example

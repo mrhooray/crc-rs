@@ -10,11 +10,11 @@ include!(concat!(env!("OUT_DIR"), "/crc64_constants.rs"));
 
 /// Structure that holds all of the important values for calculating a CRC
 /// ### Details
-/// * **table:** Holds the table values based on the supplied polynomial for the fast CRC calculations
-/// * **initial:** The initial input value. AKA *reflect_in*
-/// * **value:** Holds the current value of the CRC
-/// * **reflect:** Chooses whether or not the CRC math is normal or reflected
-/// * **final_xor:** Final value to XOR with when calling Digest::sum64
+/// - **table**: Holds the table values based on the supplied polynomial for the fast CRC calculations
+/// - **initial**: The initial input value. AKA *reflect_in*
+/// - **value**: Holds the current value of the CRC
+/// - **reflect**: Chooses whether or not the CRC math is *Normal* or *Reverse*
+/// - **final_xor**: Final value to XOR with when calling `Digest::sum64()`. AKA *reflect_out*
 pub struct Digest {
     table: [u64; 256],
     initial: u64,
