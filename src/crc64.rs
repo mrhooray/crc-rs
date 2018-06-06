@@ -9,8 +9,7 @@ pub use util::CalcType;
 include!(concat!(env!("OUT_DIR"), "/crc64_constants.rs"));
 
 /// Structure that holds all of the important values for calculating a CRC
-///
-/// # Definitions
+/// ### Details
 /// * **table:** Holds the table values based on the supplied polynomial for the fast CRC calculations
 /// * **initial:** The initial input value. AKA *reflect_in*
 /// * **value:** Holds the current value of the CRC
@@ -31,10 +30,10 @@ pub trait Hasher64 {
 }
 
 /// Caclulate the CRC of the byte string of values.
-///
+/// ### Details
 /// Updates the current CRC *value* using the CRC table *table* using the byte array *bytes*.
-/// The parameter *calc* will reflect the data.  *calc=normal* will calculate the CRC MSB first.
-/// *calc=reflect* will calculate the CRC LSB first.  *calc=compat* will calculate the CRC LSB first
+/// The parameter *calc* will reflect the data.  *calc=Normal* will calculate the CRC MSB first.
+/// *calc=Reverse* will calculate the CRC LSB first.  *calc=Compat* will calculate the CRC LSB first
 /// and reflect *value* both in and out.
 ///
 /// # Usage
@@ -64,12 +63,12 @@ pub fn update(mut value: u64, table: &[u64; 256], bytes: &[u8], calc: &CalcType)
     value
 }
 
-/// Generates a generic ECMA-188 64 bit CRC (AKA CRC-64-ECMA)
+/// Generates a generic ECMA-188 64 bit CRC (AKA CRC-64-ECMA).
 pub fn checksum_ecma(bytes: &[u8]) -> u64 {
     return update(0u64, &ECMA_TABLE, bytes, &CalcType::Compat);
 }
 
-/// Generates a generic ISO 3309 32 bit CRC (AKA CRC-64-ISO)
+/// Generates a generic ISO 3309 32 bit CRC (AKA CRC-64-ISO).
 pub fn checksum_iso(bytes: &[u8]) -> u64 {
     return update(0u64, &ISO_TABLE, bytes, &CalcType::Compat);
 }
@@ -116,7 +115,7 @@ impl Digest {
     }
 
     /// Creates a new table from the supplied polynomial, reflect parameter, initial value, and final XOR value
-    ///
+    /// ### Details
     /// This should be the dafault way to generate a custom CRC64.  See default values here: *http://crccalc.com/*
     /// The example will generate a standard CRC64 table.
     ///
@@ -145,12 +144,12 @@ impl Digest {
 }
 
 impl Hasher64 for Digest {
-    /// Resets the current CRC to the initial value
+    /// Resets the current CRC in *value* to the *initial* value
     fn reset(&mut self) {
         self.value = self.initial;
     }
 
-    /// Takes in a byte array and updates the CRC from based on the Digest::reflect field
+    /// Takes in a byte array and updates the CRC from based on the `Digest::reflect` field
     fn write(&mut self, bytes: &[u8]) {
         self.value = update(self.value, &self.table, bytes, &self.reflect);
     }
@@ -161,7 +160,7 @@ impl Hasher64 for Digest {
     }
 }
 
-/// Implementation of std::hash::Hasher so that types which #[derive(Hash)] can hash with Digest.
+/// Implementation of `std::hash::Hasher` so that types which #[derive(Hash)] can hash with Digest.
 impl Hasher for Digest {
     fn write(&mut self, bytes: &[u8]) {
         Hasher64::write(self, bytes);

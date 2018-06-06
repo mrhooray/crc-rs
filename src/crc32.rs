@@ -9,13 +9,12 @@ pub use util::CalcType;
 include!(concat!(env!("OUT_DIR"), "/crc32_constants.rs"));
 
 /// Structure that holds all of the important values for calculating a CRC
-///
-/// # Definitions
-/// * **table:** Holds the table values based on the supplied polynomial for the fast CRC calculations
-/// * **initial:** The initial input value. AKA *reflect_in*
-/// * **value:** Holds the current value of the CRC
-/// * **reflect:** Chooses whether or not the CRC math is normal or reflected
-/// * **final_xor:** Final value to XOR with when calling Digest::sum32
+/// ### Details
+/// - **table**: Holds the table values based on the supplied polynomial for the fast CRC calculations
+/// - **initial**: The initial input value. AKA *reflect_in*
+/// - **value**: Holds the current value of the CRC
+/// - **reflect**: Chooses whether or not the CRC math is *Normal* or *Reverse*
+/// - **final_xor**: Final value to XOR with when calling `Digest::sum32()`. AKA *reflect_out*
 pub struct Digest {
     table: [u32; 256],
     initial: u32,
@@ -31,10 +30,10 @@ pub trait Hasher32 {
 }
 
 /// Caclulate the CRC of the byte string of values.
-///
+/// ### Details
 /// Updates the current CRC *value* using the CRC table *table* using the byte array *bytes*.
-/// The parameter *calc* will reflect the data.  *calc=normal* will calculate the CRC MSB first.
-/// *calc=reflect* will calculate the CRC LSB first.  *calc=compat* will calculate the CRC LSB first
+/// The parameter *calc* will reflect the data.  *calc=Normal* will calculate the CRC MSB first.
+/// *calc=Reverse* will calculate the CRC LSB first.  *calc=Compat* will calculate the CRC LSB first
 /// and reflect *value* both in and out.
 ///
 /// # Usage
@@ -64,12 +63,12 @@ pub fn update(mut value: u32, table: &[u32; 256], bytes: &[u8], calc: &CalcType)
     value
 }
 
-/// Generates a generic IEEE 32 bit CRC (AKA CRC32)
+/// Generates a generic IEEE 32 bit CRC (AKA CRC32).
 pub fn checksum_ieee(bytes: &[u8]) -> u32 {
     return update(0u32, &IEEE_TABLE, bytes, &CalcType::Compat);
 }
 
-/// Generates a generic Castagnoli 32 bit CRC (AKA CRC32-C)
+/// Generates a generic Castagnoli 32 bit CRC (AKA CRC32-C).
 pub fn checksum_castagnoli(bytes: &[u8]) -> u32 {
     return update(0u32, &CASTAGNOLI_TABLE, bytes, &CalcType::Compat);
 }
@@ -80,7 +79,7 @@ pub fn checksum_koopman(bytes: &[u8]) -> u32 {
 }
 
 impl Digest {
-    /// Creates a new table from the supplied polynomial and reflect parameter
+    /// Creates a new table from the supplied polynomial and reflect parameter.
     ///
     /// # Example
     ///
@@ -100,7 +99,7 @@ impl Digest {
         }
     }
 
-    /// Creates a new table from the supplied polynomial, reflect parameter, and an initial value
+    /// Creates a new table from the supplied polynomial, reflect parameter, and an initial value.
     ///
     /// # Example
     ///
@@ -120,9 +119,9 @@ impl Digest {
         }
     }
 
-    /// Creates a new table from the supplied polynomial, reflect parameter, initial value, and final XOR value
-    ///
-    /// This should be the dafault way to generate a custom CRC32.  See default values here: *http://crccalc.com/*
+    /// Creates a new table from the supplied polynomial, reflect parameter, initial value, and final XOR value.
+    /// ### Details
+    /// This should be the dafault way to generate a custom CRC32.  See default values here: *http://crccalc.com/*.
     /// The example will generate a standard CRC32 table.
     ///
     /// # Example
@@ -150,12 +149,12 @@ impl Digest {
 }
 
 impl Hasher32 for Digest {
-    /// Resets the current CRC to the initial value
+    /// Resets the current CRC in *value* to the *initial* value
     fn reset(&mut self) {
         self.value = self.initial;
     }
 
-    /// Takes in a byte array and updates the CRC from based on the Digest::reflect field
+    /// Takes in a byte array and updates the CRC from based on the `Digest::reflect` field
     fn write(&mut self, bytes: &[u8]) {
         self.value = update(self.value, &self.table, bytes, &self.reflect);
     }
@@ -166,7 +165,7 @@ impl Hasher32 for Digest {
     }
 }
 
-/// Implementation of std::hash::Hasher so that types which #[derive(Hash)] can hash with Digest.
+/// Implementation of `std::hash::Hasher` so that types which #[derive(Hash)] can hash with Digest.
 impl Hasher for Digest {
     fn write(&mut self, bytes: &[u8]) {
         Hasher32::write(self, bytes);

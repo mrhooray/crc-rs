@@ -1,15 +1,17 @@
-/// The type of calculations to run in `update()`
-///
-/// - **normal:** forward calculation.
-/// - **reverse:** reverse calculation.
-/// - **compat:** Initial value is reflected in and out. Calc is reversed.
+/// The type of calculations to run in `update()`.
+/// - **Normal**: Forward calculation, MSB.
+///   - Used with `new_custom()`.
+/// - **Reverse**: Reverse calculation, LSB.
+///   - Used with `new_custom()`.
+/// - **Compat**: Initial value is reflected in and out. The CRC calculation is *Reverse*.
+///   - Used internally
 pub enum CalcType {
     Normal,
     Reverse,
     Compat,
 }
 
-/// Builds a CRC16 table using the standard or reflected CRC method
+/// Builds a CRC16 table using the standard or reflected CRC method.
 /// If reflect==true, flip the individual byte bitwise, then flip the 16bit table value bitwise
 pub fn make_table_crc16(poly: u16, reflect: bool) -> [u16; 256] {
     let mut table = [0u16; 256];
@@ -44,7 +46,7 @@ pub fn make_table_crc16(poly: u16, reflect: bool) -> [u16; 256] {
     table
 }
 
-/// Builds a CRC32 table using the standard CRC method
+/// Builds a CRC32 table using the standard CRC method.
 /// If reflect==true, flip the individual byte bitwise, then flip the 32bit table value bitwise
 pub fn make_table_crc32(poly: u32, reflect: bool) -> [u32; 256] {
     let mut table = [0u32; 256];
@@ -79,7 +81,7 @@ pub fn make_table_crc32(poly: u32, reflect: bool) -> [u32; 256] {
     table
 }
 
-/// Builds a CRC64 table using the standard CRC method
+/// Builds a CRC64 table using the standard CRC method.
 /// If reflect==true, flip the individual byte bitwise, then flip the 64bit table value bitwise
 pub fn make_table_crc64(poly: u64, reflect: bool) -> [u64; 256] {
     let mut table = [0u64; 256];
@@ -114,7 +116,7 @@ pub fn make_table_crc64(poly: u64, reflect: bool) -> [u64; 256] {
     table
 }
 
-/// Reflects a value of a 16 bit number
+/// Reflects a value of a 16 bit number.
 fn reflect_value_16(mut value: u16) -> u16 {
     let mut reflection: u16 = 0u16;
     let bits = 16;
@@ -128,7 +130,7 @@ fn reflect_value_16(mut value: u16) -> u16 {
     reflection
 }
 
-/// Reflects a value of a 32 bit number
+/// Reflects a value of a 32 bit number.
 fn reflect_value_32(mut value: u32) -> u32 {
     let mut reflection: u32 = 0u32;
     let bits = 32;
@@ -142,7 +144,7 @@ fn reflect_value_32(mut value: u32) -> u32 {
     reflection
 }
 
-/// Reflects a value of a 64 bit number
+/// Reflects a value of a 64 bit number.
 fn reflect_value_64(mut value: u64) -> u64 {
     let mut reflection: u64 = 0u64;
     let bits = 64;
