@@ -1,3 +1,14 @@
+/// The type of calculations to run in `update()`
+///
+/// - **normal:** forward calculation.
+/// - **reverse:** reverse calculation.
+/// - **compat:** Initial value is reflected in and out. Calc is reversed.
+pub enum CalcType {
+    Normal,
+    Reverse,
+    Compat,
+}
+
 /// Builds a CRC16 table using the standard or reflected CRC method
 /// If reflect==true, flip the individual byte bitwise, then flip the 16bit table value bitwise
 pub fn make_table_crc16(poly: u16, reflect: bool) -> [u16; 256] {

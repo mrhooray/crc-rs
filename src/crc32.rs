@@ -4,6 +4,7 @@ use core::hash::Hasher;
 use std::hash::Hasher;
 
 pub use util::make_table_crc32 as make_table;
+pub use util::CalcType;
 
 include!(concat!(env!("OUT_DIR"), "/crc32_constants.rs"));
 
@@ -19,7 +20,7 @@ pub struct Digest {
     table: [u32; 256],
     initial: u32,
     value: u32,
-    reflect: bool,
+    reflect: CalcType,
     final_xor: u32,
 }
 
@@ -32,38 +33,50 @@ pub trait Hasher32 {
 /// Caclulate the CRC of the byte string of values.
 ///
 /// Updates the current CRC *value* using the CRC table *table* using the byte array *bytes*.
-/// The parameter *rfl* will reflect the data.  *rfl=false* will calculate the CRC MSB first.
-/// *rfl=true* will calculate the CRC LSB first.
+/// The parameter *calc* will reflect the data.  *calc=normal* will calculate the CRC MSB first.
+/// *calc=reflect* will calculate the CRC LSB first.  *calc=compat* will calculate the CRC LSB first
+/// and reflect *value* both in and out.
 ///
 /// # Usage
 ///
 /// call using Digest::write(&bytes)
-pub fn update(mut value: u32, table: &[u32; 256], bytes: &[u8], rfl: bool) -> u32 {
-    if rfl {
-        value = bytes.iter().fold(value, |acc, &x| {
-            (acc >> 8) ^ (table[((acc ^ (u32::from(x))) & 0xFF) as usize])
-        });
-    } else {
-        value = bytes.iter().fold(value, |acc, &x| {
-            (acc << 8) ^ (table[((u32::from(x)) ^ (acc >> 24)) as usize])
-        });
+pub fn update(mut value: u32, table: &[u32; 256], bytes: &[u8], calc: &CalcType) -> u32 {
+    match calc {
+        CalcType::Normal => {
+            value = bytes.iter().fold(value, |acc, &x| {
+                (acc << 8) ^ (table[((u32::from(x)) ^ (acc >> 24)) as usize])
+            })
+        }
+        CalcType::Reverse => {
+            value = bytes.iter().fold(value, |acc, &x| {
+                (acc >> 8) ^ (table[((acc ^ (u32::from(x))) & 0xFF) as usize])
+            })
+        }
+        CalcType::Compat => {
+            value = !value;
+            value = bytes.iter().fold(value, |acc, &x| {
+                (acc >> 8) ^ (table[((acc ^ (u32::from(x))) & 0xFF) as usize])
+            });
+            value = !value;
+        }
     }
+
     value
 }
 
 /// Generates a generic IEEE 32 bit CRC (AKA CRC32)
 pub fn checksum_ieee(bytes: &[u8]) -> u32 {
-    return update(0xFFFFFFFF, &IEEE_TABLE, bytes, true) ^ 0xFFFFFFFF;
+    return update(0u32, &IEEE_TABLE, bytes, &CalcType::Compat);
 }
 
 /// Generates a generic Castagnoli 32 bit CRC (AKA CRC32-C)
 pub fn checksum_castagnoli(bytes: &[u8]) -> u32 {
-    return update(0xFFFFFFFF, &CASTAGNOLI_TABLE, bytes, true) ^ 0xFFFFFFFF;
+    return update(0u32, &CASTAGNOLI_TABLE, bytes, &CalcType::Compat);
 }
 
 /// Generates a generic Koopman 32 bit CRC (AKA CRC32-K)
 pub fn checksum_koopman(bytes: &[u8]) -> u32 {
-    return update(0xFFFFFFFF, &KOOPMAN_TABLE, bytes, true) ^ 0xFFFFFFFF;
+    return update(0u32, &KOOPMAN_TABLE, bytes, &CalcType::Compat);
 }
 
 impl Digest {
@@ -80,10 +93,10 @@ impl Digest {
     pub fn new(poly: u32) -> Digest {
         Digest {
             table: make_table(poly, true),
-            initial: 0xFFFFFFFF,
-            value: 0xFFFFFFFF,
-            reflect: true,
-            final_xor: 0xFFFFFFFF,
+            initial: 0u32,
+            value: 0u32,
+            reflect: CalcType::Compat,
+            final_xor: 0u32,
         }
     }
 
@@ -93,17 +106,17 @@ impl Digest {
     ///
     /// ```rust
     /// use crc::{crc32, Hasher32};
-    /// let mut digest = crc32::Digest::new_with_initial(crc32::IEEE, 0xFFFFFFFF);
+    /// let mut digest = crc32::Digest::new_with_initial(crc32::IEEE, 0u32);
     /// digest.write(b"123456789");
     /// assert_eq!(digest.sum32(), 0xcbf43926);
     /// ```
     pub fn new_with_initial(poly: u32, initial: u32) -> Digest {
         Digest {
             table: make_table(poly, true),
-            initial: initial,
+            initial,
             value: initial,
-            reflect: true,
-            final_xor: 0xFFFFFFFF,
+            reflect: CalcType::Compat,
+            final_xor: 0u32,
         }
     }
 
@@ -116,16 +129,21 @@ impl Digest {
     ///
     /// ```rust
     /// use crc::{crc32, Hasher32};
-    /// let mut digest = crc32::Digest::new_custom(crc32::IEEE, 0xFFFFFFFF, true, 0xFFFFFFFF);
+    /// let mut digest = crc32::Digest::new_custom(crc32::IEEE, 0xFFFFFFFF, crc32::CalcType::Reverse, 0xFFFFFFFF);
     /// digest.write(b"123456789");
     /// assert_eq!(digest.sum32(), 0xcbf43926);
     /// ```
-    pub fn new_custom(poly: u32, initial: u32, reflect: bool, final_xor: u32) -> Digest {
+    pub fn new_custom(poly: u32, initial: u32, reflect: CalcType, final_xor: u32) -> Digest {
+        let mut rfl: bool = true;
+        if let CalcType::Normal = reflect {
+            rfl = false;
+        }
+
         Digest {
-            table: make_table(poly, reflect),
+            table: make_table(poly, rfl),
             initial: initial,
             value: initial,
-            reflect: reflect,
+            reflect,
             final_xor: final_xor,
         }
     }
@@ -139,7 +157,7 @@ impl Hasher32 for Digest {
 
     /// Takes in a byte array and updates the CRC from based on the Digest::reflect field
     fn write(&mut self, bytes: &[u8]) {
-        self.value = update(self.value, &self.table, bytes, self.reflect);
+        self.value = update(self.value, &self.table, bytes, &self.reflect);
     }
 
     /// Returns the current CRC after being XOR'd with the final XOR value

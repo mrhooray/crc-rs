@@ -1,7 +1,7 @@
 extern crate crc;
 
 mod crc16 {
-    use crc::{Hasher16, crc16};
+    use crc::{crc16, Hasher16};
 
     const X25_CHECK_VALUE: u16 = 0x906e;
     const USB_CHECK_VALUE: u16 = 0xb4c8;
@@ -39,7 +39,7 @@ mod crc16 {
 }
 
 mod crc32 {
-    use crc::{Hasher32, crc32};
+    use crc::{crc32, Hasher32};
 
     const CASTAGNOLI_CHECK_VALUE: u32 = 0xe3069283;
     const IEEE_CHECK_VALUE: u32 = 0xcbf43926;
@@ -91,7 +91,7 @@ mod crc32 {
 }
 
 mod crc64 {
-    use crc::{Hasher64, crc64};
+    use crc::{crc64, Hasher64};
 
     const ECMA_CHECK_VALUE: u64 = 0x995dc9bbdf1939fa;
     const ISO_CHECK_VALUE: u64 = 0xb90956c775a41001;
@@ -138,7 +138,7 @@ mod crc64 {
     }
 
     fn verify_checksum2(poly: u64, check_value: u64) {
-        let mut digest = crc64::Digest::new_with_initial(poly, 0xFFFFFFFFFFFFFFFF);
+        let mut digest = crc64::Digest::new_with_initial(poly, 0u64);
         digest.write(b"123456789");
         assert_eq!(digest.sum64(), check_value);
         digest.reset();
@@ -150,7 +150,7 @@ mod crc64 {
 
     fn verify_checksum3(poly: u64, check_value: u64) {
         let mut digest =
-            crc64::Digest::new_custom(poly, 0xFFFFFFFFFFFFFFFF, true, 0xFFFFFFFFFFFFFFFF);
+            crc64::Digest::new_custom(poly, 0xFFFFFFFFFFFFFFFF, crc64::CalcType::Reverse, 0xFFFFFFFFFFFFFFFF);
         digest.write(b"123456789");
         assert_eq!(digest.sum64(), check_value);
         digest.reset();
