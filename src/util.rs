@@ -25,7 +25,7 @@ pub fn make_table_crc16(poly: u16, reflect: bool) -> [u16; 256] {
             byte = i;
         }
 
-        // Shift the cuttent table value "i" to the top byte in the long
+        // Shift the current table value "i" to the top byte in the long
         let mut value: u16 = byte << 8; //8=16 bit - 8
 
         // Step through all the bits in the byte
@@ -60,7 +60,7 @@ pub fn make_table_crc32(poly: u32, reflect: bool) -> [u32; 256] {
             byte = i;
         }
 
-        // Shift the cuttent table value "i" to the top byte in the long
+        // Shift the current table value "i" to the top byte in the long
         let mut value: u32 = byte << 24; //24=32 bit - 8
 
         // Step through all the bits in the byte
@@ -95,7 +95,7 @@ pub fn make_table_crc64(poly: u64, reflect: bool) -> [u64; 256] {
             byte = i as u64;
         }
 
-        // Shift the cuttent table value "i" to the top byte in the long
+        // Shift the current table value "i" to the top byte in the long
         let mut value: u64 = byte << 56; //56=64 bit - 8
 
         // Step through all the bits in the byte

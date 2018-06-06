@@ -29,7 +29,7 @@ pub trait Hasher32 {
     fn sum32(&self) -> u32;
 }
 
-/// Caclulate the CRC of the byte string of values.
+/// Calculate the CRC of the byte string of values.
 /// ### Details
 /// Updates the current CRC *value* using the CRC table *table* using the byte array *bytes*.
 /// The parameter *calc* will reflect the data.  *calc=Normal* will calculate the CRC MSB first.
@@ -121,7 +121,7 @@ impl Digest {
 
     /// Creates a new table from the supplied polynomial, reflect parameter, initial value, and final XOR value.
     /// ### Details
-    /// This should be the dafault way to generate a custom CRC32.  See default values here: *http://crccalc.com/*.
+    /// This should be the default way to generate a custom CRC32.  See default values here: *http://crccalc.com/*.
     /// The example will generate a standard CRC32 table.
     ///
     /// # Example
@@ -140,10 +140,10 @@ impl Digest {
 
         Digest {
             table: make_table(poly, rfl),
-            initial: initial,
+            initial,
             value: initial,
             reflect,
-            final_xor: final_xor,
+            final_xor,
         }
     }
 }
@@ -167,11 +167,11 @@ impl Hasher32 for Digest {
 
 /// Implementation of `std::hash::Hasher` so that types which #[derive(Hash)] can hash with Digest.
 impl Hasher for Digest {
-    fn write(&mut self, bytes: &[u8]) {
-        Hasher32::write(self, bytes);
-    }
-
     fn finish(&self) -> u64 {
         self.sum32() as u64
+    }
+
+    fn write(&mut self, bytes: &[u8]) {
+        Hasher32::write(self, bytes);
     }
 }
