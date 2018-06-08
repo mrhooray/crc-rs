@@ -5,6 +5,8 @@ mod crc16 {
 
     const X25_CHECK_VALUE: u16 = 0x906e;
     const USB_CHECK_VALUE: u16 = 0xb4c8;
+    const ARC_CHECK_VALUE: u16 = 0xbb3d;
+    const MOD_CHECK_VALUE: u16 = 0x4b37;
 
     #[test]
     fn checksum_x25() {
@@ -12,9 +14,20 @@ mod crc16 {
     }
 
     #[test]
+    fn checksum_arc() {
+        assert_eq!(crc16::checksum_arc(b"123456789"), ARC_CHECK_VALUE)
+    }
+
+    #[test]
+    fn checksum_modbus() {
+        assert_eq!(crc16::checksum_modbus(b"123456789"), MOD_CHECK_VALUE)
+    }
+
+    #[test]
     fn checksum_usb() {
         assert_eq!(crc16::checksum_usb(b"123456789"), USB_CHECK_VALUE)
     }
+
 
     #[test]
     fn digest_x25() {
@@ -23,7 +36,7 @@ mod crc16 {
 
     #[test]
     fn digest_usb() {
-        verify_checksum(crc16::USB, USB_CHECK_VALUE);
+        verify_checksum(crc16::POLY_8005, USB_CHECK_VALUE);
     }
 
     fn verify_checksum(poly: u16, check_value: u16) {

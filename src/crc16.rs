@@ -42,9 +42,11 @@ pub trait Hasher16 {
 pub fn update(mut value: u16, table: &[u16; 256], bytes: &[u8], calc: &CalcType) -> u16 {
     match calc {
         CalcType::Normal => {
+            value = !value;
             value = bytes.iter().fold(value, |acc, &x| {
                 (acc << 8) ^ (table[((u16::from(x)) ^ (acc >> 8)) as usize])
-            })
+            });
+            value = !value;
         }
         CalcType::Reverse => {
             value = bytes.iter().fold(value, |acc, &x| {
@@ -68,9 +70,22 @@ pub fn checksum_x25(bytes: &[u8]) -> u16 {
     return update(0u16, &X25_TABLE, bytes, &CalcType::Compat);
 }
 
-/// Generates a generic USB 16 bit CRC (AKA CRC-16-IBM).
+/// Generates a generic ARC 16 bit CRC (AKA CRC-IBM, CRC-16/ARC, CRC-16/LHA)
+/// width=16 poly=0x8005 init=0x0000 refin=true refout=true xorout=0x0000 check=0xbb3d residue=0x0000 name="ARC"
+pub fn checksum_arc(bytes: &[u8]) -> u16 {
+    return update(0u16, &POLY_8005_TABLE, bytes, &CalcType::Reverse);
+}
+
+/// Generates a Modbus CRC-16 value
+/// width=16 poly=0x8005 init=0xffff refin=true refout=true xorout=0x0000 check=0x4b37 residue=0x0000 name="MODBUS"
+pub fn checksum_modbus(bytes: &[u8]) -> u16 {
+    return update(0xffffu16, &POLY_8005_TABLE, bytes, &CalcType::Reverse);
+}
+
+/// Generates a generic USB 16 bit CRC
+/// width=16 poly=0x8005 init=0xffff refin=true refout=true xorout=0xffff check=0xb4c8 residue=0xb001 name="CRC-16/USB"
 pub fn checksum_usb(bytes: &[u8]) -> u16 {
-    return update(0u16, &USB_TABLE, bytes, &CalcType::Compat);
+    return update(0u16, &POLY_8005_TABLE, bytes, &CalcType::Compat);
 }
 
 impl Digest {

@@ -11,9 +11,9 @@ fn create_constants() {
     crc16.add_value("X25", "u16", X25);
     crc16.add_array("X25_TABLE", "u16", &make_table_crc16(X25, true));
 
-    let USB: u16 = 0x8005;
-    crc16.add_value("USB", "u16", USB);
-    crc16.add_array("USB_TABLE", "u16", &make_table_crc16(USB, true));
+    let POLY_8005: u16 = 0x8005;
+    crc16.add_value("POLY_8005", "u16", POLY_8005);
+    crc16.add_array("POLY_8005_TABLE", "u16", &make_table_crc16(POLY_8005, true));
 
     crc16.finish();
 
