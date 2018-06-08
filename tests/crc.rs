@@ -6,7 +6,9 @@ mod crc16 {
     const X25_CHECK_VALUE: u16 = 0x906e;
     const USB_CHECK_VALUE: u16 = 0xb4c8;
     const ARC_CHECK_VALUE: u16 = 0xbb3d;
-    const MOD_CHECK_VALUE: u16 = 0x4b37;
+    const MODBUS_CHECK_VALUE: u16 = 0x4b37;
+    const KERMIT_CHECK_VALUE: u16 = 0x2189;
+    const XMODEM_CHECK_VALUE: u16 = 0x31c3;
 
     #[test]
     fn checksum_x25() {
@@ -20,7 +22,17 @@ mod crc16 {
 
     #[test]
     fn checksum_modbus() {
-        assert_eq!(crc16::checksum_modbus(b"123456789"), MOD_CHECK_VALUE)
+        assert_eq!(crc16::checksum_modbus(b"123456789"), MODBUS_CHECK_VALUE)
+    }
+
+    #[test]
+    fn checksum_kermit() {
+        assert_eq!(crc16::checksum_kermit(b"123456789"), KERMIT_CHECK_VALUE)
+    }
+
+    #[test]
+    fn checksum_xmodem() {
+        assert_eq!(crc16::checksum_xmodem(b"123456789"), XMODEM_CHECK_VALUE)
     }
 
     #[test]

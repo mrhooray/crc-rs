@@ -34,7 +34,7 @@ pub trait Hasher16 {
 /// Updates the current CRC *value* using the CRC table *table* using the byte array *bytes*.
 /// The parameter *calc* will reflect the data.  *calc=Normal* will calculate the CRC MSB first.
 /// *calc=Reverse* will calculate the CRC LSB first.  *calc=Compat* will calculate the CRC LSB first
-/// and reflect *value* both in and out.
+/// and reflect *value* both in and out.  *calc=None* will calculate an MSB-first sum witih no reflection.
 ///
 /// # Usage
 ///
@@ -47,6 +47,11 @@ pub fn update(mut value: u16, table: &[u16; 256], bytes: &[u8], calc: &CalcType)
                 (acc << 8) ^ (table[((u16::from(x)) ^ (acc >> 8)) as usize])
             });
             value = !value;
+        }
+        CalcType::None => {
+            value = bytes.iter().fold(value, |acc, &x| {
+                (acc << 8) ^ (table[((u16::from(x)) ^ (acc >> 8)) as usize])
+            });
         }
         CalcType::Reverse => {
             value = bytes.iter().fold(value, |acc, &x| {
@@ -86,6 +91,18 @@ pub fn checksum_modbus(bytes: &[u8]) -> u16 {
 /// width=16 poly=0x8005 init=0xffff refin=true refout=true xorout=0xffff check=0xb4c8 residue=0xb001 name="CRC-16/USB"
 pub fn checksum_usb(bytes: &[u8]) -> u16 {
     return update(0u16, &POLY_8005_TABLE, bytes, &CalcType::Compat);
+}
+
+/// Generates an XMODEM CRC-16 (LSB-first form = KERMIT)
+/// width=16 poly=0x1021 init=0x0000 refin=false refout=false xorout=0x0000 check=0x31c3 residue=0x0000 name="XMODEM"
+pub fn checksum_xmodem(bytes: &[u8]) -> u16 {
+    return update(0u16, &XMODEM_TABLE, bytes, &CalcType::None);
+}
+
+/// Generates an KERMIT CRC-16 AKA CRC-16/CCITT (MSB-first form = XMODEM)
+/// width=16 poly=0x1021 init=0x0000 refin=true refout=true xorout=0x0000 check=0x2189 residue=0x0000 name="KERMIT"
+pub fn checksum_kermit(bytes: &[u8]) -> u16 {
+    return update(0u16, &KERMIT_TABLE, bytes, &CalcType::Reverse);
 }
 
 impl Digest {

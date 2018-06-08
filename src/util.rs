@@ -7,6 +7,7 @@
 ///   - Used internally
 pub enum CalcType {
     Normal,
+    None,
     Reverse,
     Compat,
 }

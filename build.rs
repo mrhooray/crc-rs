@@ -7,6 +7,7 @@ fn create_constants() {
     let mut crc16 = build_const::ConstWriter::for_build("crc16_constants")
         .unwrap()
         .finish_dependencies();
+
     let X25: u16 = 0x1021;
     crc16.add_value("X25", "u16", X25);
     crc16.add_array("X25_TABLE", "u16", &make_table_crc16(X25, true));
@@ -14,6 +15,14 @@ fn create_constants() {
     let POLY_8005: u16 = 0x8005;
     crc16.add_value("POLY_8005", "u16", POLY_8005);
     crc16.add_array("POLY_8005_TABLE", "u16", &make_table_crc16(POLY_8005, true));
+
+    let XMODEM: u16 = 0x1021;
+    crc16.add_value("XMODEM", "u16", XMODEM);
+    crc16.add_array("XMODEM_TABLE", "u16", &make_table_crc16(XMODEM, false));
+
+    let KERMIT: u16 = 0x1021;
+    crc16.add_value("KERMIT", "u16", KERMIT);
+    crc16.add_array("KERMIT_TABLE", "u16", &make_table_crc16(KERMIT, true));
 
     crc16.finish();
 

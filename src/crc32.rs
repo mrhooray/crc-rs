@@ -42,6 +42,13 @@ pub trait Hasher32 {
 pub fn update(mut value: u32, table: &[u32; 256], bytes: &[u8], calc: &CalcType) -> u32 {
     match calc {
         CalcType::Normal => {
+            value = !value;
+            value = bytes.iter().fold(value, |acc, &x| {
+                (acc << 8) ^ (table[((u32::from(x)) ^ (acc >> 24)) as usize])
+            });
+            value = !value;
+        }
+        CalcType::None => {
             value = bytes.iter().fold(value, |acc, &x| {
                 (acc << 8) ^ (table[((u32::from(x)) ^ (acc >> 24)) as usize])
             })
