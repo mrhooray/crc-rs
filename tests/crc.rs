@@ -91,7 +91,7 @@ mod crc32 {
 }
 
 mod crc64 {
-    use crc::{crc64, Hasher64};
+    use crc::{crc64, CalcType, Hasher64};
 
     const ECMA_CHECK_VALUE: u64 = 0x995dc9bbdf1939fa;
     const ISO_CHECK_VALUE: u64 = 0xb90956c775a41001;
@@ -149,12 +149,7 @@ mod crc64 {
     }
 
     fn verify_checksum3(poly: u64, check_value: u64) {
-        let mut digest = crc64::Digest::new_custom(
-            poly,
-            0xFFFFFFFFFFFFFFFF,
-            crc64::CalcType::Reverse,
-            0xFFFFFFFFFFFFFFFF,
-        );
+        let mut digest = crc64::Digest::new_custom(poly, !0u64, !0u64, CalcType::Reverse);
         digest.write(b"123456789");
         assert_eq!(digest.sum64(), check_value);
         digest.reset();
