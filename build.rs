@@ -45,6 +45,12 @@ fn create_constants() {
     crc32.add_value("KOOPMAN", "u32", KOOPMAN);
     crc32.add_array("KOOPMAN_TABLE", "u32", &make_table_crc32(KOOPMAN, true));
 
+    let MPEG2: u32 = 0x4C11DB7;
+    let MPEG2_INITIAL: u32 = 0xffffffff;
+    crc32.add_value("MPEG2", "u32", MPEG2);
+    crc32.add_value("MPEG2_INITIAL", "u32", MPEG2_INITIAL);
+    crc32.add_array("MPEG2_TABLE", "u32", &make_table_crc32(MPEG2, false));
+
     crc32.finish();
 
     let mut crc64 = build_const::ConstWriter::for_build("crc64_constants")

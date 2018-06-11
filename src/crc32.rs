@@ -85,6 +85,10 @@ pub fn checksum_koopman(bytes: &[u8]) -> u32 {
     return update(0u32, &KOOPMAN_TABLE, bytes, &CalcType::Compat);
 }
 
+pub fn checksum_mpeg2(bytes: &[u8]) -> u32 {
+    return update(0xffffffffu32, &MPEG2_TABLE, bytes, &CalcType::None);
+}
+
 impl Digest {
     /// Creates a new table from the supplied polynomial and reflect parameter.
     ///

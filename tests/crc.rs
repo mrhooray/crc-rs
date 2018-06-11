@@ -69,6 +69,7 @@ mod crc32 {
     const CASTAGNOLI_CHECK_VALUE: u32 = 0xe3069283;
     const IEEE_CHECK_VALUE: u32 = 0xcbf43926;
     const KOOPMAN_CHECK_VALUE: u32 = 0x2d3dd0ae;
+    const MPEG2_CHECK_VALUE: u32 = 0x0376e6e7;
 
     #[test]
     fn checksum_castagnoli() {
@@ -86,6 +87,11 @@ mod crc32 {
     #[test]
     fn checksum_koopman() {
         assert_eq!(crc32::checksum_koopman(b"123456789"), KOOPMAN_CHECK_VALUE)
+    }
+
+    #[test]
+    fn checksum_mpeg2() {
+        assert_eq!(crc32::checksum_mpeg2(b"123456789"), MPEG2_CHECK_VALUE)
     }
 
     #[test]
