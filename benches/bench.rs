@@ -1,42 +1,62 @@
-#![feature(test)]
 extern crate crc;
-extern crate test;
+#[macro_use]
+extern crate criterion;
 
 use crc::{crc16, crc32, crc64};
-use test::Bencher;
+use criterion::{Benchmark, Criterion, Throughput};
 
-#[bench]
-fn bench_crc16_make_table(b: &mut Bencher) {
-    b.iter(|| crc16::make_table(crc16::X25, true));
+fn crc16_make_table(c: &mut Criterion) {
+    c.bench_function("crc16_make_table", |b| {
+        b.iter(|| crc16::make_table(crc16::X25, true))
+    });
 }
 
-#[bench]
-fn bench_crc16_update_megabytes(b: &mut Bencher) {
+fn crc16_update_megabytes(c: &mut Criterion) {
     let table = crc16::make_table(crc16::X25, true);
     let bytes = Box::new([0u8; 1_000_000]);
-    b.iter(|| crc16::update(0, &table, &*bytes, &crc::CalcType::Reverse));
+    c.bench(
+        "crc16_update_megabytes",
+        Benchmark::new("crc16_update_megabytes", move |b| {
+            b.iter(|| crc16::update(0, &table, &*bytes, &crc::CalcType::Reverse))
+        }).throughput(Throughput::Bytes(1_000_000)),
+    );
 }
 
-#[bench]
-fn bench_crc32_make_table(b: &mut Bencher) {
-    b.iter(|| crc32::make_table(crc32::IEEE, true));
+fn crc32_make_table(c: &mut Criterion) {
+    c.bench_function("crc32_make_table", |b| {
+        b.iter(|| crc32::make_table(crc32::IEEE, true))
+    });
 }
 
-#[bench]
-fn bench_crc32_update_megabytes(b: &mut Bencher) {
+fn crc32_update_megabytes(c: &mut Criterion) {
     let table = crc32::make_table(crc32::IEEE, true);
     let bytes = Box::new([0u8; 1_000_000]);
-    b.iter(|| crc32::update(0, &table, &*bytes, &crc::CalcType::Reverse));
+    c.bench(
+        "crc32_update_megabytes",
+        Benchmark::new("crc32_update_megabytes", move |b| {
+            b.iter(|| crc32::update(0, &table, &*bytes, &crc::CalcType::Reverse))
+        }).throughput(Throughput::Bytes(1_000_000)),
+    );
 }
 
-#[bench]
-fn bench_crc64_make_table(b: &mut Bencher) {
-    b.iter(|| crc64::make_table(crc64::ECMA, true));
+fn crc64_make_table(c: &mut Criterion) {
+    c.bench_function("crc64_make_table", |b| {
+        b.iter(|| crc64::make_table(crc64::ECMA, true))
+    });
 }
 
-#[bench]
-fn bench_crc64_update_megabytes(b: &mut Bencher) {
+fn crc64_update_megabytes(c: &mut Criterion) {
     let table = crc64::make_table(crc64::ECMA, true);
     let bytes = Box::new([0u8; 1_000_000]);
-    b.iter(|| crc64::update(0, &table, &*bytes, &crc::CalcType::Reverse));
+    c.bench(
+        "crc64_update_megabytes",
+        Benchmark::new("crc64_update_megabytes", move |b| {
+            b.iter(|| crc64::update(0, &table, &*bytes, &crc::CalcType::Reverse))
+        }).throughput(Throughput::Bytes(1_000_000)),
+    );
 }
+
+criterion_group!(crc16, crc16_make_table, crc16_update_megabytes);
+criterion_group!(crc32, crc32_make_table, crc32_update_megabytes);
+criterion_group!(crc64, crc64_make_table, crc64_update_megabytes);
+criterion_main!(crc16, crc32, crc64);

@@ -15,3 +15,10 @@ build_const = "0.2"
 [features]
 std = []
 default = ["std"]
+
+[dev-dependencies]
+criterion = "0.2.5"
+
+[[bench]]
+name = "bench"
+harness = false
