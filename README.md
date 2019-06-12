@@ -1,27 +1,17 @@
-# crc [![Build Status](https://travis-ci.org/mrhooray/crc-rs.svg?branch=master)](https://travis-ci.org/mrhooray/crc-rs)
-> Rust implementation of CRC(16, 32, 64) with support of various standards
+# crc
 
-* [Crate](https://crates.io/crates/crc)
-* [Documentation](https://docs.rs/crc/)
-* [Usage](#usage)
-* [Benchmark](#benchmark)
-* [License](#license)
+[![Build Status](https://travis-ci.org/mrhooray/crc-rs.svg?branch=master)](https://travis-ci.org/mrhooray/crc-rs)
+[![Crate](https://img.shields.io/crates/v/crc.svg)](https://crates.io/crates/crc)
+[![Docs](https://docs.rs/crc/badge.svg)](https://docs.rs/crc)
+[![License](https://img.shields.io/crates/l/crc.svg?maxAge=2592000)](https://github.com/mrhooray/crc-rs#license)
+
+Rust implementation of CRC(16, 32, 64) with support of various standards
 
 ## Usage
 Add `crc` to `Cargo.toml`
 ```toml
 [dependencies]
-crc = "^1.0.0"
-```
-or
-```toml
-[dependencies.crc]
-git = "https://github.com/mrhooray/crc-rs"
-```
-
-Add this to crate root
-```rust
-extern crate crc;
+crc = "2.0"
 ```
 
 ### Compute CRC16
@@ -42,7 +32,7 @@ digest.write(b"123456789");
 assert_eq!(digest.sum16(), 0x906e);
 
 // more customization
-let mut digest = crc16::Digest::new_custom(crc16::X25, !0u16, !0u16, crc::CalcType::Reverse);
+let mut digest = crc16::Digest::new_custom(crc16::X25, 0u16, 0u16, crc::CalcType::Reverse);
 digest.write(b"123456789");
 assert_eq!(digest.sum16(), 0x906e);
 ```
@@ -67,7 +57,7 @@ digest.write(b"123456789");
 assert_eq!(digest.sum32(), 0xcbf43926);
 
 // more customization
-let mut digest = crc32::Digest::new_custom(crc32::IEEE, !0u32, !0u32, crc::CalcType::Reverse);
+let mut digest = crc32::Digest::new_custom(crc32::IEEE, 0u32, 0u32, crc::CalcType::Reverse);
 digest.write(b"123456789");
 assert_eq!(digest.sum32(), 0xcbf43926);
 ```
@@ -90,13 +80,12 @@ digest.write(b"123456789");
 assert_eq!(digest.sum64(), 0x995dc9bbdf1939fa);
 
 // more customization
-let mut digest = crc64::Digest::new_custom(crc64::ECMA, !0u64, !0u64, crc::CalcType::Reverse);
+let mut digest = crc64::Digest::new_custom(crc64::ECMA, 0u64, 0u64, crc::CalcType::Reverse);
 digest.write(b"123456789");
 assert_eq!(digest.sum64(), 0x995dc9bbdf1939fa);
 ```
 
 ## Benchmark
-> Bencher is currently not available in Rust stable releases.
 
 `cargo bench` with 2.3 GHz Intel Core i7 results ~430MB/s throughput. [Comparison](http://create.stephan-brumme.com/crc32/)
 ```

@@ -1,10 +1,7 @@
-#[cfg(not(feature = "std"))]
 use core::hash::Hasher;
-#[cfg(feature = "std")]
-use std::hash::Hasher;
 
-use super::CalcType;
-pub use util::make_table_crc64 as make_table;
+use crate::CalcType;
+pub use crate::util::make_table_crc64 as make_table;
 
 include!(concat!(env!("OUT_DIR"), "/crc64_constants.rs"));
 
