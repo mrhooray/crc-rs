@@ -58,12 +58,12 @@ pub fn update(mut value: u64, table: &[u64; 256], bytes: &[u8], calc: &CalcType)
 
 /// Generates a ECMA-188 64 bit CRC checksum (AKA CRC-64-ECMA).
 pub fn checksum_ecma(bytes: &[u8]) -> u64 {
-    return update(0u64, &ECMA_TABLE, bytes, &CalcType::Compat);
+    update(0u64, &ECMA_TABLE, bytes, &CalcType::Compat)
 }
 
 /// Generates a ISO 3309 32 bit CRC checksum (AKA CRC-64-ISO).
 pub fn checksum_iso(bytes: &[u8]) -> u64 {
-    return update(0u64, &ISO_TABLE, bytes, &CalcType::Compat);
+    update(0u64, &ISO_TABLE, bytes, &CalcType::Compat)
 }
 
 impl Digest {
@@ -149,7 +149,7 @@ impl Hasher64 for Digest {
 
 impl Hasher for Digest {
     fn finish(&self) -> u64 {
-        self.sum64() as u64
+        self.sum64()
     }
 
     fn write(&mut self, bytes: &[u8]) {

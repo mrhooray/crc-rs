@@ -112,7 +112,7 @@ fn reflect_value_16(mut value: u16) -> u16 {
         if (value & 0x01) == 1 {
             reflection |= 1 << ((bits - 1) - i)
         }
-        value = value >> 1;
+        value >>= 1;
     }
     reflection
 }
@@ -126,7 +126,7 @@ fn reflect_value_32(mut value: u32) -> u32 {
         if (value & 0x01) == 1 {
             reflection |= 1 << ((bits - 1) - i)
         }
-        value = value >> 1;
+        value >>= 1;
     }
     reflection
 }
@@ -140,7 +140,7 @@ fn reflect_value_64(mut value: u64) -> u64 {
         if (value & 0x01) == 1 {
             reflection |= 1 << ((bits - 1) - i)
         }
-        value = value >> 1;
+        value >>= 1;
     }
     reflection
 }
@@ -155,7 +155,7 @@ fn reflect_byte_16(input: u16) -> u16 {
         if (value & 0x01) == 1 {
             reflection |= 1 << ((bits - 1) - i)
         }
-        value = value >> 1;
+        value >>= 1;
     }
     reflection
 }
@@ -170,7 +170,7 @@ fn reflect_byte_32(input: u32) -> u32 {
         if (value & 0x01) == 1 {
             reflection |= 1 << ((bits - 1) - i)
         }
-        value = value >> 1;
+        value >>= 1;
     }
     reflection
 }
@@ -185,7 +185,7 @@ fn reflect_byte_64(input: u64) -> u64 {
         if (value & 0x01) == 1 {
             reflection |= 1 << ((bits - 1) - i)
         }
-        value = value >> 1;
+        value >>= 1;
     }
     reflection
 }

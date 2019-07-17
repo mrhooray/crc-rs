@@ -58,12 +58,12 @@ pub fn update(mut value: u16, table: &[u16; 256], bytes: &[u8], calc: &CalcType)
 
 /// Generates a X25 16 bit CRC checksum (AKA CRC-16-CCITT).
 pub fn checksum_x25(bytes: &[u8]) -> u16 {
-    return update(0u16, &X25_TABLE, bytes, &CalcType::Compat);
+    update(0u16, &X25_TABLE, bytes, &CalcType::Compat)
 }
 
 /// Generates a USB 16 bit CRC checksum (AKA CRC-16-IBM).
 pub fn checksum_usb(bytes: &[u8]) -> u16 {
-    return update(0u16, &USB_TABLE, bytes, &CalcType::Compat);
+    update(0u16, &USB_TABLE, bytes, &CalcType::Compat)
 }
 
 impl Digest {
@@ -149,7 +149,7 @@ impl Hasher16 for Digest {
 
 impl Hasher for Digest {
     fn finish(&self) -> u64 {
-        self.sum16() as u64
+        u64::from(self.sum16())
     }
 
     fn write(&mut self, bytes: &[u8]) {
