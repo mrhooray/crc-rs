@@ -73,7 +73,6 @@
 //! assert_eq!(digest.sum64(), 0x995dc9bbdf1939fa);
 //! ```
 #![cfg_attr(not(feature = "std"), no_std)]
-#![allow(clippy::unreadable_literal)]
 
 pub mod crc16;
 pub mod crc32;
