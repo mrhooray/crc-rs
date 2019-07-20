@@ -58,17 +58,17 @@ pub fn update(mut value: u32, table: &[u32; 256], bytes: &[u8], calc: &CalcType)
 
 /// Generates a IEEE 32 bit CRC checksum (AKA CRC32).
 pub fn checksum_ieee(bytes: &[u8]) -> u32 {
-    return update(0u32, &IEEE_TABLE, bytes, &CalcType::Compat);
+    update(0u32, &IEEE_TABLE, bytes, &CalcType::Compat)
 }
 
 /// Generates a Castagnoli 32 bit CRC checksum (AKA CRC32-C).
 pub fn checksum_castagnoli(bytes: &[u8]) -> u32 {
-    return update(0u32, &CASTAGNOLI_TABLE, bytes, &CalcType::Compat);
+    update(0u32, &CASTAGNOLI_TABLE, bytes, &CalcType::Compat)
 }
 
 /// Generates a Koopman 32 bit CRC checksum (AKA CRC32-K).
 pub fn checksum_koopman(bytes: &[u8]) -> u32 {
-    return update(0u32, &KOOPMAN_TABLE, bytes, &CalcType::Compat);
+    update(0u32, &KOOPMAN_TABLE, bytes, &CalcType::Compat)
 }
 
 impl Digest {
@@ -154,7 +154,7 @@ impl Hasher32 for Digest {
 
 impl Hasher for Digest {
     fn finish(&self) -> u64 {
-        self.sum32() as u64
+        u64::from(self.sum32())
     }
 
     fn write(&mut self, bytes: &[u8]) {

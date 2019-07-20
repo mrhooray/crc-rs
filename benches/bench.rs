@@ -18,7 +18,8 @@ fn crc16_update_megabytes(c: &mut Criterion) {
         "crc16_update_megabytes",
         Benchmark::new("crc16_update_megabytes", move |b| {
             b.iter(|| crc16::update(0, &table, &*bytes, &crc::CalcType::Reverse))
-        }).throughput(Throughput::Bytes(1_000_000)),
+        })
+        .throughput(Throughput::Bytes(1_000_000)),
     );
 }
 
@@ -35,7 +36,8 @@ fn crc32_update_megabytes(c: &mut Criterion) {
         "crc32_update_megabytes",
         Benchmark::new("crc32_update_megabytes", move |b| {
             b.iter(|| crc32::update(0, &table, &*bytes, &crc::CalcType::Reverse))
-        }).throughput(Throughput::Bytes(1_000_000)),
+        })
+        .throughput(Throughput::Bytes(1_000_000)),
     );
 }
 
@@ -52,7 +54,8 @@ fn crc64_update_megabytes(c: &mut Criterion) {
         "crc64_update_megabytes",
         Benchmark::new("crc64_update_megabytes", move |b| {
             b.iter(|| crc64::update(0, &table, &*bytes, &crc::CalcType::Reverse))
-        }).throughput(Throughput::Bytes(1_000_000)),
+        })
+        .throughput(Throughput::Bytes(1_000_000)),
     );
 }
 

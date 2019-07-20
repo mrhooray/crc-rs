@@ -41,9 +41,9 @@ mod crc16 {
 mod crc32 {
     use crc::{crc32, Hasher32};
 
-    const CASTAGNOLI_CHECK_VALUE: u32 = 0xe3069283;
-    const IEEE_CHECK_VALUE: u32 = 0xcbf43926;
-    const KOOPMAN_CHECK_VALUE: u32 = 0x2d3dd0ae;
+    const CASTAGNOLI_CHECK_VALUE: u32 = 0xe306_9283;
+    const IEEE_CHECK_VALUE: u32 = 0xcbf4_3926;
+    const KOOPMAN_CHECK_VALUE: u32 = 0x2d3d_d0ae;
 
     #[test]
     fn checksum_castagnoli() {
@@ -93,8 +93,8 @@ mod crc32 {
 mod crc64 {
     use crc::{crc64, CalcType, Hasher64};
 
-    const ECMA_CHECK_VALUE: u64 = 0x995dc9bbdf1939fa;
-    const ISO_CHECK_VALUE: u64 = 0xb90956c775a41001;
+    const ECMA_CHECK_VALUE: u64 = 0x995d_c9bb_df19_39fa;
+    const ISO_CHECK_VALUE: u64 = 0xb909_56c7_75a4_1001;
 
     #[test]
     fn checksum_ecma() {

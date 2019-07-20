@@ -12,7 +12,7 @@ mod hasher {
         let person = Person("John Smith", 34);
         let mut hasher = crc16::Digest::new(crc16::X25);
         person.hash(&mut hasher);
-        assert_eq!(27228u64, hasher.finish());
+        assert_eq!(27_228u64, hasher.finish());
     }
 
     #[test]
@@ -20,7 +20,7 @@ mod hasher {
         let person = Person("John Smith", 34);
         let mut hasher = crc32::Digest::new(crc32::IEEE);
         person.hash(&mut hasher);
-        assert_eq!(467823795u64, hasher.finish());
+        assert_eq!(467_823_795u64, hasher.finish());
     }
 
     #[test]
@@ -28,7 +28,7 @@ mod hasher {
         let person = Person("John Smith", 34);
         let mut hasher = crc64::Digest::new(crc64::ECMA);
         person.hash(&mut hasher);
-        assert_eq!(3567258626315136489u64, hasher.finish());
+        assert_eq!(3_567_258_626_315_136_489u64, hasher.finish());
     }
 
 }
