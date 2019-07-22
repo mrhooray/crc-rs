@@ -30,6 +30,8 @@ macro_rules! reflect_value {
     }};
 }
 
+/// Builds a CRC table from the given polynomial, applying input reflection and output reflection
+/// as specified.
 macro_rules! make_table {
     ($polynomial:expr, $reflect_in:expr, $reflect_out:expr) => {{
         let mut table = [0; 256];
