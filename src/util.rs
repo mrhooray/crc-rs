@@ -37,7 +37,7 @@ macro_rules! make_table {
         let top_bit = 1 << (bits - 1);
         let mut byte;
 
-        for i in 0..256 {
+        for i in 0..=255 {
             if $reflect_in {
                 byte = reflect_byte!(i);
             } else {
