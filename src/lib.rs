@@ -74,10 +74,11 @@
 //! ```
 #![cfg_attr(not(feature = "std"), no_std)]
 
+#[macro_use]
+mod util;
 pub mod crc16;
 pub mod crc32;
 pub mod crc64;
-mod util;
 
 pub use self::crc16::Hasher16;
 pub use self::crc32::Hasher32;
