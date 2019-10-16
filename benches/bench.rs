@@ -1,8 +1,5 @@
-extern crate crc;
-#[macro_use]
-extern crate criterion;
-
 use crc::{crc16, crc32, crc64};
+use criterion::{criterion_group, criterion_main};
 use criterion::{Benchmark, Criterion, Throughput};
 
 fn crc16_make_table(c: &mut Criterion) {

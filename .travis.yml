@@ -1,4 +1,14 @@
 language: rust
 rust:
-    - nightly
-    - stable
+  - stable
+  - beta
+  - nightly
+  - 1.32.0
+matrix:
+  allow_failures:
+    - rust: nightly
+  fast_finish: true
+  include:
+    - rust: stable
+      script: 'cargo bench'
+cache: cargo

@@ -72,7 +72,7 @@
 //! digest.write(b"123456789");
 //! assert_eq!(digest.sum64(), 0x995dc9bbdf1939fa);
 //! ```
-#![cfg_attr(not(feature = "std"), no_std)]
+#![no_std]
 
 #[macro_use]
 mod util;
