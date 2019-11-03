@@ -9,6 +9,7 @@ matrix:
     - rust: nightly
   fast_finish: true
   include:
-    - rust: stable
+    - stage: bench
+      rust: stable
       script: 'cargo bench'
 cache: cargo
