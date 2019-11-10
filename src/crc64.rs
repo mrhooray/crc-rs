@@ -1,9 +1,12 @@
 use core::hash::Hasher;
 
-use crate::CalcType;
 pub use crate::util::make_table_crc64 as make_table;
+use crate::CalcType;
 
-include!(concat!(env!("OUT_DIR"), "/crc64_constants.rs"));
+pub const ECMA: u64 = 0x42F0E1EBA9EA3693;
+const ECMA_TABLE: [u64; 256] = make_table(ECMA, true);
+pub const ISO: u64 = 0x000000000000001B;
+const ISO_TABLE: [u64; 256] = make_table(ISO, true);
 
 /// `Digest` struct for CRC calculation
 /// - `table`: Calculation table generated from input parameters.
@@ -74,7 +77,7 @@ impl Digest {
     /// digest.write(b"123456789");
     /// assert_eq!(digest.sum64(), 0x995dc9bbdf1939fa);;
     /// ```
-    pub fn new(poly: u64) -> Digest {
+    pub const fn new(poly: u64) -> Digest {
         Digest {
             table: make_table(poly, true),
             initial: 0u64,
@@ -94,7 +97,7 @@ impl Digest {
     /// digest.write(b"123456789");
     /// assert_eq!(digest.sum64(), 0x995dc9bbdf1939fa);
     /// ```
-    pub fn new_with_initial(poly: u64, initial: u64) -> Digest {
+    pub const fn new_with_initial(poly: u64, initial: u64) -> Digest {
         Digest {
             table: make_table(poly, true),
             initial,

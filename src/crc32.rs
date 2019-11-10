@@ -1,9 +1,14 @@
 use core::hash::Hasher;
 
-use crate::CalcType;
 pub use crate::util::make_table_crc32 as make_table;
+use crate::CalcType;
 
-include!(concat!(env!("OUT_DIR"), "/crc32_constants.rs"));
+pub const CASTAGNOLI: u32 = 0x1EDC6F41;
+const CASTAGNOLI_TABLE: [u32; 256] = make_table(CASTAGNOLI, true);
+pub const IEEE: u32 = 0x04C11DB7;
+const IEEE_TABLE: [u32; 256] = make_table(IEEE, true);
+pub const KOOPMAN: u32 = 0x741B8CD7;
+const KOOPMAN_TABLE: [u32; 256] = make_table(KOOPMAN, true);
 
 /// `Digest` struct for CRC calculation
 /// - `table`: Calculation table generated from input parameters.
@@ -79,7 +84,7 @@ impl Digest {
     /// digest.write(b"123456789");
     /// assert_eq!(digest.sum32(), 0xcbf43926);;
     /// ```
-    pub fn new(poly: u32) -> Digest {
+    pub const fn new(poly: u32) -> Digest {
         Digest {
             table: make_table(poly, true),
             initial: 0u32,
@@ -99,7 +104,7 @@ impl Digest {
     /// digest.write(b"123456789");
     /// assert_eq!(digest.sum32(), 0xcbf43926);
     /// ```
-    pub fn new_with_initial(poly: u32, initial: u32) -> Digest {
+    pub const fn new_with_initial(poly: u32, initial: u32) -> Digest {
         Digest {
             table: make_table(poly, true),
             initial,
