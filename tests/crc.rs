@@ -1,5 +1,3 @@
-extern crate crc;
-
 mod crc16 {
     use crc::{crc16, Hasher16};
 

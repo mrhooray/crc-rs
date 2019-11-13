@@ -72,6 +72,7 @@
 //! digest.write(b"123456789");
 //! assert_eq!(digest.sum64(), 0x995dc9bbdf1939fa);
 //! ```
+#![recursion_limit = "256"]
 #![no_std]
 
 #[macro_use]

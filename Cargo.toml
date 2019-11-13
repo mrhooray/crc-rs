@@ -11,9 +11,6 @@ keywords = ["crc", "crc16", "crc32", "crc64", "hash"]
 categories = ["algorithms", "no-std"]
 edition = "2018"
 
-[build-dependencies]
-build_const = "0.2"
-
 [dev-dependencies]
 criterion = "0.3"
 
