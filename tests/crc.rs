@@ -51,9 +51,17 @@ mod crc32 {
         )
     }
 
+    const IEEE_CHECK_FAILURE: &'static [u8] =
+        b"012345678\n012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901";
+    const IEEE_CHECK_EXPECTED: u32 = 0xd2d_90aa2;
+
     #[test]
     fn checksum_ieee() {
-        assert_eq!(crc32::checksum_ieee(b"123456789"), IEEE_CHECK_VALUE)
+        assert_eq!(crc32::checksum_ieee(b"123456789"), IEEE_CHECK_VALUE);
+        assert_eq!(
+            crc32::checksum_ieee(IEEE_CHECK_FAILURE),
+            IEEE_CHECK_EXPECTED
+        )
     }
 
     #[test]
