@@ -4,11 +4,11 @@ pub use crate::util::make_table_crc32 as make_table;
 use crate::CalcType;
 
 pub const CASTAGNOLI: u32 = 0x1EDC6F41;
-const CASTAGNOLI_TABLE: [u32; 256] = make_table(CASTAGNOLI, true);
+pub const CASTAGNOLI_TABLE: [u32; 256] = make_table(CASTAGNOLI, true);
 pub const IEEE: u32 = 0x04C11DB7;
-const IEEE_TABLE: [u32; 256] = make_table(IEEE, true);
+pub const IEEE_TABLE: [u32; 256] = make_table(IEEE, true);
 pub const KOOPMAN: u32 = 0x741B8CD7;
-const KOOPMAN_TABLE: [u32; 256] = make_table(KOOPMAN, true);
+pub const KOOPMAN_TABLE: [u32; 256] = make_table(KOOPMAN, true);
 
 /// `Digest` struct for CRC calculation
 /// - `table`: Calculation table generated from input parameters.
