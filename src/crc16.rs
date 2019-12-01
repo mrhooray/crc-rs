@@ -4,9 +4,9 @@ pub use crate::util::make_table_crc16 as make_table;
 use crate::CalcType;
 
 pub const X25: u16 = 0x1021;
-const X25_TABLE: [u16; 256] = make_table(X25, true);
+pub const X25_TABLE: [u16; 256] = make_table(X25, true);
 pub const USB: u16 = 0x8005;
-const USB_TABLE: [u16; 256] = make_table(USB, true);
+pub const USB_TABLE: [u16; 256] = make_table(USB, true);
 
 /// `Digest` struct for CRC calculation
 /// - `table`: Calculation table generated from input parameters.
