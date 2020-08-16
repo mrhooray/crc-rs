@@ -5,7 +5,7 @@
 [![Docs](https://docs.rs/crc/badge.svg)](https://docs.rs/crc)
 [![License](https://img.shields.io/crates/l/crc.svg?maxAge=2592000)](https://github.com/mrhooray/crc-rs#license)
 
-Rust implementation of CRC(16, 32, 64) with support of various standards
+Rust implementation of CRC(16, 32, 64)
 
 ## Usage
 Add `crc` to `Cargo.toml`
@@ -14,91 +14,45 @@ Add `crc` to `Cargo.toml`
 crc = "2.0"
 ```
 
-### Compute CRC16
+### Compute CRC
+
 ```rust
-use crc::{crc16, Hasher16};
+use crc::{Crc, Algorithm, CRC_16_IBM_SDLC, CRC_32_ISCSI};
 
-assert_eq!(crc16::checksum_x25(b"123456789"), 0x906e);
-assert_eq!(crc16::checksum_usb(b"123456789"), 0xb4c8);
+pub const X25: Crc<u16> = Crc::<u16>::new(&CRC_16_IBM_SDLC);
+pub const CASTAGNOLI: Crc<u32> = Crc::<u32>::new(&CRC_32_ISCSI);
 
-// use provided or custom polynomial
-let mut digest = crc16::Digest::new(crc16::X25);
-digest.write(b"123456789");
-assert_eq!(digest.sum16(), 0x906e);
+assert_eq!(X25.checksum(b"123456789"), 0x906e);
+assert_eq!(CASTAGNOLI.checksum(b"123456789"), 0xe3069283);
 
-// with initial
-let mut digest = crc16::Digest::new_with_initial(crc16::X25, 0u16);
-digest.write(b"123456789");
-assert_eq!(digest.sum16(), 0x906e);
-
-// more customization
-let mut digest = crc16::Digest::new_custom(crc16::X25, 0u16, 0u16, crc::CalcType::Reverse);
-digest.write(b"123456789");
-assert_eq!(digest.sum16(), 0x906e);
-```
-
-### Compute CRC32
-```rust
-use crc::{crc32, Hasher32};
-
-// CRC-32-IEEE being the most commonly used one
-assert_eq!(crc32::checksum_ieee(b"123456789"), 0xcbf43926);
-assert_eq!(crc32::checksum_castagnoli(b"123456789"), 0xe3069283);
-assert_eq!(crc32::checksum_koopman(b"123456789"), 0x2d3dd0ae);
-
-// use provided or custom polynomial
-let mut digest = crc32::Digest::new(crc32::IEEE);
-digest.write(b"123456789");
-assert_eq!(digest.sum32(), 0xcbf43926);
-
-// with initial
-let mut digest = crc32::Digest::new_with_initial(crc32::IEEE, 0u32);
-digest.write(b"123456789");
-assert_eq!(digest.sum32(), 0xcbf43926);
-
-// more customization
-let mut digest = crc32::Digest::new_custom(crc32::IEEE, 0u32, 0u32, crc::CalcType::Reverse);
-digest.write(b"123456789");
-assert_eq!(digest.sum32(), 0xcbf43926);
-```
-
-### Compute CRC64
-```rust
-use crc::{crc64, Hasher64};
-
-assert_eq!(crc64::checksum_ecma(b"123456789"), 0x995dc9bbdf1939fa);
-assert_eq!(crc64::checksum_iso(b"123456789"), 0xb90956c775a41001);
-
-// use provided or custom polynomial
-let mut digest = crc64::Digest::new(crc64::ECMA);
-digest.write(b"123456789");
-assert_eq!(digest.sum64(), 0x995dc9bbdf1939fa);
-
-// with initial
-let mut digest = crc64::Digest::new_with_initial(crc64::ECMA, 0u64);
-digest.write(b"123456789");
-assert_eq!(digest.sum64(), 0x995dc9bbdf1939fa);
-
-// more customization
-let mut digest = crc64::Digest::new_custom(crc64::ECMA, 0u64, 0u64, crc::CalcType::Reverse);
-digest.write(b"123456789");
-assert_eq!(digest.sum64(), 0x995dc9bbdf1939fa);
+// use custom algorithm
+const CUSTOM_ALG: Algorithm<u16> = Algorithm {
+    poly: 0x8005,
+    init: 0xffff,
+    refin: false,
+    refout: false,
+    xorout: 0x0000,
+    check: 0xaee7,
+    residue: 0x0000
+};
+let crc = Crc::<u16>::new(&CUSTOM_ALG);
+let mut digest = crc.digest();
+digest.update(b"123456789");
+assert_eq!(digest.finalize(), 0xaee7);
 ```
 
 ## Benchmark
 
-`cargo bench` with 2.3 GHz Intel Core i7 results ~430MB/s throughput. [Comparison](http://create.stephan-brumme.com/crc32/)
+`cargo bench` with 2.6 GHz Intel Core i7. [Comparison](http://create.stephan-brumme.com/crc32/)
 ```
-cargo bench
-     Running target/release/bench-5c82e94dab3e9c79
+crc16          time:   [2.0082 ms 2.0206 ms 2.0367 ms]
+               thrpt:  [468.25 MiB/s 471.96 MiB/s 474.89 MiB/s]
 
-running 4 tests
-test bench_crc32_make_table       ... bench:       439 ns/iter (+/- 82)
-test bench_crc32_update_megabytes ... bench:   2327803 ns/iter (+/- 138845)
-test bench_crc64_make_table       ... bench:      1200 ns/iter (+/- 223)
-test bench_crc64_update_megabytes ... bench:   2322472 ns/iter (+/- 92870)
+crc32          time:   [1.7659 ms 1.7793 ms 1.7952 ms]
+               thrpt:  [531.25 MiB/s 535.98 MiB/s 540.05 MiB/s]
 
-test result: ok. 0 passed; 0 failed; 0 ignored; 4 measured
+crc64          time:   [2.0655 ms 2.0803 ms 2.0973 ms]
+               thrpt:  [454.71 MiB/s 458.43 MiB/s 461.72 MiB/s]
 ```
 
 ## License

@@ -1,159 +1,53 @@
-mod crc16 {
-    use crc::{crc16, Hasher16};
+use crc::*;
 
-    const X25_CHECK_VALUE: u16 = 0x906e;
-    const USB_CHECK_VALUE: u16 = 0xb4c8;
+const INIT: &[u8] = b"123456789";
 
-    #[test]
-    fn checksum_x25() {
-        assert_eq!(crc16::checksum_x25(b"123456789"), X25_CHECK_VALUE)
-    }
-
-    #[test]
-    fn checksum_usb() {
-        assert_eq!(crc16::checksum_usb(b"123456789"), USB_CHECK_VALUE)
-    }
-
-    #[test]
-    fn digest_x25() {
-        verify_checksum(crc16::X25, X25_CHECK_VALUE);
-    }
-
-    #[test]
-    fn digest_usb() {
-        verify_checksum(crc16::USB, USB_CHECK_VALUE);
-    }
-
-    fn verify_checksum(poly: u16, check_value: u16) {
-        let mut digest = crc16::Digest::new(poly);
-        digest.write(b"123456789");
-        assert_eq!(digest.sum16(), check_value);
-        digest.reset();
-        for i in 1..10 {
-            digest.write(i.to_string().as_bytes());
-        }
-        assert_eq!(digest.sum16(), check_value);
+#[test]
+fn crc_16() {
+    let algs = &[
+        CRC_16_IBM_SDLC,
+        CRC_16_USB,
+        CRC_16_ARC,
+        CRC_16_CDMA2000,
+        CRC_16_IBM_3740,
+        CRC_16_IBM_SDLC,
+        CRC_16_KERMIT,
+    ];
+    for alg in algs {
+        let crc = Crc::<u16>::new(alg);
+        assert_eq!(alg.check, crc.checksum(INIT));
+        let mut digest = crc.digest();
+        digest.update(INIT);
+        assert_eq!(alg.check, digest.finalize());
     }
 }
 
-mod crc32 {
-    use crc::{crc32, Hasher32};
-
-    const CASTAGNOLI_CHECK_VALUE: u32 = 0xe306_9283;
-    const IEEE_CHECK_VALUE: u32 = 0xcbf4_3926;
-    const KOOPMAN_CHECK_VALUE: u32 = 0x2d3d_d0ae;
-
-    #[test]
-    fn checksum_castagnoli() {
-        assert_eq!(
-            crc32::checksum_castagnoli(b"123456789"),
-            CASTAGNOLI_CHECK_VALUE
-        )
-    }
-
-    #[test]
-    fn checksum_ieee() {
-        assert_eq!(crc32::checksum_ieee(b"123456789"), IEEE_CHECK_VALUE)
-    }
-
-    #[test]
-    fn checksum_koopman() {
-        assert_eq!(crc32::checksum_koopman(b"123456789"), KOOPMAN_CHECK_VALUE)
-    }
-
-    #[test]
-    fn digest_castagnoli() {
-        verify_checksum(crc32::CASTAGNOLI, CASTAGNOLI_CHECK_VALUE);
-    }
-
-    #[test]
-    fn digest_ieee() {
-        verify_checksum(crc32::IEEE, IEEE_CHECK_VALUE);
-    }
-
-    #[test]
-    fn digest_koopman() {
-        verify_checksum(crc32::KOOPMAN, KOOPMAN_CHECK_VALUE);
-    }
-
-    fn verify_checksum(poly: u32, check_value: u32) {
-        let mut digest = crc32::Digest::new(poly);
-        digest.write(b"123456789");
-        assert_eq!(digest.sum32(), check_value);
-        digest.reset();
-        for i in 1..10 {
-            digest.write(i.to_string().as_bytes());
-        }
-        assert_eq!(digest.sum32(), check_value);
+#[test]
+fn crc_32() {
+    let algs = &[
+        CRC_32_ISCSI,
+        CRC_32_AUTOSAR,
+        CRC_32_BZIP2,
+        CRC_32_ISCSI,
+        CRC_32_ISO_HDLC,
+    ];
+    for alg in algs {
+        let crc = Crc::<u32>::new(alg);
+        assert_eq!(alg.check, crc.checksum(INIT));
+        let mut digest = crc.digest();
+        digest.update(INIT);
+        assert_eq!(alg.check, digest.finalize());
     }
 }
 
-mod crc64 {
-    use crc::{crc64, CalcType, Hasher64};
-
-    const ECMA_CHECK_VALUE: u64 = 0x995d_c9bb_df19_39fa;
-    const ISO_CHECK_VALUE: u64 = 0xb909_56c7_75a4_1001;
-
-    #[test]
-    fn checksum_ecma() {
-        assert_eq!(crc64::checksum_ecma(b"123456789"), ECMA_CHECK_VALUE)
-    }
-
-    #[test]
-    fn checksum_iso() {
-        assert_eq!(crc64::checksum_iso(b"123456789"), ISO_CHECK_VALUE)
-    }
-
-    #[test]
-    fn digest_ecma() {
-        verify_checksum(crc64::ECMA, ECMA_CHECK_VALUE);
-    }
-
-    #[test]
-    fn digest_ecma_initial() {
-        verify_checksum2(crc64::ECMA, ECMA_CHECK_VALUE);
-    }
-
-    #[test]
-    fn digest_ecma_custom() {
-        verify_checksum3(crc64::ECMA, ECMA_CHECK_VALUE);
-    }
-
-    #[test]
-    fn digest_iso() {
-        verify_checksum(crc64::ISO, ISO_CHECK_VALUE);
-    }
-
-    fn verify_checksum(poly: u64, check_value: u64) {
-        let mut digest = crc64::Digest::new(poly);
-        digest.write(b"123456789");
-        assert_eq!(digest.sum64(), check_value);
-        digest.reset();
-        for i in 1..10 {
-            digest.write(i.to_string().as_bytes());
-        }
-        assert_eq!(digest.sum64(), check_value);
-    }
-
-    fn verify_checksum2(poly: u64, check_value: u64) {
-        let mut digest = crc64::Digest::new_with_initial(poly, 0u64);
-        digest.write(b"123456789");
-        assert_eq!(digest.sum64(), check_value);
-        digest.reset();
-        for i in 1..10 {
-            digest.write(i.to_string().as_bytes());
-        }
-        assert_eq!(digest.sum64(), check_value);
-    }
-
-    fn verify_checksum3(poly: u64, check_value: u64) {
-        let mut digest = crc64::Digest::new_custom(poly, !0u64, !0u64, CalcType::Reverse);
-        digest.write(b"123456789");
-        assert_eq!(digest.sum64(), check_value);
-        digest.reset();
-        for i in 1..10 {
-            digest.write(i.to_string().as_bytes());
-        }
-        assert_eq!(digest.sum64(), check_value);
+#[test]
+fn crc_64() {
+    let algs = &[CRC_64_ECMA_182, CRC_64_GO_ISO, CRC_64_WE, CRC_64_XZ];
+    for alg in algs {
+        let crc = Crc::<u64>::new(alg);
+        assert_eq!(alg.check, crc.checksum(INIT));
+        let mut digest = crc.digest();
+        digest.update(INIT);
+        assert_eq!(alg.check, digest.finalize());
     }
 }

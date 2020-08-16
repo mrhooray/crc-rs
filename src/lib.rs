@@ -4,96 +4,46 @@
 //! ## Usage
 //! ### Compute CRC16
 //! ```rust
-//! use crc::{crc16, Hasher16};
+//! use crc::{Crc, Algorithm, CRC_16_IBM_SDLC, CRC_32_ISCSI};
 //!
-//! assert_eq!(crc16::checksum_x25(b"123456789"), 0x906e);
-//! assert_eq!(crc16::checksum_usb(b"123456789"), 0xb4c8);
+//! pub const X25: Crc<u16> = Crc::<u16>::new(&CRC_16_IBM_SDLC);
+//! pub const CASTAGNOLI: Crc<u32> = Crc::<u32>::new(&CRC_32_ISCSI);
 //!
-//! // use provided or custom polynomial
-//! let mut digest = crc16::Digest::new(crc16::X25);
-//! digest.write(b"123456789");
-//! assert_eq!(digest.sum16(), 0x906e);
+//! assert_eq!(X25.checksum(b"123456789"), 0x906e);
+//! assert_eq!(CASTAGNOLI.checksum(b"123456789"), 0xe3069283);
 //!
-//! // with initial
-//! let mut digest = crc16::Digest::new_with_initial(crc16::X25, 0u16);
-//! digest.write(b"123456789");
-//! assert_eq!(digest.sum16(), 0x906e);
-//!
-//! // more customization
-//! let mut digest = crc16::Digest::new_custom(crc16::X25, !0u16, !0u16, crc::CalcType::Reverse);
-//! digest.write(b"123456789");
-//! assert_eq!(digest.sum16(), 0x906e);
+//! // use custom algorithm
+//! const CUSTOM_ALG: Algorithm<u16> = Algorithm {
+//!     poly: 0x8005,
+//!     init: 0xffff,
+//!     refin: false,
+//!     refout: false,
+//!     xorout: 0x0000,
+//!     check: 0xaee7,
+//!     residue: 0x0000
+//! };
+//! let crc = Crc::<u16>::new(&CUSTOM_ALG);
+//! let mut digest = crc.digest();
+//! digest.update(b"123456789");
+//! assert_eq!(digest.finalize(), 0xaee7);
 //! ```
-//!
-//! ### Compute CRC32
-//! ```rust
-//! use crc::{crc32, Hasher32};
-//!
-//! // CRC-32-IEEE being the most commonly used one
-//! assert_eq!(crc32::checksum_ieee(b"123456789"), 0xcbf43926);
-//! assert_eq!(crc32::checksum_castagnoli(b"123456789"), 0xe3069283);
-//! assert_eq!(crc32::checksum_koopman(b"123456789"), 0x2d3dd0ae);
-//!
-//! // use provided or custom polynomial
-//! let mut digest = crc32::Digest::new(crc32::IEEE);
-//! digest.write(b"123456789");
-//! assert_eq!(digest.sum32(), 0xcbf43926);
-//!
-//! // with initial
-//! let mut digest = crc32::Digest::new_with_initial(crc32::IEEE, 0u32);
-//! digest.write(b"123456789");
-//! assert_eq!(digest.sum32(), 0xcbf43926);
-//!
-//! // more customization
-//! let mut digest = crc32::Digest::new_custom(crc32::IEEE, !0u32, !0u32, crc::CalcType::Reverse);
-//! digest.write(b"123456789");
-//! assert_eq!(digest.sum32(), 0xcbf43926);
-//! ```
-//!
-//! ### Compute CRC64
-//! ```rust
-//! use crc::{crc64, Hasher64};
-//!
-//! assert_eq!(crc64::checksum_ecma(b"123456789"), 0x995dc9bbdf1939fa);
-//! assert_eq!(crc64::checksum_iso(b"123456789"), 0xb90956c775a41001);
-//!
-//! // use provided or custom polynomial
-//! let mut digest = crc64::Digest::new(crc64::ECMA);
-//! digest.write(b"123456789");
-//! assert_eq!(digest.sum64(), 0x995dc9bbdf1939fa);
-//!
-//! // with initial
-//! let mut digest = crc64::Digest::new_with_initial(crc64::ECMA, 0u64);
-//! digest.write(b"123456789");
-//! assert_eq!(digest.sum64(), 0x995dc9bbdf1939fa);
-//!
-//! // more customization
-//! let mut digest = crc64::Digest::new_custom(crc64::ECMA, !0u64, !0u64, crc::CalcType::Reverse);
-//! digest.write(b"123456789");
-//! assert_eq!(digest.sum64(), 0x995dc9bbdf1939fa);
-//! ```
-#![recursion_limit = "256"]
 #![no_std]
+#![forbid(unsafe_code)]
 
-#[macro_use]
+pub use crc_catalog::*;
+
+mod crc16;
+mod crc32;
+mod crc64;
+mod table;
 mod util;
-pub mod crc16;
-pub mod crc32;
-pub mod crc64;
 
-pub use self::crc16::Hasher16;
-pub use self::crc32::Hasher32;
-pub use self::crc64::Hasher64;
+pub struct Crc<W: Width> {
+    pub algorithm: &'static Algorithm<W>,
+    table: [W; 256],
+}
 
-/// Type of calculations:
-/// - `Normal`: Forward calculation, MSB first.
-///   - Used with `new_custom()`.
-/// - `Reverse`: Reverse calculation, LSB first.
-///   - Used with `new_custom()`.
-/// - `Compat`: `Reverse` CalcType with value reflected in and out.
-///   - Used internally.
-pub enum CalcType {
-    Normal,
-    Reverse,
-    Compat,
+pub struct Digest<'a, W: Width> {
+    crc: &'a Crc<W>,
+    value: W,
 }
