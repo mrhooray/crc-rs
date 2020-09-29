@@ -8,13 +8,13 @@ impl Crc<u64> {
         Self { algorithm, table }
     }
 
-    pub fn checksum(&self, bytes: &[u8]) -> u64 {
+    pub const fn checksum(&self, bytes: &[u8]) -> u64 {
         let mut crc = self.init();
         crc = self.update(crc, bytes);
         self.finalize(crc)
     }
 
-    fn init(&self) -> u64 {
+    const fn init(&self) -> u64 {
         if self.algorithm.refin {
             reflect_64(self.algorithm.init)
         } else {
@@ -22,36 +22,40 @@ impl Crc<u64> {
         }
     }
 
-    fn table_entry(&self, index: u64) -> u64 {
+    const fn table_entry(&self, index: u64) -> u64 {
         self.table[(index & 0xFF) as usize]
     }
 
-    fn update(&self, crc: u64, bytes: &[u8]) -> u64 {
+    const fn update(&self, mut crc: u64, bytes: &[u8]) -> u64 {
+        let mut i = 0;
         if self.algorithm.refin {
-            bytes.iter().fold(crc, |crc, &byte| {
-                self.table_entry(crc ^ byte as u64) ^ (crc >> 8)
-            })
+            while i < bytes.len() {
+                crc = self.table_entry(crc ^ bytes[i] as u64) ^ (crc >> 8);
+                i += 1;
+            }
         } else {
-            bytes.iter().fold(crc, |crc, &byte| {
-                self.table_entry((byte as u64) ^ (crc >> 56)) ^ (crc << 8)
-            })
+            while i < bytes.len() {
+                crc = self.table_entry(bytes[i] as u64 ^ (crc >> 56)) ^ (crc << 8);
+                i += 1;
+            }
         }
+        crc
     }
 
-    fn finalize(&self, mut crc: u64) -> u64 {
+    const fn finalize(&self, mut crc: u64) -> u64 {
         if self.algorithm.refin ^ self.algorithm.refout {
             crc = reflect_64(crc);
         }
         crc ^ self.algorithm.xorout
     }
 
-    pub fn digest(&self) -> Digest<u64> {
+    pub const fn digest(&self) -> Digest<u64> {
         Digest::new(self)
     }
 }
 
 impl<'a> Digest<'a, u64> {
-    fn new(crc: &'a Crc<u64>) -> Self {
+    const fn new(crc: &'a Crc<u64>) -> Self {
         let value = crc.init();
         Digest { crc, value }
     }
@@ -60,7 +64,7 @@ impl<'a> Digest<'a, u64> {
         self.value = self.crc.update(self.value, bytes);
     }
 
-    pub fn finalize(self) -> u64 {
+    pub const fn finalize(self) -> u64 {
         self.crc.finalize(self.value)
     }
 }
