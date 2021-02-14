@@ -1,6 +1,5 @@
 use super::{Algorithm, Crc, Digest};
 use crate::table::crc32_table;
-use crate::util::reflect_32;
 
 impl Crc<u32> {
     pub const fn new(algorithm: &'static Algorithm<u32>) -> Self {
@@ -16,7 +15,7 @@ impl Crc<u32> {
 
     const fn init(&self) -> u32 {
         if self.algorithm.refin {
-            reflect_32(self.algorithm.init)
+            self.algorithm.init.reverse_bits()
         } else {
             self.algorithm.init
         }
@@ -44,7 +43,7 @@ impl Crc<u32> {
 
     const fn finalize(&self, mut crc: u32) -> u32 {
         if self.algorithm.refin ^ self.algorithm.refout {
-            crc = reflect_32(crc);
+            crc = crc.reverse_bits();
         }
         crc ^ self.algorithm.xorout
     }
