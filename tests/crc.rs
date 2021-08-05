@@ -3,6 +3,18 @@ use crc::*;
 const INIT: &[u8] = b"123456789";
 
 #[test]
+fn crc_8() {
+    let algs = &[CRC_8_AUTOSAR, CRC_8_BLUETOOTH, CRC_8_SMBUS, CRC_8_DARC];
+    for alg in algs {
+        let crc = Crc::<u8>::new(alg);
+        assert_eq!(alg.check, crc.checksum(INIT));
+        let mut digest = crc.digest();
+        digest.update(INIT);
+        assert_eq!(alg.check, digest.finalize());
+    }
+}
+
+#[test]
 fn crc_16() {
     let algs = &[
         CRC_16_IBM_SDLC,

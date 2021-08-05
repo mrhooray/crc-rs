@@ -1,5 +1,5 @@
 //! # crc
-//! Rust implementation of CRC(16, 32, 64)
+//! Rust implementation of CRC(8, 16, 32, 64)
 //!
 //! ## Usage
 //! ### Compute CRC16
@@ -35,6 +35,7 @@ pub use crc_catalog::*;
 mod crc16;
 mod crc32;
 mod crc64;
+mod crc8;
 mod table;
 mod util;
 
