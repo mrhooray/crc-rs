@@ -1,3 +1,19 @@
+pub(crate) const fn crc8(poly: u8, reflect: bool, mut byte: u8) -> u8 {
+    if reflect {
+        byte = byte.reverse_bits()
+    };
+    let mut value = byte;
+    let mut i = 0;
+    while i < 8 {
+        value = (value << 1) ^ ((value >> 7) * poly);
+        i += 1;
+    }
+    if reflect {
+        value = value.reverse_bits()
+    }
+    value
+}
+
 pub(crate) const fn crc16(poly: u16, reflect: bool, mut byte: u8) -> u16 {
     if reflect {
         byte = byte.reverse_bits()
