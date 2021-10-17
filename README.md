@@ -27,6 +27,7 @@ assert_eq!(CASTAGNOLI.checksum(b"123456789"), 0xe3069283);
 
 // use custom algorithm
 const CUSTOM_ALG: Algorithm<u16> = Algorithm {
+    width: 16,
     poly: 0x8005,
     init: 0xffff,
     refin: false,

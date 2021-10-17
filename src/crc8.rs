@@ -3,7 +3,7 @@ use crate::table::crc8_table;
 
 impl Crc<u8> {
     pub const fn new(algorithm: &'static Algorithm<u8>) -> Self {
-        let table = crc8_table(algorithm.poly, algorithm.refin);
+        let table = crc8_table(algorithm.width, algorithm.poly, algorithm.refin);
         Self { algorithm, table }
     }
 
@@ -15,9 +15,9 @@ impl Crc<u8> {
 
     const fn init(&self) -> u8 {
         if self.algorithm.refin {
-            self.algorithm.init.reverse_bits()
+            self.algorithm.init.reverse_bits() >> (u8::BITS as u8 - self.algorithm.width)
         } else {
-            self.algorithm.init
+            self.algorithm.init << (u8::BITS as u8 - self.algorithm.width)
         }
     }
 
@@ -39,6 +39,9 @@ impl Crc<u8> {
     const fn finalize(&self, mut crc: u8) -> u8 {
         if self.algorithm.refin ^ self.algorithm.refout {
             crc = crc.reverse_bits();
+        }
+        if !self.algorithm.refout {
+            crc >>= u8::BITS as u8 - self.algorithm.width;
         }
         crc ^ self.algorithm.xorout
     }
