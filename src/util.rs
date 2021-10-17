@@ -73,3 +73,22 @@ pub(crate) const fn crc64(poly: u64, reflect: bool, mut value: u64) -> u64 {
     }
     value
 }
+
+pub(crate) const fn crc128(poly: u128, reflect: bool, mut value: u128) -> u128 {
+    if reflect {
+        let mut i = 0;
+        while i < 8 {
+            value = (value >> 1) ^ ((value & 1) * poly);
+            i += 1;
+        }
+    } else {
+        value <<= u128::BITS - 8;
+
+        let mut i = 0;
+        while i < 8 {
+            value = (value << 1) ^ (((value >> (u128::BITS - 1)) & 1) * poly);
+            i += 1;
+        }
+    }
+    value
+}
