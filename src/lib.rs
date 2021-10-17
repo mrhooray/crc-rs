@@ -33,6 +33,7 @@
 
 pub use crc_catalog::*;
 
+mod crc128;
 mod crc16;
 mod crc32;
 mod crc64;

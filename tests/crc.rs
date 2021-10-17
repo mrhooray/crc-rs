@@ -166,3 +166,16 @@ fn crc_64() {
         assert_eq!(alg.check, digest.finalize());
     }
 }
+
+#[test]
+fn crc_128() {
+    let algs = &[CRC_82_DARC];
+    for alg in algs {
+        let crc = Crc::<u128>::new(alg);
+        assert_eq!(alg.check, crc.checksum(INIT));
+        let mut digest = crc.digest();
+        digest.update(INIT_PART1);
+        digest.update(INIT_PART2);
+        assert_eq!(alg.check, digest.finalize());
+    }
+}
