@@ -15,4 +15,4 @@ categories = ["algorithms", "no-std"]
 edition = "2018"
 
 [dependencies]
-crc-catalog = "1.1.1"
+crc-catalog = "2.0.1"

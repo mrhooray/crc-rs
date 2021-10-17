@@ -3,7 +3,7 @@ use crate::table::crc64_table;
 
 impl Crc<u64> {
     pub const fn new(algorithm: &'static Algorithm<u64>) -> Self {
-        let table = crc64_table(algorithm.poly, algorithm.refin);
+        let table = crc64_table(algorithm.width, algorithm.poly, algorithm.refin);
         Self { algorithm, table }
     }
 
@@ -15,9 +15,9 @@ impl Crc<u64> {
 
     const fn init(&self) -> u64 {
         if self.algorithm.refin {
-            self.algorithm.init.reverse_bits()
+            self.algorithm.init.reverse_bits() >> (u64::BITS as u8 - self.algorithm.width)
         } else {
-            self.algorithm.init
+            self.algorithm.init << (u64::BITS as u8 - self.algorithm.width)
         }
     }
 
@@ -29,12 +29,14 @@ impl Crc<u64> {
         let mut i = 0;
         if self.algorithm.refin {
             while i < bytes.len() {
-                crc = self.table_entry(crc ^ bytes[i] as u64) ^ (crc >> 8);
+                let table_index = crc ^ bytes[i] as u64;
+                crc = self.table_entry(table_index) ^ (crc >> 8);
                 i += 1;
             }
         } else {
             while i < bytes.len() {
-                crc = self.table_entry(bytes[i] as u64 ^ (crc >> 56)) ^ (crc << 8);
+                let table_index = (crc >> (u64::BITS - 8)) ^ bytes[i] as u64;
+                crc = self.table_entry(table_index) ^ (crc << 8);
                 i += 1;
             }
         }
@@ -44,6 +46,9 @@ impl Crc<u64> {
     const fn finalize(&self, mut crc: u64) -> u64 {
         if self.algorithm.refin ^ self.algorithm.refout {
             crc = crc.reverse_bits();
+        }
+        if !self.algorithm.refout {
+            crc >>= u64::BITS as u8 - self.algorithm.width;
         }
         crc ^ self.algorithm.xorout
     }
