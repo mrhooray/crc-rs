@@ -1,7 +1,10 @@
 [package]
 name = "crc"
-version = "2.0.1-alpha.0"
-authors = ["Rui Hu <code@mrhooray.com>"]
+version = "2.1.0"
+authors = [
+    "Rui Hu <code@mrhooray.com>",
+    "Akhil Velagapudi <4@4khil.com>"
+]
 license = "MIT OR Apache-2.0"
 readme = "README.md"
 repository = "https://github.com/mrhooray/crc-rs.git"
@@ -12,11 +15,4 @@ categories = ["algorithms", "no-std"]
 edition = "2018"
 
 [dependencies]
-crc-catalog = "1.1"
-
-[dev-dependencies]
-criterion = "0.3"
-
-[[bench]]
-name = "bench"
-harness = false
+crc-catalog = "1.1.1"

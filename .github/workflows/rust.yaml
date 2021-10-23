@@ -19,6 +19,7 @@ jobs:
           profile: minimal
           toolchain: stable
           components: rustfmt, clippy
+          override: true
       - uses: actions-rs/cargo@v1
         with:
           command: clippy
@@ -41,6 +42,7 @@ jobs:
         with:
           profile: minimal
           toolchain: ${{ matrix.rust }}
+          override: true
       - uses: actions-rs/cargo@v1
         with:
           command: check
