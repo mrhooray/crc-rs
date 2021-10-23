@@ -1,6 +1,6 @@
 # crc
 
-[![Build Status](https://travis-ci.org/mrhooray/crc-rs.svg?branch=master)](https://travis-ci.org/mrhooray/crc-rs)
+[![rust](https://github.com/mrhooray/crc-rs/actions/workflows/rust.yaml/badge.svg)](https://github.com/mrhooray/crc-rs/actions/workflows/rust.yaml)
 [![Crate](https://img.shields.io/crates/v/crc.svg)](https://crates.io/crates/crc)
 [![Docs](https://docs.rs/crc/badge.svg)](https://docs.rs/crc)
 [![License](https://img.shields.io/crates/l/crc.svg?maxAge=2592000)](https://github.com/mrhooray/crc-rs#license)
