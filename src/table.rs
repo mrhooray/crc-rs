@@ -3,9 +3,9 @@ use crate::util::*;
 pub(crate) const fn crc8_table(width: u8, poly: u8, reflect: bool) -> [u8; 256] {
     let poly = if reflect {
         let poly = poly.reverse_bits();
-        poly >> (u8::BITS as u8 - width)
+        poly >> (8u8 - width)
     } else {
-        poly << (u8::BITS as u8 - width)
+        poly << (8u8 - width)
     };
 
     let mut table = [0u8; 256];
@@ -20,9 +20,9 @@ pub(crate) const fn crc8_table(width: u8, poly: u8, reflect: bool) -> [u8; 256] 
 pub(crate) const fn crc16_table(width: u8, poly: u16, reflect: bool) -> [u16; 256] {
     let poly = if reflect {
         let poly = poly.reverse_bits();
-        poly >> (u16::BITS as u8 - width)
+        poly >> (16u8 - width)
     } else {
-        poly << (u16::BITS as u8 - width)
+        poly << (16u8 - width)
     };
 
     let mut table = [0u16; 256];
@@ -37,9 +37,9 @@ pub(crate) const fn crc16_table(width: u8, poly: u16, reflect: bool) -> [u16; 25
 pub(crate) const fn crc32_table(width: u8, poly: u32, reflect: bool) -> [u32; 256] {
     let poly = if reflect {
         let poly = poly.reverse_bits();
-        poly >> (u32::BITS as u8 - width)
+        poly >> (32u8 - width)
     } else {
-        poly << (u32::BITS as u8 - width)
+        poly << (32u8 - width)
     };
 
     let mut table = [0u32; 256];
@@ -54,9 +54,9 @@ pub(crate) const fn crc32_table(width: u8, poly: u32, reflect: bool) -> [u32; 25
 pub(crate) const fn crc64_table(width: u8, poly: u64, reflect: bool) -> [u64; 256] {
     let poly = if reflect {
         let poly = poly.reverse_bits();
-        poly >> (u64::BITS as u8 - width)
+        poly >> (64u8 - width)
     } else {
-        poly << (u64::BITS as u8 - width)
+        poly << (64u8 - width)
     };
 
     let mut table = [0u64; 256];
@@ -71,9 +71,9 @@ pub(crate) const fn crc64_table(width: u8, poly: u64, reflect: bool) -> [u64; 25
 pub(crate) const fn crc128_table(width: u8, poly: u128, reflect: bool) -> [u128; 256] {
     let poly = if reflect {
         let poly = poly.reverse_bits();
-        poly >> (u128::BITS as u8 - width)
+        poly >> (128u8 - width)
     } else {
-        poly << (u128::BITS as u8 - width)
+        poly << (128u8 - width)
     };
 
     let mut table = [0u128; 256];
