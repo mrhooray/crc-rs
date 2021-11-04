@@ -15,9 +15,9 @@ impl Crc<u8> {
 
     const fn init(&self) -> u8 {
         if self.algorithm.refin {
-            self.algorithm.init.reverse_bits() >> (u8::BITS as u8 - self.algorithm.width)
+            self.algorithm.init.reverse_bits() >> (8u8 - self.algorithm.width)
         } else {
-            self.algorithm.init << (u8::BITS as u8 - self.algorithm.width)
+            self.algorithm.init << (8u8 - self.algorithm.width)
         }
     }
 
@@ -41,7 +41,7 @@ impl Crc<u8> {
             crc = crc.reverse_bits();
         }
         if !self.algorithm.refout {
-            crc >>= u8::BITS as u8 - self.algorithm.width;
+            crc >>= 8u8 - self.algorithm.width;
         }
         crc ^ self.algorithm.xorout
     }

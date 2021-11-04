@@ -15,9 +15,9 @@ impl Crc<u16> {
 
     const fn init(&self) -> u16 {
         if self.algorithm.refin {
-            self.algorithm.init.reverse_bits() >> (u16::BITS as u8 - self.algorithm.width)
+            self.algorithm.init.reverse_bits() >> (16u8 - self.algorithm.width)
         } else {
-            self.algorithm.init << (u16::BITS as u8 - self.algorithm.width)
+            self.algorithm.init << (16u8 - self.algorithm.width)
         }
     }
 
@@ -35,7 +35,7 @@ impl Crc<u16> {
             }
         } else {
             while i < bytes.len() {
-                let table_index = (crc >> (u16::BITS - 8)) ^ bytes[i] as u16;
+                let table_index = (crc >> 8) ^ bytes[i] as u16;
                 crc = self.table_entry(table_index) ^ (crc << 8);
                 i += 1;
             }
@@ -48,7 +48,7 @@ impl Crc<u16> {
             crc = crc.reverse_bits();
         }
         if !self.algorithm.refout {
-            crc >>= u16::BITS as u8 - self.algorithm.width;
+            crc >>= 16u8 - self.algorithm.width;
         }
         crc ^ self.algorithm.xorout
     }
