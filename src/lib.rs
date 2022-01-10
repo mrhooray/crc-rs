@@ -46,6 +46,7 @@ pub struct Crc<W: Width> {
     table: [W; 256],
 }
 
+#[derive(Clone)]
 pub struct Digest<'a, W: Width> {
     crc: &'a Crc<W>,
     value: W,
