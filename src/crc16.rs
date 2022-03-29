@@ -54,13 +54,17 @@ impl Crc<u16> {
     }
 
     pub const fn digest(&self) -> Digest<u16> {
-        Digest::new(self)
+        let initial = self.init();
+        Digest::new(self, initial)
+    }
+
+    pub const fn digest_with_initial(&self, initial: u16) -> Digest<u16> {
+        Digest::new(self, initial)
     }
 }
 
 impl<'a> Digest<'a, u16> {
-    const fn new(crc: &'a Crc<u16>) -> Self {
-        let value = crc.init();
+    const fn new(crc: &'a Crc<u16>, value: u16) -> Self {
         Digest { crc, value }
     }
 
