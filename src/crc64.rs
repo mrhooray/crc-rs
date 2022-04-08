@@ -8,16 +8,16 @@ impl Crc<u64> {
     }
 
     pub const fn checksum(&self, bytes: &[u8]) -> u64 {
-        let mut crc = self.init();
+        let mut crc = self.init(self.algorithm.init);
         crc = self.update(crc, bytes);
         self.finalize(crc)
     }
 
-    const fn init(&self) -> u64 {
+    const fn init(&self, initial: u64) -> u64 {
         if self.algorithm.refin {
-            self.algorithm.init.reverse_bits() >> (64u8 - self.algorithm.width)
+            initial.reverse_bits() >> (64u8 - self.algorithm.width)
         } else {
-            self.algorithm.init << (64u8 - self.algorithm.width)
+            initial << (64u8 - self.algorithm.width)
         }
     }
 
@@ -54,12 +54,12 @@ impl Crc<u64> {
     }
 
     pub const fn digest(&self) -> Digest<u64> {
-        let initial = self.init();
-        Digest::new(self, initial)
+        self.digest_with_initial(self.algorithm.init)
     }
 
     pub const fn digest_with_initial(&self, initial: u64) -> Digest<u64> {
-        Digest::new(self, initial)
+        let value = self.init(initial);
+        Digest::new(self, value)
     }
 }
 
