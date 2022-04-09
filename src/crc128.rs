@@ -68,6 +68,11 @@ impl<'a> Digest<'a, u128> {
         self.value = self.crc.update(self.value, bytes);
     }
 
+    pub const fn updated(mut self, bytes: &[u8]) -> Self {
+        self.value = self.crc.update(self.value, bytes);
+        self
+    }
+
     pub const fn finalize(self) -> u128 {
         self.crc.finalize(self.value)
     }
