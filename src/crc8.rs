@@ -50,6 +50,11 @@ impl Crc<u8> {
         self.digest_with_initial(self.algorithm.init)
     }
 
+    /// Construct a `Digest` with a given initial value.
+    ///
+    /// This overrides the initial value specified by the algorithm.
+    /// The effects of the algorithm's properties `refin` and `width`
+    /// are applied to the custom initial value.
     pub const fn digest_with_initial(&self, initial: u8) -> Digest<u8> {
         let value = self.init(initial);
         Digest::new(self, value)
