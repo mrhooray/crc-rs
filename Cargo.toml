@@ -1,6 +1,6 @@
 [package]
 name = "crc"
-version = "2.1.0"
+version = "3.0.0"
 authors = [
     "Rui Hu <code@mrhooray.com>",
     "Akhil Velagapudi <4@4khil.com>"
@@ -15,4 +15,4 @@ categories = ["algorithms", "no-std"]
 edition = "2018"
 
 [dependencies]
-crc-catalog = "2.0.1"
+crc-catalog = "2.1.0"
