@@ -11,7 +11,7 @@ Rust implementation of CRC(8, 16, 32, 64). MSRV is 1.46.
 Add `crc` to `Cargo.toml`
 ```toml
 [dependencies]
-crc = "2.0"
+crc = "3.0"
 ```
 
 ### Compute CRC
