@@ -5,7 +5,7 @@
 [![Docs](https://docs.rs/crc/badge.svg)](https://docs.rs/crc)
 [![License](https://img.shields.io/crates/l/crc.svg?maxAge=2592000)](https://github.com/mrhooray/crc-rs#license)
 
-Rust implementation of CRC(8, 16, 32, 64). MSRV is 1.46.
+Rust implementation of CRC. MSRV is 1.46.
 
 ## Usage
 Add `crc` to `Cargo.toml`
