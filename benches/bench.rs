@@ -1,6 +1,6 @@
 use crc::*;
 use criterion::{criterion_group, criterion_main};
-use criterion::{Benchmark, Criterion, Throughput};
+use criterion::{Criterion, Throughput};
 
 pub const BLUETOOTH: Crc<u8> = Crc::<u8>::new(&CRC_8_BLUETOOTH);
 pub const X25: Crc<u16> = Crc::<u16>::new(&CRC_16_IBM_SDLC);
@@ -9,64 +9,60 @@ pub const GSM_40: Crc<u64> = Crc::<u64>::new(&CRC_40_GSM);
 pub const ECMA: Crc<u64> = Crc::<u64>::new(&CRC_64_ECMA_182);
 pub const DARC: Crc<u128> = Crc::<u128>::new(&CRC_82_DARC);
 
+const INPUT_SIZE: usize = 1_000_000;
+
 fn crc8(c: &mut Criterion) {
     let mut digest = BLUETOOTH.digest();
-    let bytes = vec![0u8; 1_000_000];
-    c.bench(
-        "crc8",
-        Benchmark::new("crc8", move |b| b.iter(|| digest.update(&bytes)))
-            .throughput(Throughput::Bytes(1_000_000)),
-    );
+    let bytes = vec![0u8; INPUT_SIZE];
+    let mut group = c.benchmark_group("crc8");
+    group
+        .throughput(Throughput::Bytes(bytes.len() as u64))
+        .bench_function("crc8", move |b| b.iter(|| digest.update(&bytes)));
 }
 
 fn crc16(c: &mut Criterion) {
     let mut digest = X25.digest();
-    let bytes = vec![0u8; 1_000_000];
-    c.bench(
-        "crc16",
-        Benchmark::new("crc16", move |b| b.iter(|| digest.update(&bytes)))
-            .throughput(Throughput::Bytes(1_000_000)),
-    );
+    let bytes = vec![0u8; INPUT_SIZE];
+    let mut group = c.benchmark_group("crc16");
+    group
+        .throughput(Throughput::Bytes(bytes.len() as u64))
+        .bench_function("crc16", move |b| b.iter(|| digest.update(&bytes)));
 }
 
 fn crc32(c: &mut Criterion) {
     let mut digest = CASTAGNOLI.digest();
-    let bytes = vec![0u8; 1_000_000];
-    c.bench(
-        "crc32",
-        Benchmark::new("crc32", move |b| b.iter(|| digest.update(&bytes)))
-            .throughput(Throughput::Bytes(1_000_000)),
-    );
+    let bytes = vec![0u8; INPUT_SIZE];
+    let mut group = c.benchmark_group("crc32");
+    group
+        .throughput(Throughput::Bytes(bytes.len() as u64))
+        .bench_function("crc32", move |b| b.iter(|| digest.update(&bytes)));
 }
 
 fn crc40(c: &mut Criterion) {
     let mut digest = GSM_40.digest();
-    let bytes = vec![0u8; 1_000_000];
-    c.bench(
-        "crc40",
-        Benchmark::new("crc40", move |b| b.iter(|| digest.update(&bytes)))
-            .throughput(Throughput::Bytes(1_000_000)),
-    );
+    let bytes = vec![0u8; INPUT_SIZE];
+    let mut group = c.benchmark_group("crc40");
+    group
+        .throughput(Throughput::Bytes(bytes.len() as u64))
+        .bench_function("crc40", move |b| b.iter(|| digest.update(&bytes)));
 }
 
 fn crc64(c: &mut Criterion) {
     let mut digest = ECMA.digest();
-    let bytes = vec![0u8; 1_000_000];
-    c.bench(
-        "crc64",
-        Benchmark::new("crc64", move |b| b.iter(|| digest.update(&bytes)))
-            .throughput(Throughput::Bytes(1_000_000)),
-    );
+    let bytes = vec![0u8; INPUT_SIZE];
+    let mut group = c.benchmark_group("crc64");
+    group
+        .throughput(Throughput::Bytes(bytes.len() as u64))
+        .bench_function("crc64", move |b| b.iter(|| digest.update(&bytes)));
 }
 
 fn crc82(c: &mut Criterion) {
     let mut digest = ECMA.digest();
-    let bytes = vec![0u8; 1_000_000];
-    c.bench(
-        "crc82",
-        Benchmark::new("crc82", move |b| b.iter(|| digest.update(&bytes)))
-            .throughput(Throughput::Bytes(1_000_000)),
-    );
+    let bytes = vec![0u8; INPUT_SIZE];
+    let mut group = c.benchmark_group("crc82");
+    group
+        .throughput(Throughput::Bytes(bytes.len() as u64))
+        .bench_function("crc82", move |b| b.iter(|| digest.update(&bytes)));
 }
 
 criterion_group!(crc8_benches, crc8);
