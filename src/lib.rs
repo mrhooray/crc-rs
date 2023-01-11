@@ -41,13 +41,28 @@ mod crc8;
 mod table;
 mod util;
 
-pub struct Crc<W: Width> {
-    pub algorithm: &'static Algorithm<W>,
-    table: [W; 256],
+mod private {
+    pub trait Sealed {}
+    impl<W: super::Width> Sealed for W {}
+}
+
+pub trait Implementation: private::Sealed {
+    type Width: Width;
+    type Table;
+}
+
+impl<W: Width> Implementation for W {
+    type Width = W;
+    type Table = [W; 256];
+}
+
+pub struct Crc<I: Implementation> {
+    pub algorithm: &'static Algorithm<I::Width>,
+    table: I::Table,
 }
 
 #[derive(Clone)]
-pub struct Digest<'a, W: Width> {
-    crc: &'a Crc<W>,
-    value: W,
+pub struct Digest<'a, I: Implementation> {
+    crc: &'a Crc<I>,
+    value: I::Width,
 }
