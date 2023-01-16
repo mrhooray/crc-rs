@@ -11,12 +11,17 @@ pub const DARC: Crc<u128> = Crc::<u128>::new(&CRC_82_DARC);
 
 static KB: usize = 1024;
 
+fn baseline(data: &[u8]) -> usize {
+    data.iter().fold(0usize, |acc, v| acc.wrapping_add(*v as usize))
+}
+
 fn checksum(c: &mut Criterion) {
     let size = 16 * KB;
     let bytes = vec![0u8; size];
 
     c.benchmark_group("checksum")
         .throughput(Throughput::Bytes(size as u64))
+        .bench_function("baseline", |b| b.iter(|| baseline(black_box(&bytes))))
         .bench_function("crc8", |b| b.iter(|| BLUETOOTH.checksum(black_box(&bytes))))
         .bench_function("crc16", |b| b.iter(|| X25.checksum(black_box(&bytes))))
         .bench_function("crc32", |b| b.iter(|| ISCSI.checksum(black_box(&bytes))))
