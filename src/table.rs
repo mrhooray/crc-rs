@@ -34,7 +34,11 @@ pub(crate) const fn crc16_table(width: u8, poly: u16, reflect: bool) -> [u16; 25
     table
 }
 
-pub(crate) const fn crc32_table(width: u8, poly: u32, reflect: bool) -> [u32; 256] {
+pub(crate) const fn crc32_table<const LEVEL: usize>(
+    width: u8,
+    poly: u32,
+    reflect: bool,
+) -> [[u32; 256]; LEVEL] {
     let poly = if reflect {
         let poly = poly.reverse_bits();
         poly >> (32u8 - width)
@@ -42,10 +46,25 @@ pub(crate) const fn crc32_table(width: u8, poly: u32, reflect: bool) -> [u32; 25
         poly << (32u8 - width)
     };
 
-    let mut table = [0u32; 256];
+    let mut table = [[0u32; 256]; LEVEL];
     let mut i = 0;
-    while i < table.len() {
-        table[i] = crc32(poly, reflect, i as u32);
+    while i < 256 {
+        table[0][i] = crc32(poly, reflect, i as u32);
+        i += 1;
+    }
+
+    let mut i = 0;
+    while i < 256 {
+        let mut e = 1;
+        while e < LEVEL {
+            let one_lower = table[e - 1][i];
+            if reflect {
+                table[e][i] = (one_lower >> 8) ^ table[0][(one_lower & 0xFF) as usize];
+            } else {
+                table[e][i] = (one_lower << 8) ^ table[0][((one_lower >> 24) & 0xFF) as usize];
+            }
+            e += 1;
+        }
         i += 1;
     }
     table
