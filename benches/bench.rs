@@ -12,7 +12,8 @@ pub const DARC: Crc<u128> = Crc::<u128>::new(&CRC_82_DARC);
 static KB: usize = 1024;
 
 fn baseline(data: &[u8]) -> usize {
-    data.iter().fold(0usize, |acc, v| acc.wrapping_add(*v as usize))
+    data.iter()
+        .fold(0usize, |acc, v| acc.wrapping_add(*v as usize))
 }
 
 fn checksum(c: &mut Criterion) {

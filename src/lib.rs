@@ -41,7 +41,6 @@ mod crc8;
 mod table;
 mod util;
 
-
 mod crc32_fast;
 pub use crc32_fast::FastU32;
 

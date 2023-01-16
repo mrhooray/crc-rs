@@ -1,5 +1,5 @@
 use super::{Algorithm, Crc, Digest};
-use crate::{table::crc32_table};
+use crate::table::crc32_table;
 
 /// This implements a faster version of Crc<u32> with a 16kB lookup table
 pub struct FastU32;
