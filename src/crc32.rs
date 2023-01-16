@@ -3,11 +3,8 @@ use crate::table::crc32_table;
 
 impl Crc<u32> {
     pub const fn new(algorithm: &'static Algorithm<u32>) -> Self {
-        let table = crc32_table::<1>(algorithm.width, algorithm.poly, algorithm.refin);
-        Self {
-            algorithm,
-            table: table[0],
-        }
+        let table = crc32_table(algorithm.width, algorithm.poly, algorithm.refin);
+        Self { algorithm, table }
     }
 
     pub const fn checksum(&self, bytes: &[u8]) -> u32 {

@@ -1,5 +1,5 @@
 use super::{Algorithm, Crc, Digest};
-use crate::table::crc32_table;
+use crate::table::crc32_table_slice_16;
 
 /// This implements a faster version of Crc<u32> with a 16kB lookup table
 pub struct FastU32;
@@ -13,7 +13,7 @@ impl crate::Implementation for FastU32 {
 
 impl Crc<FastU32> {
     pub const fn new(algorithm: &'static Algorithm<u32>) -> Self {
-        let table = crc32_table::<16>(algorithm.width, algorithm.poly, algorithm.refin);
+        let table = crc32_table_slice_16(algorithm.width, algorithm.poly, algorithm.refin);
         Self { algorithm, table }
     }
 
