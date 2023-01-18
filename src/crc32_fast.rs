@@ -163,54 +163,33 @@ fn correctness() {
         residue: 0xb798b438,
     };
 
-    let iscsi = Crc::<Slice16<u32>>::new(&CRC_32_ISCSI);
-    let iscsi_nonreflex = Crc::<Slice16<u32>>::new(&CRC_32_ISCSI_NONREFLEX);
+    let algs_to_test = [&CRC_32_ISCSI, &CRC_32_ISCSI_NONREFLEX];
 
-    for data in data {
-        let expected = Crc::<u32>::new(&CRC_32_ISCSI).checksum(data.as_bytes());
+    for alg in algs_to_test {
+        for data in data {
+            let test_crc = Crc::<Slice16<u32>>::new(alg);
+            let expected = Crc::<u32>::new(alg).checksum(data.as_bytes());
 
-        // Check that doing all at once works as expected
-        let crc1 = iscsi.checksum(data.as_bytes());
-        assert_eq!(crc1, expected);
+            // Check that doing all at once works as expected
+            let crc1 = test_crc.checksum(data.as_bytes());
+            assert_eq!(crc1, expected);
 
-        let mut digest = iscsi.digest();
-        digest.update(data.as_bytes());
-        let crc2 = digest.finalize();
-        assert_eq!(crc2, expected);
+            let mut digest = test_crc.digest();
+            digest.update(data.as_bytes());
+            let crc2 = digest.finalize();
+            assert_eq!(crc2, expected);
 
-        // Check that we didn't break updating from multiple sources
-        if data.len() > 2 {
-            let data = data.as_bytes();
-            let data1 = &data[..data.len() / 2];
-            let data2 = &data[data.len() / 2..];
-            let mut digest = iscsi.digest();
-            digest.update(data1);
-            digest.update(data2);
-            let crc3 = digest.finalize();
-            assert_eq!(crc3, expected);
-        }
-
-        let expected = Crc::<u32>::new(&CRC_32_ISCSI_NONREFLEX).checksum(data.as_bytes());
-
-        // Check that doing all at once works as expected
-        let crc1 = iscsi_nonreflex.checksum(data.as_bytes());
-        assert_eq!(crc1, expected);
-
-        let mut digest = iscsi_nonreflex.digest();
-        digest.update(data.as_bytes());
-        let crc2 = digest.finalize();
-        assert_eq!(crc2, expected);
-
-        // Check that we didn't break updating from multiple sources
-        if data.len() > 2 {
-            let data = data.as_bytes();
-            let data1 = &data[..data.len() / 2];
-            let data2 = &data[data.len() / 2..];
-            let mut digest = iscsi_nonreflex.digest();
-            digest.update(data1);
-            digest.update(data2);
-            let crc3 = digest.finalize();
-            assert_eq!(crc3, expected);
+            // Check that we didn't break updating from multiple sources
+            if data.len() > 2 {
+                let data = data.as_bytes();
+                let data1 = &data[..data.len() / 2];
+                let data2 = &data[data.len() / 2..];
+                let mut digest = test_crc.digest();
+                digest.update(data1);
+                digest.update(data2);
+                let crc3 = digest.finalize();
+                assert_eq!(crc3, expected);
+            }
         }
     }
 }
