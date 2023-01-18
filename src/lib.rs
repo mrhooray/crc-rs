@@ -36,13 +36,21 @@ pub use crc_catalog::*;
 mod crc128;
 mod crc16;
 mod crc32;
+mod crc32_fast;
 mod crc64;
 mod crc8;
 mod table;
 mod util;
 
-mod crc32_fast;
-pub use crc32_fast::FastU32;
+/// For some widths there is a faster implementation using a 16x larger lookup table. Use it with `Crc<Slice16<W>>`
+pub struct Slice16<W: Width>(core::marker::PhantomData<W>);
+
+impl<W: Width> crate::private::Sealed for Slice16<W> {}
+
+impl<W: Width> crate::Implementation for Slice16<W> {
+    type Width = W;
+    type Table = [[W; 256]; 16];
+}
 
 mod private {
     pub trait Sealed {}

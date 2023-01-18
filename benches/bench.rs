@@ -4,7 +4,7 @@ use criterion::{black_box, criterion_group, criterion_main, Criterion, Throughpu
 pub const BLUETOOTH: Crc<u8> = Crc::<u8>::new(&CRC_8_BLUETOOTH);
 pub const X25: Crc<u16> = Crc::<u16>::new(&CRC_16_IBM_SDLC);
 pub const ISCSI: Crc<u32> = Crc::<u32>::new(&CRC_32_ISCSI);
-pub const ISCSI_SLICE16: Crc<FastU32> = Crc::<FastU32>::new(&CRC_32_ISCSI);
+pub const ISCSI_SLICE16: Crc<Slice16<u32>> = Crc::<Slice16<u32>>::new(&CRC_32_ISCSI);
 pub const GSM_40: Crc<u64> = Crc::<u64>::new(&CRC_40_GSM);
 pub const ECMA: Crc<u64> = Crc::<u64>::new(&CRC_64_ECMA_182);
 pub const DARC: Crc<u128> = Crc::<u128>::new(&CRC_82_DARC);

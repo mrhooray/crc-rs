@@ -1,17 +1,7 @@
-use super::{Algorithm, Crc, Digest};
+use super::{Algorithm, Crc, Digest, Slice16};
 use crate::table::crc32_table_slice_16;
 
-/// This implements a faster version of Crc<u32> with a 16kB lookup table
-pub struct FastU32;
-
-impl crate::private::Sealed for FastU32 {}
-
-impl crate::Implementation for FastU32 {
-    type Width = u32;
-    type Table = [[u32; 256]; 16];
-}
-
-impl Crc<FastU32> {
+impl Crc<Slice16<u32>> {
     pub const fn new(algorithm: &'static Algorithm<u32>) -> Self {
         let table = crc32_table_slice_16(algorithm.width, algorithm.poly, algorithm.refin);
         Self { algorithm, table }
@@ -117,7 +107,7 @@ impl Crc<FastU32> {
         crc ^ self.algorithm.xorout
     }
 
-    pub const fn digest(&self) -> Digest<FastU32> {
+    pub const fn digest(&self) -> Digest<Slice16<u32>> {
         self.digest_with_initial(self.algorithm.init)
     }
 
@@ -126,14 +116,14 @@ impl Crc<FastU32> {
     /// This overrides the initial value specified by the algorithm.
     /// The effects of the algorithm's properties `refin` and `width`
     /// are applied to the custom initial value.
-    pub const fn digest_with_initial(&self, initial: u32) -> Digest<FastU32> {
+    pub const fn digest_with_initial(&self, initial: u32) -> Digest<Slice16<u32>> {
         let value = self.init(initial);
         Digest::new(self, value)
     }
 }
 
-impl<'a> Digest<'a, FastU32> {
-    const fn new(crc: &'a Crc<FastU32>, value: u32) -> Self {
+impl<'a> Digest<'a, Slice16<u32>> {
+    const fn new(crc: &'a Crc<Slice16<u32>>, value: u32) -> Self {
         Digest { crc, value }
     }
 
@@ -173,8 +163,8 @@ fn correctness() {
         residue: 0xb798b438,
     };
 
-    let iscsi = Crc::<FastU32>::new(&CRC_32_ISCSI);
-    let iscsi_nonreflex = Crc::<FastU32>::new(&CRC_32_ISCSI_NONREFLEX);
+    let iscsi = Crc::<Slice16<u32>>::new(&CRC_32_ISCSI);
+    let iscsi_nonreflex = Crc::<Slice16<u32>>::new(&CRC_32_ISCSI_NONREFLEX);
 
     for data in data {
         let expected = Crc::<u32>::new(&CRC_32_ISCSI).checksum(data.as_bytes());
