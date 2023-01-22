@@ -36,20 +36,37 @@ pub use crc_catalog::*;
 mod crc128;
 mod crc16;
 mod crc32;
-mod crc32_fast;
 mod crc64;
 mod crc8;
 mod table;
 mod util;
 
-/// For some widths there is a faster implementation using a 16x larger lookup table. Use it with `Crc<Slice16<W>>`
+/// Implementation using a 16 * 256 entries lookup table. Use it with `Crc<Slice16<W>>`
 pub struct Slice16<W: Width>(core::marker::PhantomData<W>);
 
+/// Implementation using a 256 entries lookup table. Use it with `Crc<Bytewise<W>>`
+pub struct Bytewise<W: Width>(core::marker::PhantomData<W>);
+
+/// Implementation using no lookup table. Use it with `Crc<Nolookup<W>>`
+pub struct Nolookup<W: Width>(core::marker::PhantomData<W>);
+
 impl<W: Width> crate::private::Sealed for Slice16<W> {}
+impl<W: Width> crate::private::Sealed for Bytewise<W> {}
+impl<W: Width> crate::private::Sealed for Nolookup<W> {}
 
 impl<W: Width> crate::Implementation for Slice16<W> {
     type Width = W;
     type Table = [[W; 256]; 16];
+}
+
+impl<W: Width> crate::Implementation for Bytewise<W> {
+    type Width = W;
+    type Table = [W; 256];
+}
+
+impl<W: Width> crate::Implementation for Nolookup<W> {
+    type Width = W;
+    type Table = ();
 }
 
 mod private {
@@ -67,6 +84,8 @@ impl<W: Width> Implementation for W {
     type Table = [W; 256];
 }
 
+/// Crc with pluggable implementations. `I`can be either a unsigned integer type (e.g. u32) to get the default implementation for that width
+/// or one of `Bytewise<>`, `Nolookup<>`, or `Slice16<>` to choose the used implementation
 pub struct Crc<I: Implementation> {
     pub algorithm: &'static Algorithm<I::Width>,
     table: I::Table,
@@ -77,3 +96,8 @@ pub struct Digest<'a, I: Implementation> {
     crc: &'a Crc<I>,
     value: I::Width,
 }
+
+// Convenient type aliases
+pub type Crc32Slice16 = Crc<Slice16<u32>>;
+pub type Crc32Bytewise = Crc<Bytewise<u32>>;
+pub type Crc32Nolookup = Crc<Nolookup<u32>>;
