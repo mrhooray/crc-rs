@@ -152,7 +152,7 @@ const fn update_slice16(
 
 #[cfg(test)]
 mod test {
-    use crate::{Bytewise, Crc, Nolookup, Slice16};
+    use crate::{Bytewise, Crc, NoTable, Slice16};
     use crc_catalog::{Algorithm, CRC_32_ISCSI};
 
     /// Test this opitimized version against the well known implementation to ensure correctness
@@ -185,7 +185,7 @@ mod test {
         for alg in algs_to_test {
             for data in data {
                 let crc_slice16 = Crc::<Slice16<u32>>::new(alg);
-                let crc_nolookup = Crc::<Nolookup<u32>>::new(alg);
+                let crc_nolookup = Crc::<NoTable<u32>>::new(alg);
                 let expected = Crc::<Bytewise<u32>>::new(alg).checksum(data.as_bytes());
 
                 // Check that doing all at once works as expected

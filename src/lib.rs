@@ -48,11 +48,11 @@ pub struct Slice16<W: Width>(core::marker::PhantomData<W>);
 pub struct Bytewise<W: Width>(core::marker::PhantomData<W>);
 
 /// Implementation using no lookup table. Use it with `Crc<Nolookup<W>>`
-pub struct Nolookup<W: Width>(core::marker::PhantomData<W>);
+pub struct NoTable<W: Width>(core::marker::PhantomData<W>);
 
 impl<W: Width> crate::private::Sealed for Slice16<W> {}
 impl<W: Width> crate::private::Sealed for Bytewise<W> {}
-impl<W: Width> crate::private::Sealed for Nolookup<W> {}
+impl<W: Width> crate::private::Sealed for NoTable<W> {}
 
 impl<W: Width> crate::Implementation for Slice16<W> {
     type Width = W;
@@ -64,7 +64,7 @@ impl<W: Width> crate::Implementation for Bytewise<W> {
     type Table = [W; 256];
 }
 
-impl<W: Width> crate::Implementation for Nolookup<W> {
+impl<W: Width> crate::Implementation for NoTable<W> {
     type Width = W;
     type Table = ();
 }

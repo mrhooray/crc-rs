@@ -1,8 +1,8 @@
-use crate::{Algorithm, Crc, Digest, Nolookup};
+use crate::{Algorithm, Crc, Digest, NoTable};
 
 use super::{finalize, init, update_nolookup};
 
-impl Crc<Nolookup<u32>> {
+impl Crc<NoTable<u32>> {
     pub const fn new(algorithm: &'static Algorithm<u32>) -> Self {
         Self {
             algorithm,
@@ -20,7 +20,7 @@ impl Crc<Nolookup<u32>> {
         update_nolookup(crc, self.algorithm, bytes)
     }
 
-    pub const fn digest(&self) -> Digest<Nolookup<u32>> {
+    pub const fn digest(&self) -> Digest<NoTable<u32>> {
         self.digest_with_initial(self.algorithm.init)
     }
 
@@ -29,14 +29,14 @@ impl Crc<Nolookup<u32>> {
     /// This overrides the initial value specified by the algorithm.
     /// The effects of the algorithm's properties `refin` and `width`
     /// are applied to the custom initial value.
-    pub const fn digest_with_initial(&self, initial: u32) -> Digest<Nolookup<u32>> {
+    pub const fn digest_with_initial(&self, initial: u32) -> Digest<NoTable<u32>> {
         let value = init(self.algorithm, initial);
         Digest::new(self, value)
     }
 }
 
-impl<'a> Digest<'a, Nolookup<u32>> {
-    const fn new(crc: &'a Crc<Nolookup<u32>>, value: u32) -> Self {
+impl<'a> Digest<'a, NoTable<u32>> {
+    const fn new(crc: &'a Crc<NoTable<u32>>, value: u32) -> Self {
         Digest { crc, value }
     }
 
