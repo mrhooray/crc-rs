@@ -1,7 +1,7 @@
 use crate::table::crc32_table_slice_16;
 use crate::{Algorithm, Crc, Digest, Slice16};
 
-use super::update_slice16;
+use super::{finalize, init, update_slice16};
 
 impl Crc<Slice16<u32>> {
     pub const fn new(algorithm: &'static Algorithm<u32>) -> Self {
@@ -10,31 +10,13 @@ impl Crc<Slice16<u32>> {
     }
 
     pub const fn checksum(&self, bytes: &[u8]) -> u32 {
-        let mut crc = self.init(self.algorithm.init);
+        let mut crc = init(&self.algorithm, self.algorithm.init);
         crc = self.update(crc, bytes);
-        self.finalize(crc)
-    }
-
-    const fn init(&self, initial: u32) -> u32 {
-        if self.algorithm.refin {
-            initial.reverse_bits() >> (32u8 - self.algorithm.width)
-        } else {
-            initial << (32u8 - self.algorithm.width)
-        }
+        finalize(&self.algorithm, crc)
     }
 
     const fn update(&self, crc: u32, bytes: &[u8]) -> u32 {
         update_slice16(crc, self.algorithm.refin, &self.table, bytes)
-    }
-
-    const fn finalize(&self, mut crc: u32) -> u32 {
-        if self.algorithm.refin ^ self.algorithm.refout {
-            crc = crc.reverse_bits();
-        }
-        if !self.algorithm.refout {
-            crc >>= 32u8 - self.algorithm.width;
-        }
-        crc ^ self.algorithm.xorout
     }
 
     pub const fn digest(&self) -> Digest<Slice16<u32>> {
@@ -47,7 +29,7 @@ impl Crc<Slice16<u32>> {
     /// The effects of the algorithm's properties `refin` and `width`
     /// are applied to the custom initial value.
     pub const fn digest_with_initial(&self, initial: u32) -> Digest<Slice16<u32>> {
-        let value = self.init(initial);
+        let value = init(&self.algorithm, initial);
         Digest::new(self, value)
     }
 }
@@ -62,6 +44,6 @@ impl<'a> Digest<'a, Slice16<u32>> {
     }
 
     pub const fn finalize(self) -> u32 {
-        self.crc.finalize(self.value)
+        finalize(&self.crc.algorithm, self.value)
     }
 }

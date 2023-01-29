@@ -6,6 +6,26 @@ mod slice16;
 use crate::util::crc32;
 use crc_catalog::Algorithm;
 
+// init is shared between all impls
+const fn init(algorithm: &Algorithm<u32>, initial: u32) -> u32 {
+    if algorithm.refin {
+        initial.reverse_bits() >> (32u8 - algorithm.width)
+    } else {
+        initial << (32u8 - algorithm.width)
+    }
+}
+
+// finalize is shared between all impls
+const fn finalize(algorithm: &Algorithm<u32>, mut crc: u32) -> u32 {
+    if algorithm.refin ^ algorithm.refout {
+        crc = crc.reverse_bits();
+    }
+    if !algorithm.refout {
+        crc >>= 32u8 - algorithm.width;
+    }
+    crc ^ algorithm.xorout
+}
+
 const fn update_nolookup(mut crc: u32, algorithm: &Algorithm<u32>, bytes: &[u8]) -> u32 {
     let poly = if algorithm.refin {
         let poly = algorithm.poly.reverse_bits();
