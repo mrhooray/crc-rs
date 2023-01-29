@@ -10,9 +10,9 @@ impl Crc<u32> {
     }
 
     pub const fn checksum(&self, bytes: &[u8]) -> u32 {
-        let mut crc = init(&self.algorithm, self.algorithm.init);
+        let mut crc = init(self.algorithm, self.algorithm.init);
         crc = self.update(crc, bytes);
-        finalize(&self.algorithm, crc)
+        finalize(self.algorithm, crc)
     }
 
     const fn update(&self, crc: u32, bytes: &[u8]) -> u32 {
@@ -29,7 +29,7 @@ impl Crc<u32> {
     /// The effects of the algorithm's properties `refin` and `width`
     /// are applied to the custom initial value.
     pub const fn digest_with_initial(&self, initial: u32) -> Digest<u32> {
-        let value = init(&self.algorithm, initial);
+        let value = init(self.algorithm, initial);
         Digest::new(self, value)
     }
 }
@@ -44,6 +44,6 @@ impl<'a> Digest<'a, u32> {
     }
 
     pub const fn finalize(self) -> u32 {
-        finalize(&self.crc.algorithm, self.value)
+        finalize(self.crc.algorithm, self.value)
     }
 }

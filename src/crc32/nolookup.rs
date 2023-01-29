@@ -11,9 +11,9 @@ impl Crc<NoTable<u32>> {
     }
 
     pub const fn checksum(&self, bytes: &[u8]) -> u32 {
-        let mut crc = init(&self.algorithm, self.algorithm.init);
+        let mut crc = init(self.algorithm, self.algorithm.init);
         crc = self.update(crc, bytes);
-        finalize(&self.algorithm, crc)
+        finalize(self.algorithm, crc)
     }
 
     const fn update(&self, crc: u32, bytes: &[u8]) -> u32 {
@@ -45,6 +45,6 @@ impl<'a> Digest<'a, NoTable<u32>> {
     }
 
     pub const fn finalize(self) -> u32 {
-        finalize(&self.crc.algorithm, self.value)
+        finalize(self.crc.algorithm, self.value)
     }
 }
