@@ -41,10 +41,10 @@ mod crc8;
 mod table;
 mod util;
 
-/// Implementation using a 16 * 256 entries lookup table. Use it with `Crc<Slice16<W>>`
+/// Implementation using a 16 * 256 entry lookup table. Use it with `Crc<Slice16<W>>`
 pub struct Slice16<W: Width>(core::marker::PhantomData<W>);
 
-/// Implementation using a 256 entries lookup table. Use it with `Crc<Bytewise<W>>`
+/// Implementation using a 256 entry lookup table. Use it with `Crc<Bytewise<W>>`
 pub struct Bytewise<W: Width>(core::marker::PhantomData<W>);
 
 /// Implementation using no lookup table. Use it with `Crc<Nolookup<W>>`
@@ -84,8 +84,8 @@ impl<W: Width> Implementation for W {
     type Table = [W; 256];
 }
 
-/// Crc with pluggable implementations. `I`can be either a unsigned integer type (e.g. u32) to get the default implementation for that width
-/// or one of `Bytewise<>`, `Nolookup<>`, or `Slice16<>` to choose the used implementation
+/// Crc with pluggable implementations ([Nolookup], [Bytewise], [Slice16]).
+/// To choose the default implemenation, use the [Width] directly (e.g. `Crc<u32>`).
 pub struct Crc<I: Implementation> {
     pub algorithm: &'static Algorithm<I::Width>,
     table: I::Table,
@@ -96,8 +96,3 @@ pub struct Digest<'a, I: Implementation> {
     crc: &'a Crc<I>,
     value: I::Width,
 }
-
-// Convenient type aliases
-pub type Crc32Slice16 = Crc<Slice16<u32>>;
-pub type Crc32Bytewise = Crc<Bytewise<u32>>;
-pub type Crc32Nolookup = Crc<Nolookup<u32>>;
