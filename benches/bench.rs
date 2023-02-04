@@ -9,6 +9,9 @@ pub const ISCSI_BYTEWISE: Crc<Bytewise<u32>> = Crc::<Bytewise<u32>>::new(&CRC_32
 pub const ISCSI_NOLOOKUP: Crc<NoTable<u32>> = Crc::<NoTable<u32>>::new(&CRC_32_ISCSI);
 pub const GSM_40: Crc<u64> = Crc::<u64>::new(&CRC_40_GSM);
 pub const ECMA: Crc<u64> = Crc::<u64>::new(&CRC_64_ECMA_182);
+pub const ECMA_SLICE16: Crc<Slice16<u64>> = Crc::<Slice16<u64>>::new(&CRC_64_ECMA_182);
+pub const ECMA_BYTEWISE: Crc<Bytewise<u64>> = Crc::<Bytewise<u64>>::new(&CRC_64_ECMA_182);
+pub const ECMA_NOLOOKUP: Crc<NoTable<u64>> = Crc::<NoTable<u64>>::new(&CRC_64_ECMA_182);
 pub const DARC: Crc<u128> = Crc::<u128>::new(&CRC_82_DARC);
 
 static KB: usize = 1024;
@@ -39,11 +42,23 @@ fn checksum(c: &mut Criterion) {
             b.iter(|| ISCSI_SLICE16.checksum(black_box(&bytes)))
         });
 
+    c.benchmark_group("crc64")
+        .throughput(Throughput::Bytes(size as u64))
+        .bench_function("default", |b| b.iter(|| ECMA.checksum(black_box(&bytes))))
+        .bench_function("nolookup", |b| {
+            b.iter(|| ECMA_NOLOOKUP.checksum(black_box(&bytes)))
+        })
+        .bench_function("bytewise", |b| {
+            b.iter(|| ECMA_BYTEWISE.checksum(black_box(&bytes)))
+        })
+        .bench_function("slice16", |b| {
+            b.iter(|| ECMA_SLICE16.checksum(black_box(&bytes)))
+        });
+
     c.benchmark_group("checksum")
         .bench_function("crc8", |b| b.iter(|| BLUETOOTH.checksum(black_box(&bytes))))
         .bench_function("crc16", |b| b.iter(|| X25.checksum(black_box(&bytes))))
         .bench_function("crc40", |b| b.iter(|| GSM_40.checksum(black_box(&bytes))))
-        .bench_function("crc64", |b| b.iter(|| ECMA.checksum(black_box(&bytes))))
         .bench_function("crc82", |b| b.iter(|| DARC.checksum(black_box(&bytes))));
 }
 
