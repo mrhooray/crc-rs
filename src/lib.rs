@@ -85,7 +85,7 @@ impl<W: Width> Implementation for W {
 }
 
 /// Crc with pluggable implementations ([Nolookup], [Bytewise], [Slice16]).
-/// To choose the default implemenation, use the [Width] directly (e.g. `Crc<u32>`).
+/// To choose the default implementation, use the [Width] directly (e.g. `Crc<u32>`).
 pub struct Crc<I: Implementation> {
     pub algorithm: &'static Algorithm<I::Width>,
     table: I::Table,
