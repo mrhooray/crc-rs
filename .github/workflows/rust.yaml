@@ -20,14 +20,8 @@ jobs:
           toolchain: stable
           components: rustfmt, clippy
           override: true
-      - uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-          args: -- -D warnings
-      - uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: --all -- --check
+      - run: cargo clippy -- -D warnings
+      - run: cargo fmt --all -- --check
   build:
     runs-on: ubuntu-latest
     strategy:
@@ -43,12 +37,8 @@ jobs:
           profile: minimal
           toolchain: ${{ matrix.rust }}
           override: true
-      - uses: actions-rs/cargo@v1
-        with:
-          command: check
-      - uses: actions-rs/cargo@v1
-        with:
-          command: build
+      - run: cargo check
+      - run: cargo build
   test:
     runs-on: ubuntu-latest
     strategy:
@@ -63,6 +53,4 @@ jobs:
           profile: minimal
           toolchain: ${{ matrix.rust }}
           override: true
-      - uses: actions-rs/cargo@v1
-        with:
-          command: test
+      - run: cargo test
