@@ -2,6 +2,9 @@ use crc::*;
 use criterion::{black_box, criterion_group, criterion_main, Criterion, Throughput};
 
 pub const BLUETOOTH: Crc<u8> = Crc::<u8>::new(&CRC_8_BLUETOOTH);
+pub const BLUETOOTH_SLICE16: Crc<Slice16<u8>> = Crc::<Slice16<u8>>::new(&CRC_8_BLUETOOTH);
+pub const BLUETOOTH_BYTEWISE: Crc<Bytewise<u8>> = Crc::<Bytewise<u8>>::new(&CRC_8_BLUETOOTH);
+pub const BLUETOOTH_NOLOOKUP: Crc<NoTable<u8>> = Crc::<NoTable<u8>>::new(&CRC_8_BLUETOOTH);
 pub const X25: Crc<u16> = Crc::<u16>::new(&CRC_16_IBM_SDLC);
 pub const X25_SLICE16: Crc<Slice16<u16>> = Crc::<Slice16<u16>>::new(&CRC_16_IBM_SDLC);
 pub const X25_BYTEWISE: Crc<Bytewise<u16>> = Crc::<Bytewise<u16>>::new(&CRC_16_IBM_SDLC);
@@ -34,6 +37,19 @@ fn checksum(c: &mut Criterion) {
     c.benchmark_group("baseline")
         .throughput(Throughput::Bytes(size as u64))
         .bench_function("baseline", |b| b.iter(|| baseline(black_box(&bytes))));
+
+    c.benchmark_group("crc8")
+        .throughput(Throughput::Bytes(size as u64))
+        .bench_function("default", |b| b.iter(|| BLUETOOTH.checksum(black_box(&bytes))))
+        .bench_function("nolookup", |b| {
+            b.iter(|| BLUETOOTH_NOLOOKUP.checksum(black_box(&bytes)))
+        })
+        .bench_function("bytewise", |b| {
+            b.iter(|| BLUETOOTH_BYTEWISE.checksum(black_box(&bytes)))
+        })
+        .bench_function("slice16", |b| {
+            b.iter(|| BLUETOOTH_SLICE16.checksum(black_box(&bytes)))
+        });
 
     c.benchmark_group("crc16")
         .throughput(Throughput::Bytes(size as u64))
@@ -89,7 +105,6 @@ fn checksum(c: &mut Criterion) {
 
     c.benchmark_group("checksum")
         .bench_function("crc8", |b| b.iter(|| BLUETOOTH.checksum(black_box(&bytes))))
-        .bench_function("crc16", |b| b.iter(|| X25.checksum(black_box(&bytes))))
         .bench_function("crc40", |b| b.iter(|| GSM_40.checksum(black_box(&bytes))));
 }
 
