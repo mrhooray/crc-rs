@@ -40,7 +40,9 @@ fn checksum(c: &mut Criterion) {
 
     c.benchmark_group("crc8")
         .throughput(Throughput::Bytes(size as u64))
-        .bench_function("default", |b| b.iter(|| BLUETOOTH.checksum(black_box(&bytes))))
+        .bench_function("default", |b| {
+            b.iter(|| BLUETOOTH.checksum(black_box(&bytes)))
+        })
         .bench_function("nolookup", |b| {
             b.iter(|| BLUETOOTH_NOLOOKUP.checksum(black_box(&bytes)))
         })
