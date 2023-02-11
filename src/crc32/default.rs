@@ -1,11 +1,11 @@
-use crate::table::crc32_table;
+use crate::table::crc32_table_slice_16;
 use crate::{Algorithm, Crc, Digest};
 
-use super::{finalize, init, update_bytewise};
+use super::{finalize, init, update_slice16};
 
 impl Crc<u32> {
     pub const fn new(algorithm: &'static Algorithm<u32>) -> Self {
-        let table = crc32_table(algorithm.width, algorithm.poly, algorithm.refin);
+        let table = crc32_table_slice_16(algorithm.width, algorithm.poly, algorithm.refin);
         Self { algorithm, table }
     }
 
@@ -16,7 +16,7 @@ impl Crc<u32> {
     }
 
     const fn update(&self, crc: u32, bytes: &[u8]) -> u32 {
-        update_bytewise(crc, self.algorithm.refin, &self.table, bytes)
+        update_slice16(crc, self.algorithm.refin, &self.table, bytes)
     }
 
     pub const fn digest(&self) -> Digest<u32> {

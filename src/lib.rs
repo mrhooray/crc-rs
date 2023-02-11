@@ -28,7 +28,7 @@
 //! digest.update(b"123456789");
 //! assert_eq!(digest.finalize(), 0xaee7);
 //! ```
-//#![no_std]
+#![no_std]
 #![forbid(unsafe_code)]
 
 pub use crc_catalog::*;
@@ -79,9 +79,29 @@ pub trait Implementation: private::Sealed {
     type Table;
 }
 
-impl<W: Width> Implementation for W {
-    type Width = W;
-    type Table = [W; 256];
+impl Implementation for u8 {
+    type Width = u8;
+    type Table = [[u8; 256]; 16];
+}
+
+impl Implementation for u16 {
+    type Width = u16;
+    type Table = [[u16; 256]; 16];
+}
+
+impl Implementation for u32 {
+    type Width = u32;
+    type Table = [[u32; 256]; 16];
+}
+
+impl Implementation for u64 {
+    type Width = u64;
+    type Table = [[u64; 256]; 16];
+}
+
+impl Implementation for u128 {
+    type Width = u128;
+    type Table = [u128; 256];
 }
 
 /// Crc with pluggable implementations ([Nolookup], [Bytewise], [Slice16]).
