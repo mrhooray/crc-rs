@@ -17,6 +17,34 @@ pub(crate) const fn crc8_table(width: u8, poly: u8, reflect: bool) -> [u8; 256] 
     table
 }
 
+pub(crate) const fn crc8_table_slice_16(width: u8, poly: u8, reflect: bool) -> [[u8; 256]; 16] {
+    let poly = if reflect {
+        let poly = poly.reverse_bits();
+        poly >> (8u8 - width)
+    } else {
+        poly << (8u8 - width)
+    };
+
+    let mut table = [[0u8; 256]; 16];
+    let mut i = 0;
+    while i < 256 {
+        table[0][i] = crc8(poly, reflect, i as u8);
+        i += 1;
+    }
+
+    let mut i = 0;
+    while i < 256 {
+        let mut e = 1;
+        while e < 16 {
+            let one_lower = table[e - 1][i];
+            table[e][i] = table[0][one_lower as usize];
+            e += 1;
+        }
+        i += 1;
+    }
+    table
+}
+
 pub(crate) const fn crc16_table(width: u8, poly: u16, reflect: bool) -> [u16; 256] {
     let poly = if reflect {
         let poly = poly.reverse_bits();
