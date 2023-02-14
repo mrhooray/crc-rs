@@ -1,10 +1,12 @@
-use crate::crc8::{finalize, init, update_bytewise};
-use crate::table::crc8_table;
+use crate::crc8::{finalize, init};
+use crate::table::crc8_table_slice_16;
 use crate::{Algorithm, Crc, Digest};
+
+use super::update_slice16;
 
 impl Crc<u8> {
     pub const fn new(algorithm: &'static Algorithm<u8>) -> Self {
-        let table = crc8_table(algorithm.width, algorithm.poly, algorithm.refin);
+        let table = crc8_table_slice_16(algorithm.width, algorithm.poly, algorithm.refin);
         Self { algorithm, table }
     }
 
@@ -15,7 +17,7 @@ impl Crc<u8> {
     }
 
     const fn update(&self, crc: u8, bytes: &[u8]) -> u8 {
-        update_bytewise(crc, &self.table, bytes)
+        update_slice16(crc, &self.table, bytes)
     }
 
     pub const fn digest(&self) -> Digest<u8> {
