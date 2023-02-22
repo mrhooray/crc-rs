@@ -77,6 +77,8 @@ const fn update_slice16(
     let mut i = 0;
     if reflect {
         while i + 16 < len {
+            assert!((i + 15) < len);
+
             let current0 = bytes[i] ^ (crc as u8);
             let current1 = bytes[i + 1] ^ ((crc >> 8) as u8);
 
@@ -107,6 +109,8 @@ const fn update_slice16(
         }
     } else {
         while i + 16 < len {
+            assert!((i + 15) < len);
+
             let current0 = bytes[i] ^ ((crc >> 8) as u8);
             let current1 = bytes[i + 1] ^ (crc as u8);
 

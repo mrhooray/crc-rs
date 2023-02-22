@@ -58,6 +58,8 @@ const fn update_slice16(mut crc: u8, table: &[[u8; 256]; 16], bytes: &[u8]) -> u
     let mut i = 0;
 
     while i + 16 < len {
+        assert!((i + 15) < len);
+
         crc = table[0][bytes[i + 15] as usize]
             ^ table[1][bytes[i + 14] as usize]
             ^ table[2][bytes[i + 13] as usize]

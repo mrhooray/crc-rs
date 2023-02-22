@@ -76,8 +76,11 @@ const fn update_slice16(
     bytes: &[u8],
 ) -> u32 {
     let mut i = 0;
+    let len = bytes.len();
     if reflect {
-        while i + 16 <= bytes.len() {
+        while i + 16 <= len {
+            assert!((i + 15) < len);
+
             let mut current_slice = [bytes[i], bytes[i + 1], bytes[i + 2], bytes[i + 3]];
 
             current_slice[0] ^= crc as u8;
@@ -106,13 +109,15 @@ const fn update_slice16(
         }
 
         // Last few bytes
-        while i < bytes.len() {
+        while i < len{
             let table_index = ((crc ^ bytes[i] as u32) & 0xFF) as usize;
             crc = table[0][table_index] ^ (crc >> 8);
             i += 1;
         }
     } else {
-        while i + 16 <= bytes.len() {
+        while i + 16 <= len {
+            assert!((i + 15) < len);
+
             let mut current_slice = [bytes[i], bytes[i + 1], bytes[i + 2], bytes[i + 3]];
 
             current_slice[0] ^= (crc >> 24) as u8;
@@ -141,7 +146,7 @@ const fn update_slice16(
         }
 
         // Last few bytes
-        while i < bytes.len() {
+        while i < len {
             let table_index = (((crc >> 24) ^ bytes[i] as u32) & 0xFF) as usize;
             crc = table[0][table_index] ^ (crc << 8);
             i += 1;
