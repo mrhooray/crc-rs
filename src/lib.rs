@@ -1,19 +1,16 @@
 //! # crc
 //! Rust implementation of CRC.
 //!
-//! ## Usage
-//! ### Compute CRC16
+//! ### Examples
+//! Using a well-known algorithm:
 //! ```rust
-//! use crc::{Crc, Algorithm, CRC_16_IBM_SDLC, CRC_32_ISCSI};
-//!
-//! pub const X25: Crc<u16> = Crc::<u16>::new(&CRC_16_IBM_SDLC);
-//! pub const CASTAGNOLI: Crc<u32> = Crc::<u32>::new(&CRC_32_ISCSI);
-//!
+//! const X25: crc::Crc<u16> = crc::Crc::<u16>::new(&crc::CRC_16_IBM_SDLC);
 //! assert_eq!(X25.checksum(b"123456789"), 0x906e);
-//! assert_eq!(CASTAGNOLI.checksum(b"123456789"), 0xe3069283);
+//! ```
 //!
-//! // use custom algorithm
-//! const CUSTOM_ALG: Algorithm<u16> = Algorithm {
+//! Using a custom algorithm:
+//! ```rust
+//! const CUSTOM_ALG: crc::Algorithm<u16> = crc::Algorithm {
 //!     width: 16,
 //!     poly: 0x8005,
 //!     init: 0xffff,
@@ -23,7 +20,7 @@
 //!     check: 0xaee7,
 //!     residue: 0x0000
 //! };
-//! let crc = Crc::<u16>::new(&CUSTOM_ALG);
+//! let crc = crc::Crc::<u16>::new(&CUSTOM_ALG);
 //! let mut digest = crc.digest();
 //! digest.update(b"123456789");
 //! assert_eq!(digest.finalize(), 0xaee7);
