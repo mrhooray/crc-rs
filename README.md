@@ -2,7 +2,7 @@
 
 Rust implementation of CRC.
 
-[![rust](https://github.com/mrhooray/crc-rs/actions/workflows/rust.yaml/badge.svg)](https://github.com/mrhooray/crc-rs/actions/workflows/rust.yaml)
+[![ci](https://github.com/mrhooray/crc-rs/actions/workflows/ci.yaml/badge.svg)](https://github.com/mrhooray/crc-rs/actions/workflows/ci.yaml)
 [![Crate](https://img.shields.io/crates/v/crc.svg)](https://crates.io/crates/crc)
 [![Docs](https://docs.rs/crc/badge.svg)](https://docs.rs/crc)
 [![License](https://img.shields.io/crates/l/crc.svg?maxAge=2592000)](https://github.com/mrhooray/crc-rs#license)
@@ -43,7 +43,7 @@ assert_eq!(digest.finalize(), 0xaee7);
 
 ### Minimum supported Rust version (MSRV)
 
-This crate's MSRV is 1.46.
+This crate's MSRV is 1.56.
 
 At a minimum, the MSRV will be <= the oldest stable release in the last 12 months. MSRV may be bumped in minor version releases.
 

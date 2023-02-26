@@ -1,13 +1,12 @@
-name: rust
+name: ci
 
 on:
+  pull_request: {}
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
-
-env:
-  CARGO_TERM_COLOR: always
+    branches:
+      - master
+  schedule:
+    - cron: '0 0 * * 0'
 
 jobs:
   lint:
@@ -25,7 +24,7 @@ jobs:
     strategy:
       matrix:
         rust:
-          - 1.46.0
+          - 1.56.0
           - stable
           - beta
     steps:
