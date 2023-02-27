@@ -14,6 +14,12 @@ keywords = ["crc", "crc16", "crc32", "crc64", "hash"]
 categories = ["algorithms", "no-std"]
 edition = "2018"
 
+[features]
+default = ["slice16-defaults"]
+notable-defaults = []
+bytewise-defaults = []
+slice16-defaults = []
+
 [dependencies]
 crc-catalog = "2.1.0"
 

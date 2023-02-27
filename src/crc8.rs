@@ -1,8 +1,14 @@
 use crate::util::crc8;
 use crc_catalog::Algorithm;
 
-mod bytewise;
+#[cfg(any(
+    feature = "notable-defaults",
+    feature = "bytewise-defaults",
+    feature = "slice16-defaults"
+))]
 mod default;
+
+mod bytewise;
 mod nolookup;
 mod slice16;
 
