@@ -1,11 +1,44 @@
-use crate::table::crc128_table;
-use crate::{Algorithm, Crc, Digest};
+use crate::{Algorithm, Crc, Digest, Implementation};
 
-use super::{finalize, init, update_bytewise};
+use super::{finalize, init};
+
+#[cfg(feature = "notable-defaults")]
+impl Implementation for u128 {
+    type Width = u128;
+    type Table = ();
+}
+
+#[cfg(all(not(feature = "notable-defaults"), feature = "bytewise-defaults"))]
+impl Implementation for u128 {
+    type Width = u128;
+    type Table = [u128; 256];
+}
+
+#[cfg(all(
+    not(feature = "notable-defaults"),
+    not(feature = "bytewise-defaults"),
+    feature = "slice16-defaults"
+))]
+impl Implementation for u128 {
+    type Width = u128;
+    type Table = [[u128; 256]; 16];
+}
 
 impl Crc<u128> {
     pub const fn new(algorithm: &'static Algorithm<u128>) -> Self {
-        let table = crc128_table(algorithm.width, algorithm.poly, algorithm.refin);
+        #[cfg(all(
+            not(feature = "notable-defaults"),
+            not(feature = "bytewise-defaults"),
+            feature = "slice16-defaults"
+        ))]
+        let table =
+            crate::table::crc128_table_slice_16(algorithm.width, algorithm.poly, algorithm.refin);
+
+        #[cfg(all(not(feature = "notable-defaults"), feature = "bytewise-defaults"))]
+        let table = crate::table::crc128_table(algorithm.width, algorithm.poly, algorithm.refin);
+
+        #[cfg(feature = "notable-defaults")]
+        let table = ();
         Self { algorithm, table }
     }
 
@@ -16,7 +49,24 @@ impl Crc<u128> {
     }
 
     const fn update(&self, crc: u128, bytes: &[u8]) -> u128 {
-        update_bytewise(crc, self.algorithm.refin, &self.table, bytes)
+        #[cfg(all(
+            not(feature = "notable-defaults"),
+            not(feature = "bytewise-defaults"),
+            feature = "slice16-defaults"
+        ))]
+        {
+            super::update_slice16(crc, self.algorithm.refin, &self.table, bytes)
+        }
+
+        #[cfg(all(not(feature = "notable-defaults"), feature = "bytewise-defaults"))]
+        {
+            super::update_bytewise(crc, self.algorithm.refin, &self.table, bytes)
+        }
+
+        #[cfg(feature = "notable-defaults")]
+        {
+            super::update_nolookup(crc, self.algorithm, bytes)
+        }
     }
 
     pub const fn digest(&self) -> Digest<u128> {

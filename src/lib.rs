@@ -76,11 +76,6 @@ pub trait Implementation: private::Sealed {
     type Table;
 }
 
-impl Implementation for u128 {
-    type Width = u128;
-    type Table = [u128; 256];
-}
-
 /// Crc with pluggable implementations ([Nolookup], [Bytewise], [Slice16]).
 /// To choose the default implementation, use the [Width] directly (e.g. `Crc<u32>`).
 pub struct Crc<I: Implementation> {
