@@ -76,11 +76,6 @@ pub trait Implementation: private::Sealed {
     type Table;
 }
 
-impl Implementation for u16 {
-    type Width = u16;
-    type Table = [[u16; 256]; 16];
-}
-
 impl Implementation for u32 {
     type Width = u32;
     type Table = [[u32; 256]; 16];
