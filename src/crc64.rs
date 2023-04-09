@@ -1,15 +1,8 @@
+use crate::util::crc64;
 use crc_catalog::Algorithm;
 
-use crate::util::crc64;
-
-#[cfg(any(
-    feature = "notable-defaults",
-    feature = "bytewise-defaults",
-    feature = "slice16-defaults"
-))]
-mod default;
-
 mod bytewise;
+mod default;
 mod nolookup;
 mod slice16;
 

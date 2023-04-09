@@ -1,6 +1,5 @@
 use crate::crc8::{finalize, init};
-use crate::Implementation;
-use crate::{Algorithm, Crc, Digest};
+use crate::{Algorithm, Crc, Digest, Implementation};
 
 #[cfg(feature = "notable-defaults")]
 impl Implementation for u8 {
@@ -24,6 +23,16 @@ impl Implementation for u8 {
     type Table = [[u8; 256]; 16];
 }
 
+#[cfg(all(
+    not(feature = "notable-defaults"),
+    not(feature = "bytewise-defaults"),
+    not(feature = "slice16-defaults")
+))]
+impl Implementation for u8 {
+    type Width = u8;
+    type Table = [u8; 256];
+}
+
 impl Crc<u8> {
     pub const fn new(algorithm: &'static Algorithm<u8>) -> Self {
         #[cfg(all(
@@ -38,7 +47,15 @@ impl Crc<u8> {
         let table = crate::table::crc8_table(algorithm.width, algorithm.poly, algorithm.refin);
 
         #[cfg(feature = "notable-defaults")]
+        #[allow(clippy::let_unit_value)]
         let table = ();
+
+        #[cfg(all(
+            not(feature = "notable-defaults"),
+            not(feature = "bytewise-defaults"),
+            not(feature = "slice16-defaults")
+        ))]
+        let table = crate::table::crc8_table(algorithm.width, algorithm.poly, algorithm.refin);
 
         Self { algorithm, table }
     }
@@ -67,6 +84,15 @@ impl Crc<u8> {
         #[cfg(feature = "notable-defaults")]
         {
             super::update_nolookup(crc, self.algorithm, bytes)
+        }
+
+        #[cfg(all(
+            not(feature = "notable-defaults"),
+            not(feature = "bytewise-defaults"),
+            not(feature = "slice16-defaults")
+        ))]
+        {
+            super::update_bytewise(crc, &self.table, bytes)
         }
     }
 

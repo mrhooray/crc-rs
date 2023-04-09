@@ -1,6 +1,5 @@
+use crate::crc64::{finalize, init};
 use crate::{Algorithm, Crc, Digest, Implementation};
-
-use super::{finalize, init};
 
 #[cfg(feature = "notable-defaults")]
 impl Implementation for u64 {
@@ -24,6 +23,16 @@ impl Implementation for u64 {
     type Table = [[u64; 256]; 16];
 }
 
+#[cfg(all(
+    not(feature = "notable-defaults"),
+    not(feature = "bytewise-defaults"),
+    not(feature = "slice16-defaults")
+))]
+impl Implementation for u64 {
+    type Width = u64;
+    type Table = [u64; 256];
+}
+
 impl Crc<u64> {
     pub const fn new(algorithm: &'static Algorithm<u64>) -> Self {
         #[cfg(all(
@@ -38,7 +47,16 @@ impl Crc<u64> {
         let table = crate::table::crc64_table(algorithm.width, algorithm.poly, algorithm.refin);
 
         #[cfg(feature = "notable-defaults")]
+        #[allow(clippy::let_unit_value)]
         let table = ();
+
+        #[cfg(all(
+            not(feature = "notable-defaults"),
+            not(feature = "bytewise-defaults"),
+            not(feature = "slice16-defaults")
+        ))]
+        let table = crate::table::crc64_table(algorithm.width, algorithm.poly, algorithm.refin);
+
         Self { algorithm, table }
     }
 
@@ -66,6 +84,15 @@ impl Crc<u64> {
         #[cfg(feature = "notable-defaults")]
         {
             super::update_nolookup(crc, self.algorithm, bytes)
+        }
+
+        #[cfg(all(
+            not(feature = "notable-defaults"),
+            not(feature = "bytewise-defaults"),
+            not(feature = "slice16-defaults")
+        ))]
+        {
+            super::update_bytewise(crc, self.algorithm.refin, &self.table, bytes)
         }
     }
 

@@ -15,7 +15,6 @@ categories = ["algorithms", "no-std"]
 edition = "2018"
 
 [features]
-default = ["slice16-defaults"]
 notable-defaults = []
 bytewise-defaults = []
 slice16-defaults = []
