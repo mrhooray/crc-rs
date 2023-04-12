@@ -88,8 +88,64 @@ const fn update_slice16(mut crc: u8, table: &[[u8; 256]; 16], bytes: &[u8]) -> u
 
 #[cfg(test)]
 mod test {
-    use crate::{Bytewise, Crc, NoTable, Slice16};
+    use crate::{Bytewise, Crc, Implementation, NoTable, Slice16};
     use crc_catalog::{Algorithm, CRC_8_BLUETOOTH};
+
+    #[test]
+    fn default_table_size() {
+        let table_size = core::mem::size_of::<<u8 as Implementation>::Table>();
+        #[cfg(all(
+            feature = "notable-defaults",
+            feature = "bytewise-defaults",
+            feature = "slice16-defaults"
+        ))]
+        assert_eq!(0, table_size);
+        #[cfg(all(
+            feature = "notable-defaults",
+            feature = "bytewise-defaults",
+            not(feature = "slice16-defaults")
+        ))]
+        assert_eq!(0, table_size);
+        #[cfg(all(
+            feature = "notable-defaults",
+            not(feature = "bytewise-defaults"),
+            feature = "slice16-defaults"
+        ))]
+        assert_eq!(0, table_size);
+        #[cfg(all(
+            feature = "notable-defaults",
+            not(feature = "bytewise-defaults"),
+            not(feature = "slice16-defaults")
+        ))]
+        assert_eq!(0, table_size);
+
+        #[cfg(all(
+            not(feature = "notable-defaults"),
+            feature = "bytewise-defaults",
+            feature = "slice16-defaults"
+        ))]
+        assert_eq!(256 * 1, table_size);
+        #[cfg(all(
+            not(feature = "notable-defaults"),
+            feature = "bytewise-defaults",
+            not(feature = "slice16-defaults")
+        ))]
+        assert_eq!(256 * 1, table_size);
+
+        #[cfg(all(
+            not(feature = "notable-defaults"),
+            not(feature = "bytewise-defaults"),
+            feature = "slice16-defaults"
+        ))]
+        assert_eq!(256 * 16 * 1, table_size);
+
+        #[cfg(all(
+            not(feature = "notable-defaults"),
+            not(feature = "bytewise-defaults"),
+            not(feature = "slice16-defaults")
+        ))]
+        assert_eq!(256 * 1, table_size);
+    }
 
     /// Test this opitimized version against the well known implementation to ensure correctness
     #[test]

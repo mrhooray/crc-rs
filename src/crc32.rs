@@ -152,8 +152,64 @@ const fn update_slice16(
 
 #[cfg(test)]
 mod test {
-    use crate::{Bytewise, Crc, NoTable, Slice16};
+    use crate::{Bytewise, Crc, Implementation, NoTable, Slice16};
     use crc_catalog::{Algorithm, CRC_32_ISCSI};
+
+    #[test]
+    fn default_table_size() {
+        let table_size = core::mem::size_of::<<u32 as Implementation>::Table>();
+        #[cfg(all(
+            feature = "notable-defaults",
+            feature = "bytewise-defaults",
+            feature = "slice16-defaults"
+        ))]
+        assert_eq!(0, table_size);
+        #[cfg(all(
+            feature = "notable-defaults",
+            feature = "bytewise-defaults",
+            not(feature = "slice16-defaults")
+        ))]
+        assert_eq!(0, table_size);
+        #[cfg(all(
+            feature = "notable-defaults",
+            not(feature = "bytewise-defaults"),
+            feature = "slice16-defaults"
+        ))]
+        assert_eq!(0, table_size);
+        #[cfg(all(
+            feature = "notable-defaults",
+            not(feature = "bytewise-defaults"),
+            not(feature = "slice16-defaults")
+        ))]
+        assert_eq!(0, table_size);
+
+        #[cfg(all(
+            not(feature = "notable-defaults"),
+            feature = "bytewise-defaults",
+            feature = "slice16-defaults"
+        ))]
+        assert_eq!(256 * 4, table_size);
+        #[cfg(all(
+            not(feature = "notable-defaults"),
+            feature = "bytewise-defaults",
+            not(feature = "slice16-defaults")
+        ))]
+        assert_eq!(256 * 4, table_size);
+
+        #[cfg(all(
+            not(feature = "notable-defaults"),
+            not(feature = "bytewise-defaults"),
+            feature = "slice16-defaults"
+        ))]
+        assert_eq!(256 * 16 * 4, table_size);
+
+        #[cfg(all(
+            not(feature = "notable-defaults"),
+            not(feature = "bytewise-defaults"),
+            not(feature = "slice16-defaults")
+        ))]
+        assert_eq!(256 * 4, table_size);
+    }
 
     /// Test this opitimized version against the well known implementation to ensure correctness
     #[test]
