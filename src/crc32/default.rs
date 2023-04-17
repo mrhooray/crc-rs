@@ -7,7 +7,10 @@ impl Implementation for u32 {
     type Table = ();
 }
 
-#[cfg(all(not(feature = "no-table-memory-restrictions"), feature = "bytewise-memory-restrictions"))]
+#[cfg(all(
+    not(feature = "no-table-memory-restrictions"),
+    feature = "bytewise-memory-restrictions"
+))]
 impl Implementation for u32 {
     type Width = u32;
     type Table = [u32; 256];
@@ -43,7 +46,10 @@ impl Crc<u32> {
         let table =
             crate::table::crc32_table_slice_16(algorithm.width, algorithm.poly, algorithm.refin);
 
-        #[cfg(all(not(feature = "no-table-memory-restrictions"), feature = "bytewise-memory-restrictions"))]
+        #[cfg(all(
+            not(feature = "no-table-memory-restrictions"),
+            feature = "bytewise-memory-restrictions"
+        ))]
         let table = crate::table::crc32_table(algorithm.width, algorithm.poly, algorithm.refin);
 
         #[cfg(feature = "no-table-memory-restrictions")]
@@ -76,7 +82,10 @@ impl Crc<u32> {
             super::update_slice16(crc, self.algorithm.refin, &self.table, bytes)
         }
 
-        #[cfg(all(not(feature = "no-table-memory-restrictions"), feature = "bytewise-memory-restrictions"))]
+        #[cfg(all(
+            not(feature = "no-table-memory-restrictions"),
+            feature = "bytewise-memory-restrictions"
+        ))]
         {
             super::update_bytewise(crc, self.algorithm.refin, &self.table, bytes)
         }
