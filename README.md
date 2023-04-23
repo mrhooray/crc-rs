@@ -56,13 +56,13 @@ See the benchmark section for hints, but do benchmarks on your target hardware t
 2. `Bytewise` provides an implementation that uses a lookup table that uses 256 entries of the used width (e.g. for u32 thats 256 * 4 bytes)
 3. `Slice16` provides an implementation that uses a lookup table that uses 16 * 256 entries of the used width (e.g. for u32 thats 16 * 256 * 4 bytes)
 
-These can be used by substituting `Crc<uxxx>` with e.g. `Crc<Slice16<uxxx>>`. If you use `Crc<uxxx>` the default implementation is used which are as follows:
+These can be used by substituting `Crc<uxxx>` with e.g. `Crc<Slice16<uxxx>>`. The flavor for `Crc<uxxx>` is chosen based on three crate features:
 
-* u8 -> Slice16
-* u16 -> Slice16
-* u32 -> Slice16
-* u64 -> Slice16
-* u128 -> Bytewise
+* no-table-mem-limit: Takes precedence over "bytewise-mem-limit" and "slice16-mem-limit"
+* bytewise-mem-limit: Takes precedence over "slice16-mem-limit"
+* slice16-mem-limit: Can be overriden by setting "bytewise-mem-limit" and "slice16-mem-limit"
+
+If no feature is selected, the `Bytewise` flavor is used.
 
 Note that these tables can bloat your binary size if you precalculate them at compiletime (this happens in `Crc::new`). 
 Choosing a crate like oncecell or lazystatic to compute them once at runtime may be preferable where binary size is a concern.
