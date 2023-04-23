@@ -7,10 +7,7 @@ impl Implementation for u16 {
     type Table = ();
 }
 
-#[cfg(all(
-    not(feature = "no-table-mem-limit"),
-    feature = "bytewise-mem-limit"
-))]
+#[cfg(all(not(feature = "no-table-mem-limit"), feature = "bytewise-mem-limit"))]
 impl Implementation for u16 {
     type Width = u16;
     type Table = [u16; 256];
@@ -46,10 +43,7 @@ impl Crc<u16> {
         let table =
             crate::table::crc16_table_slice_16(algorithm.width, algorithm.poly, algorithm.refin);
 
-        #[cfg(all(
-            not(feature = "no-table-mem-limit"),
-            feature = "bytewise-mem-limit"
-        ))]
+        #[cfg(all(not(feature = "no-table-mem-limit"), feature = "bytewise-mem-limit"))]
         let table = crate::table::crc16_table(algorithm.width, algorithm.poly, algorithm.refin);
 
         #[cfg(feature = "no-table-mem-limit")]
@@ -82,10 +76,7 @@ impl Crc<u16> {
             super::update_slice16(crc, self.algorithm.refin, &self.table, bytes)
         }
 
-        #[cfg(all(
-            not(feature = "no-table-mem-limit"),
-            feature = "bytewise-mem-limit"
-        ))]
+        #[cfg(all(not(feature = "no-table-mem-limit"), feature = "bytewise-mem-limit"))]
         {
             super::update_bytewise(crc, self.algorithm.refin, &self.table, bytes)
         }

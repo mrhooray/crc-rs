@@ -7,10 +7,7 @@ impl Implementation for u8 {
     type Table = ();
 }
 
-#[cfg(all(
-    not(feature = "no-table-mem-limit"),
-    feature = "bytewise-mem-limit"
-))]
+#[cfg(all(not(feature = "no-table-mem-limit"), feature = "bytewise-mem-limit"))]
 impl Implementation for u8 {
     type Width = u8;
     type Table = [u8; 256];
@@ -46,10 +43,7 @@ impl Crc<u8> {
         let table =
             crate::table::crc8_table_slice_16(algorithm.width, algorithm.poly, algorithm.refin);
 
-        #[cfg(all(
-            not(feature = "no-table-mem-limit"),
-            feature = "bytewise-mem-limit"
-        ))]
+        #[cfg(all(not(feature = "no-table-mem-limit"), feature = "bytewise-mem-limit"))]
         let table = crate::table::crc8_table(algorithm.width, algorithm.poly, algorithm.refin);
 
         #[cfg(feature = "no-table-mem-limit")]
@@ -82,10 +76,7 @@ impl Crc<u8> {
             super::update_slice16(crc, &self.table, bytes)
         }
 
-        #[cfg(all(
-            not(feature = "no-table-mem-limit"),
-            feature = "bytewise-mem-limit"
-        ))]
+        #[cfg(all(not(feature = "no-table-mem-limit"), feature = "bytewise-mem-limit"))]
         {
             super::update_bytewise(crc, &self.table, bytes)
         }
