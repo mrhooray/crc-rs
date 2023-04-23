@@ -160,9 +160,9 @@ mod test {
         const TABLE_SIZE: usize = core::mem::size_of::<<u32 as Implementation>::Table>();
         const BYTES_PER_ENTRY: usize = 4;
         #[cfg(all(
-            feature = "no-table-memory-restrictions",
-            feature = "bytewise-memory-restrictions",
-            feature = "slice16-memory-restrictions"
+            feature = "no-table-mem-limit",
+            feature = "bytewise-mem-limit",
+            feature = "slice16-mem-limit"
         ))]
         {
             const EXPECTED: usize = 0;
@@ -170,9 +170,9 @@ mod test {
             const _: () = assert!(EXPECTED == TABLE_SIZE);
         }
         #[cfg(all(
-            feature = "no-table-memory-restrictions",
-            feature = "bytewise-memory-restrictions",
-            not(feature = "slice16-memory-restrictions")
+            feature = "no-table-mem-limit",
+            feature = "bytewise-mem-limit",
+            not(feature = "slice16-mem-limit")
         ))]
         {
             const EXPECTED: usize = 0;
@@ -180,9 +180,9 @@ mod test {
             const _: () = assert!(EXPECTED == TABLE_SIZE);
         }
         #[cfg(all(
-            feature = "no-table-memory-restrictions",
-            not(feature = "bytewise-memory-restrictions"),
-            feature = "slice16-memory-restrictions"
+            feature = "no-table-mem-limit",
+            not(feature = "bytewise-mem-limit"),
+            feature = "slice16-mem-limit"
         ))]
         {
             const EXPECTED: usize = 0;
@@ -190,9 +190,9 @@ mod test {
             const _: () = assert!(EXPECTED == TABLE_SIZE);
         }
         #[cfg(all(
-            feature = "no-table-memory-restrictions",
-            not(feature = "bytewise-memory-restrictions"),
-            not(feature = "slice16-memory-restrictions")
+            feature = "no-table-mem-limit",
+            not(feature = "bytewise-mem-limit"),
+            not(feature = "slice16-mem-limit")
         ))]
         {
             const EXPECTED: usize = 0;
@@ -201,9 +201,9 @@ mod test {
         }
 
         #[cfg(all(
-            not(feature = "no-table-memory-restrictions"),
-            feature = "bytewise-memory-restrictions",
-            feature = "slice16-memory-restrictions"
+            not(feature = "no-table-mem-limit"),
+            feature = "bytewise-mem-limit",
+            feature = "slice16-mem-limit"
         ))]
         {
             const EXPECTED: usize = 256 * BYTES_PER_ENTRY;
@@ -211,9 +211,9 @@ mod test {
             const _: () = assert!(EXPECTED == TABLE_SIZE);
         }
         #[cfg(all(
-            not(feature = "no-table-memory-restrictions"),
-            feature = "bytewise-memory-restrictions",
-            not(feature = "slice16-memory-restrictions")
+            not(feature = "no-table-mem-limit"),
+            feature = "bytewise-mem-limit",
+            not(feature = "slice16-mem-limit")
         ))]
         {
             const EXPECTED: usize = 256 * BYTES_PER_ENTRY;
@@ -222,9 +222,9 @@ mod test {
         }
 
         #[cfg(all(
-            not(feature = "no-table-memory-restrictions"),
-            not(feature = "bytewise-memory-restrictions"),
-            feature = "slice16-memory-restrictions"
+            not(feature = "no-table-mem-limit"),
+            not(feature = "bytewise-mem-limit"),
+            feature = "slice16-mem-limit"
         ))]
         {
             const EXPECTED: usize = 256 * 16 * BYTES_PER_ENTRY;
@@ -233,9 +233,9 @@ mod test {
         }
 
         #[cfg(all(
-            not(feature = "no-table-memory-restrictions"),
-            not(feature = "bytewise-memory-restrictions"),
-            not(feature = "slice16-memory-restrictions")
+            not(feature = "no-table-mem-limit"),
+            not(feature = "bytewise-mem-limit"),
+            not(feature = "slice16-mem-limit")
         ))]
         {
             const EXPECTED: usize = 256 * BYTES_PER_ENTRY;

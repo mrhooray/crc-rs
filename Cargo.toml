@@ -16,14 +16,14 @@ edition = "2018"
 
 [features]
 # use the "NoTable" implementation for the default Crc<uXXX> struct, using no additional memory for a lookup table.
-# Takes predence over "bytewise-memory-restrictions" and "slice16-memory-restrictions"
-no-table-memory-restrictions = []
+# Takes predence over "bytewise-mem-limit" and "slice16-mem-limit"
+no-table-mem-limit = []
 # use the "Bytewise" implementation for the default Crc<uXXX> struct, using 256 entries of the respective width for a lookup table.
-# Takes predence over "slice16-memory-restrictions" and is used if no feature is selected
-bytewise-memory-restrictions = []
+# Takes predence over "slice16-mem-limit" and is used if no feature is selected
+bytewise-mem-limit = []
 # use the "Slice16" implementation for the default Crc<uXXX> struct, using 256 * 16 entries of the respective width for a lookup table.
-# Can be overriden by setting "bytewise-memory-restrictions" and "slice16-memory-restrictions"
-slice16-memory-restrictions = []
+# Can be overriden by setting "bytewise-mem-limit" and "slice16-mem-limit"
+slice16-mem-limit = []
 
 [dependencies]
 crc-catalog = "2.1.0"

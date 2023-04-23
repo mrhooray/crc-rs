@@ -1,15 +1,15 @@
 use crate::crc8::{finalize, init};
 use crate::{Algorithm, Crc, Digest, Implementation};
 
-#[cfg(feature = "no-table-memory-restrictions")]
+#[cfg(feature = "no-table-mem-limit")]
 impl Implementation for u8 {
     type Width = u8;
     type Table = ();
 }
 
 #[cfg(all(
-    not(feature = "no-table-memory-restrictions"),
-    feature = "bytewise-memory-restrictions"
+    not(feature = "no-table-mem-limit"),
+    feature = "bytewise-mem-limit"
 ))]
 impl Implementation for u8 {
     type Width = u8;
@@ -17,9 +17,9 @@ impl Implementation for u8 {
 }
 
 #[cfg(all(
-    not(feature = "no-table-memory-restrictions"),
-    not(feature = "bytewise-memory-restrictions"),
-    feature = "slice16-memory-restrictions"
+    not(feature = "no-table-mem-limit"),
+    not(feature = "bytewise-mem-limit"),
+    feature = "slice16-mem-limit"
 ))]
 impl Implementation for u8 {
     type Width = u8;
@@ -27,9 +27,9 @@ impl Implementation for u8 {
 }
 
 #[cfg(all(
-    not(feature = "no-table-memory-restrictions"),
-    not(feature = "bytewise-memory-restrictions"),
-    not(feature = "slice16-memory-restrictions")
+    not(feature = "no-table-mem-limit"),
+    not(feature = "bytewise-mem-limit"),
+    not(feature = "slice16-mem-limit")
 ))]
 impl Implementation for u8 {
     type Width = u8;
@@ -39,27 +39,27 @@ impl Implementation for u8 {
 impl Crc<u8> {
     pub const fn new(algorithm: &'static Algorithm<u8>) -> Self {
         #[cfg(all(
-            not(feature = "no-table-memory-restrictions"),
-            not(feature = "bytewise-memory-restrictions"),
-            feature = "slice16-memory-restrictions"
+            not(feature = "no-table-mem-limit"),
+            not(feature = "bytewise-mem-limit"),
+            feature = "slice16-mem-limit"
         ))]
         let table =
             crate::table::crc8_table_slice_16(algorithm.width, algorithm.poly, algorithm.refin);
 
         #[cfg(all(
-            not(feature = "no-table-memory-restrictions"),
-            feature = "bytewise-memory-restrictions"
+            not(feature = "no-table-mem-limit"),
+            feature = "bytewise-mem-limit"
         ))]
         let table = crate::table::crc8_table(algorithm.width, algorithm.poly, algorithm.refin);
 
-        #[cfg(feature = "no-table-memory-restrictions")]
+        #[cfg(feature = "no-table-mem-limit")]
         #[allow(clippy::let_unit_value)]
         let table = ();
 
         #[cfg(all(
-            not(feature = "no-table-memory-restrictions"),
-            not(feature = "bytewise-memory-restrictions"),
-            not(feature = "slice16-memory-restrictions")
+            not(feature = "no-table-mem-limit"),
+            not(feature = "bytewise-mem-limit"),
+            not(feature = "slice16-mem-limit")
         ))]
         let table = crate::table::crc8_table(algorithm.width, algorithm.poly, algorithm.refin);
 
@@ -74,31 +74,31 @@ impl Crc<u8> {
 
     const fn update(&self, crc: u8, bytes: &[u8]) -> u8 {
         #[cfg(all(
-            not(feature = "no-table-memory-restrictions"),
-            not(feature = "bytewise-memory-restrictions"),
-            feature = "slice16-memory-restrictions"
+            not(feature = "no-table-mem-limit"),
+            not(feature = "bytewise-mem-limit"),
+            feature = "slice16-mem-limit"
         ))]
         {
             super::update_slice16(crc, &self.table, bytes)
         }
 
         #[cfg(all(
-            not(feature = "no-table-memory-restrictions"),
-            feature = "bytewise-memory-restrictions"
+            not(feature = "no-table-mem-limit"),
+            feature = "bytewise-mem-limit"
         ))]
         {
             super::update_bytewise(crc, &self.table, bytes)
         }
 
-        #[cfg(feature = "no-table-memory-restrictions")]
+        #[cfg(feature = "no-table-mem-limit")]
         {
             super::update_nolookup(crc, self.algorithm, bytes)
         }
 
         #[cfg(all(
-            not(feature = "no-table-memory-restrictions"),
-            not(feature = "bytewise-memory-restrictions"),
-            not(feature = "slice16-memory-restrictions")
+            not(feature = "no-table-mem-limit"),
+            not(feature = "bytewise-mem-limit"),
+            not(feature = "slice16-mem-limit")
         ))]
         {
             super::update_bytewise(crc, &self.table, bytes)
