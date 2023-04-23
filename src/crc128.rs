@@ -1,6 +1,5 @@
-use crc_catalog::Algorithm;
-
 use crate::util::crc128;
+use crc_catalog::Algorithm;
 
 mod bytewise;
 mod default;
@@ -170,10 +169,101 @@ const fn update_slice16(
 
 #[cfg(test)]
 mod test {
-    use crate::{Bytewise, Crc, NoTable, Slice16};
+    use crate::{Bytewise, Crc, Implementation, NoTable, Slice16};
     use crc_catalog::{Algorithm, CRC_82_DARC};
 
-    /// Test this opitimized version against the well known implementation to ensure correctness
+    #[test]
+    fn default_table_size() {
+        const TABLE_SIZE: usize = core::mem::size_of::<<u128 as Implementation>::Table>();
+        const BYTES_PER_ENTRY: usize = 16;
+        #[cfg(all(
+            feature = "no-table-mem-limit",
+            feature = "bytewise-mem-limit",
+            feature = "slice16-mem-limit"
+        ))]
+        {
+            const EXPECTED: usize = 0;
+            let _ = EXPECTED;
+            const _: () = assert!(EXPECTED == TABLE_SIZE);
+        }
+        #[cfg(all(
+            feature = "no-table-mem-limit",
+            feature = "bytewise-mem-limit",
+            not(feature = "slice16-mem-limit")
+        ))]
+        {
+            const EXPECTED: usize = 0;
+            let _ = EXPECTED;
+            const _: () = assert!(EXPECTED == TABLE_SIZE);
+        }
+        #[cfg(all(
+            feature = "no-table-mem-limit",
+            not(feature = "bytewise-mem-limit"),
+            feature = "slice16-mem-limit"
+        ))]
+        {
+            const EXPECTED: usize = 0;
+            let _ = EXPECTED;
+            const _: () = assert!(EXPECTED == TABLE_SIZE);
+        }
+        #[cfg(all(
+            feature = "no-table-mem-limit",
+            not(feature = "bytewise-mem-limit"),
+            not(feature = "slice16-mem-limit")
+        ))]
+        {
+            const EXPECTED: usize = 0;
+            let _ = EXPECTED;
+            const _: () = assert!(EXPECTED == TABLE_SIZE);
+        }
+
+        #[cfg(all(
+            not(feature = "no-table-mem-limit"),
+            feature = "bytewise-mem-limit",
+            feature = "slice16-mem-limit"
+        ))]
+        {
+            const EXPECTED: usize = 256 * BYTES_PER_ENTRY;
+            let _ = EXPECTED;
+            const _: () = assert!(EXPECTED == TABLE_SIZE);
+        }
+        #[cfg(all(
+            not(feature = "no-table-mem-limit"),
+            feature = "bytewise-mem-limit",
+            not(feature = "slice16-mem-limit")
+        ))]
+        {
+            const EXPECTED: usize = 256 * BYTES_PER_ENTRY;
+            let _ = EXPECTED;
+            const _: () = assert!(EXPECTED == TABLE_SIZE);
+        }
+
+        #[cfg(all(
+            not(feature = "no-table-mem-limit"),
+            not(feature = "bytewise-mem-limit"),
+            feature = "slice16-mem-limit"
+        ))]
+        {
+            const EXPECTED: usize = 256 * 16 * BYTES_PER_ENTRY;
+            let _ = EXPECTED;
+            const _: () = assert!(EXPECTED == TABLE_SIZE);
+        }
+
+        #[cfg(all(
+            not(feature = "no-table-mem-limit"),
+            not(feature = "bytewise-mem-limit"),
+            not(feature = "slice16-mem-limit")
+        ))]
+        {
+            const EXPECTED: usize = 256 * BYTES_PER_ENTRY;
+            let _ = EXPECTED;
+            const _: () = assert!(EXPECTED == TABLE_SIZE);
+        }
+        let _ = TABLE_SIZE;
+        let _ = BYTES_PER_ENTRY;
+    }
+
+    /// Test this optimized version against the well known implementation to ensure correctness
     #[test]
     fn correctness() {
         let data: &[&str] = &[

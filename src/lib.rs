@@ -76,31 +76,6 @@ pub trait Implementation: private::Sealed {
     type Table;
 }
 
-impl Implementation for u8 {
-    type Width = u8;
-    type Table = [[u8; 256]; 16];
-}
-
-impl Implementation for u16 {
-    type Width = u16;
-    type Table = [[u16; 256]; 16];
-}
-
-impl Implementation for u32 {
-    type Width = u32;
-    type Table = [[u32; 256]; 16];
-}
-
-impl Implementation for u64 {
-    type Width = u64;
-    type Table = [[u64; 256]; 16];
-}
-
-impl Implementation for u128 {
-    type Width = u128;
-    type Table = [u128; 256];
-}
-
 /// Crc with pluggable implementations ([Nolookup], [Bytewise], [Slice16]).
 /// To choose the default implementation, use the [Width] directly (e.g. `Crc<u32>`).
 pub struct Crc<I: Implementation> {

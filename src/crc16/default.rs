@@ -1,12 +1,62 @@
 use crate::crc16::{finalize, init};
-use crate::table::crc16_table_slice_16;
-use crate::{Algorithm, Crc, Digest};
+use crate::{Algorithm, Crc, Digest, Implementation};
 
-use super::update_slice16;
+#[cfg(feature = "no-table-mem-limit")]
+impl Implementation for u16 {
+    type Width = u16;
+    type Table = ();
+}
+
+#[cfg(all(not(feature = "no-table-mem-limit"), feature = "bytewise-mem-limit"))]
+impl Implementation for u16 {
+    type Width = u16;
+    type Table = [u16; 256];
+}
+
+#[cfg(all(
+    not(feature = "no-table-mem-limit"),
+    not(feature = "bytewise-mem-limit"),
+    feature = "slice16-mem-limit"
+))]
+impl Implementation for u16 {
+    type Width = u16;
+    type Table = [[u16; 256]; 16];
+}
+
+#[cfg(all(
+    not(feature = "no-table-mem-limit"),
+    not(feature = "bytewise-mem-limit"),
+    not(feature = "slice16-mem-limit")
+))]
+impl Implementation for u16 {
+    type Width = u16;
+    type Table = [u16; 256];
+}
 
 impl Crc<u16> {
     pub const fn new(algorithm: &'static Algorithm<u16>) -> Self {
-        let table = crc16_table_slice_16(algorithm.width, algorithm.poly, algorithm.refin);
+        #[cfg(all(
+            not(feature = "no-table-mem-limit"),
+            not(feature = "bytewise-mem-limit"),
+            feature = "slice16-mem-limit"
+        ))]
+        let table =
+            crate::table::crc16_table_slice_16(algorithm.width, algorithm.poly, algorithm.refin);
+
+        #[cfg(all(not(feature = "no-table-mem-limit"), feature = "bytewise-mem-limit"))]
+        let table = crate::table::crc16_table(algorithm.width, algorithm.poly, algorithm.refin);
+
+        #[cfg(feature = "no-table-mem-limit")]
+        #[allow(clippy::let_unit_value)]
+        let table = ();
+
+        #[cfg(all(
+            not(feature = "no-table-mem-limit"),
+            not(feature = "bytewise-mem-limit"),
+            not(feature = "slice16-mem-limit")
+        ))]
+        let table = crate::table::crc16_table(algorithm.width, algorithm.poly, algorithm.refin);
+
         Self { algorithm, table }
     }
 
@@ -17,7 +67,33 @@ impl Crc<u16> {
     }
 
     const fn update(&self, crc: u16, bytes: &[u8]) -> u16 {
-        update_slice16(crc, self.algorithm.refin, &self.table, bytes)
+        #[cfg(all(
+            not(feature = "no-table-mem-limit"),
+            not(feature = "bytewise-mem-limit"),
+            feature = "slice16-mem-limit"
+        ))]
+        {
+            super::update_slice16(crc, self.algorithm.refin, &self.table, bytes)
+        }
+
+        #[cfg(all(not(feature = "no-table-mem-limit"), feature = "bytewise-mem-limit"))]
+        {
+            super::update_bytewise(crc, self.algorithm.refin, &self.table, bytes)
+        }
+
+        #[cfg(feature = "no-table-mem-limit")]
+        {
+            super::update_nolookup(crc, self.algorithm, bytes)
+        }
+
+        #[cfg(all(
+            not(feature = "no-table-mem-limit"),
+            not(feature = "bytewise-mem-limit"),
+            not(feature = "slice16-mem-limit")
+        ))]
+        {
+            super::update_bytewise(crc, self.algorithm.refin, &self.table, bytes)
+        }
     }
 
     pub const fn digest(&self) -> Digest<u16> {
