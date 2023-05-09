@@ -78,6 +78,7 @@ pub trait Implementation: private::Sealed {
 
 /// Crc with pluggable implementations ([Nolookup], [Bytewise], [Slice16]).
 /// To choose the default implementation, use the [Width] directly (e.g. `Crc<u32>`).
+#[derive(Clone)]
 pub struct Crc<I: Implementation> {
     pub algorithm: &'static Algorithm<I::Width>,
     table: I::Table,
