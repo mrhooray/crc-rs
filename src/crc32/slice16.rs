@@ -1,5 +1,6 @@
 use crate::table::crc32_table_slice_16;
 use crate::{Algorithm, Crc, Digest, Slice16};
+use core::hash::{BuildHasher, Hasher};
 
 use super::{finalize, init, update_slice16};
 
@@ -45,5 +46,23 @@ impl<'a> Digest<'a, Slice16<u32>> {
 
     pub const fn finalize(self) -> u32 {
         finalize(self.crc.algorithm, self.value)
+    }
+}
+
+impl<'a> Hasher for Digest<'a, Slice16<u32>> {
+    fn finish(&self) -> u64 {
+        self.clone().finalize() as u64
+    }
+
+    fn write(&mut self, bytes: &[u8]) {
+        self.update(bytes);
+    }
+}
+
+impl<'a> BuildHasher for &'a Crc<Slice16<u32>> {
+    type Hasher = Digest<'a, Slice16<u32>>;
+
+    fn build_hasher(&self) -> Self::Hasher {
+        self.digest()
     }
 }

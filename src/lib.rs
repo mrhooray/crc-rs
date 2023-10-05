@@ -39,12 +39,15 @@ mod table;
 mod util;
 
 /// Implementation using a 16 * 256 entry lookup table. Use it with `Crc<Slice16<W>>`
+#[derive(Clone)]
 pub struct Slice16<W: Width>(core::marker::PhantomData<W>);
 
 /// Implementation using a 256 entry lookup table. Use it with `Crc<Bytewise<W>>`
+#[derive(Clone)]
 pub struct Bytewise<W: Width>(core::marker::PhantomData<W>);
 
 /// Implementation using no lookup table. Use it with `Crc<Nolookup<W>>`
+#[derive(Clone)]
 pub struct NoTable<W: Width>(core::marker::PhantomData<W>);
 
 impl<W: Width> crate::private::Sealed for Slice16<W> {}
