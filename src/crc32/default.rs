@@ -1,5 +1,6 @@
 use crate::crc32::{finalize, init};
 use crate::{Algorithm, Crc, Digest, Implementation};
+use core::hash::{BuildHasher, Hasher};
 
 #[cfg(feature = "no-table-mem-limit")]
 impl Implementation for u32 {
@@ -122,5 +123,23 @@ impl<'a> Digest<'a, u32> {
 
     pub const fn finalize(self) -> u32 {
         finalize(self.crc.algorithm, self.value)
+    }
+}
+
+impl<'a> Hasher for Digest<'a, u32> {
+    fn finish(&self) -> u64 {
+        self.clone().finalize() as u64
+    }
+
+    fn write(&mut self, bytes: &[u8]) {
+        self.update(bytes);
+    }
+}
+
+impl<'a> BuildHasher for &'a Crc<u32> {
+    type Hasher = Digest<'a, u32>;
+
+    fn build_hasher(&self) -> Self::Hasher {
+        self.digest()
     }
 }

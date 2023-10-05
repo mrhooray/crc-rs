@@ -1,6 +1,7 @@
 use crate::crc16::{finalize, init, update_slice16};
 use crate::table::crc16_table_slice_16;
 use crate::{Algorithm, Crc, Digest, Slice16};
+use core::hash::{BuildHasher, Hasher};
 
 impl Crc<Slice16<u16>> {
     pub const fn new(algorithm: &'static Algorithm<u16>) -> Self {
@@ -44,5 +45,23 @@ impl<'a> Digest<'a, Slice16<u16>> {
 
     pub const fn finalize(self) -> u16 {
         finalize(self.crc.algorithm, self.value)
+    }
+}
+
+impl<'a> Hasher for Digest<'a, Slice16<u16>> {
+    fn finish(&self) -> u64 {
+        self.clone().finalize() as u64
+    }
+
+    fn write(&mut self, bytes: &[u8]) {
+        self.update(bytes);
+    }
+}
+
+impl<'a> BuildHasher for &'a Crc<Slice16<u16>> {
+    type Hasher = Digest<'a, Slice16<u16>>;
+
+    fn build_hasher(&self) -> Self::Hasher {
+        self.digest()
     }
 }
