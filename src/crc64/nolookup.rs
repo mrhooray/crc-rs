@@ -52,7 +52,7 @@ impl<'a> Digest<'a, NoTable<u64>> {
 
 impl<'a> Hasher for Digest<'a, NoTable<u64>> {
     fn finish(&self) -> u64 {
-        self.clone().finalize() as u64
+        self.clone().finalize()
     }
 
     fn write(&mut self, bytes: &[u8]) {
