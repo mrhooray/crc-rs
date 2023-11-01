@@ -44,7 +44,7 @@ pub struct Slice16<W: Width>(core::marker::PhantomData<W>);
 /// Implementation using a 256 entry lookup table. Use it with `Crc<Bytewise<W>>`
 pub struct Bytewise<W: Width>(core::marker::PhantomData<W>);
 
-/// Implementation using no lookup table. Use it with `Crc<Nolookup<W>>`
+/// Implementation using no lookup table. Use it with `Crc<NoTable<W>>`
 pub struct NoTable<W: Width>(core::marker::PhantomData<W>);
 
 impl<W: Width> crate::private::Sealed for Slice16<W> {}
@@ -76,7 +76,7 @@ pub trait Implementation: private::Sealed {
     type Table;
 }
 
-/// Crc with pluggable implementations ([Nolookup], [Bytewise], [Slice16]).
+/// Crc with pluggable implementations ([NoTable], [Bytewise], [Slice16]).
 /// To choose the default implementation, use the [Width] directly (e.g. `Crc<u32>`).
 pub struct Crc<I: Implementation> {
     pub algorithm: &'static Algorithm<I::Width>,
