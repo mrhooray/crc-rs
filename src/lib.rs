@@ -28,7 +28,8 @@
 #![no_std]
 #![forbid(unsafe_code)]
 
-pub use crc_catalog::*;
+pub use crc_catalog::algorithm::*;
+pub use crc_catalog::{Algorithm, Width};
 
 mod crc128;
 mod crc16;
