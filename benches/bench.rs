@@ -5,14 +5,17 @@ pub const BLUETOOTH: Crc<u8> = Crc::<u8>::new(&CRC_8_BLUETOOTH);
 pub const BLUETOOTH_SLICE16: Crc<Slice16<u8>> = Crc::<Slice16<u8>>::new(&CRC_8_BLUETOOTH);
 pub const BLUETOOTH_BYTEWISE: Crc<Bytewise<u8>> = Crc::<Bytewise<u8>>::new(&CRC_8_BLUETOOTH);
 pub const BLUETOOTH_NOLOOKUP: Crc<NoTable<u8>> = Crc::<NoTable<u8>>::new(&CRC_8_BLUETOOTH);
+pub const BLUETOOTH_SIMD: Crc<Simd<u8>> = Crc::<Simd<u8>>::new(&CRC_8_BLUETOOTH);
 pub const X25: Crc<u16> = Crc::<u16>::new(&CRC_16_IBM_SDLC);
 pub const X25_SLICE16: Crc<Slice16<u16>> = Crc::<Slice16<u16>>::new(&CRC_16_IBM_SDLC);
 pub const X25_BYTEWISE: Crc<Bytewise<u16>> = Crc::<Bytewise<u16>>::new(&CRC_16_IBM_SDLC);
 pub const X25_NOLOOKUP: Crc<NoTable<u16>> = Crc::<NoTable<u16>>::new(&CRC_16_IBM_SDLC);
+pub const X25_SIMD: Crc<Simd<u16>> = Crc::<Simd<u16>>::new(&CRC_16_IBM_SDLC);
 pub const ISCSI: Crc<u32> = Crc::<u32>::new(&CRC_32_ISCSI);
 pub const ISCSI_SLICE16: Crc<Slice16<u32>> = Crc::<Slice16<u32>>::new(&CRC_32_ISCSI);
 pub const ISCSI_BYTEWISE: Crc<Bytewise<u32>> = Crc::<Bytewise<u32>>::new(&CRC_32_ISCSI);
 pub const ISCSI_NOLOOKUP: Crc<NoTable<u32>> = Crc::<NoTable<u32>>::new(&CRC_32_ISCSI);
+pub const ISCSI_SIMD: Crc<Simd<u32>> = Crc::<Simd<u32>>::new(&CRC_32_ISCSI);
 pub const GSM_40: Crc<u64> = Crc::<u64>::new(&CRC_40_GSM);
 pub const ECMA: Crc<u64> = Crc::<u64>::new(&CRC_64_ECMA_182);
 pub const ECMA_SLICE16: Crc<Slice16<u64>> = Crc::<Slice16<u64>>::new(&CRC_64_ECMA_182);
@@ -51,6 +54,9 @@ fn checksum(c: &mut Criterion) {
         })
         .bench_function("slice16", |b| {
             b.iter(|| BLUETOOTH_SLICE16.checksum(black_box(&bytes)))
+        })
+        .bench_function("simd", |b| {
+            b.iter(|| BLUETOOTH_SIMD.checksum(black_box(&bytes)))
         });
 
     c.benchmark_group("crc16")
@@ -64,7 +70,8 @@ fn checksum(c: &mut Criterion) {
         })
         .bench_function("slice16", |b| {
             b.iter(|| X25_SLICE16.checksum(black_box(&bytes)))
-        });
+        })
+        .bench_function("simd", |b| b.iter(|| X25_SIMD.checksum(black_box(&bytes))));
 
     c.benchmark_group("crc32")
         .throughput(Throughput::Bytes(size as u64))
@@ -77,6 +84,9 @@ fn checksum(c: &mut Criterion) {
         })
         .bench_function("slice16", |b| {
             b.iter(|| ISCSI_SLICE16.checksum(black_box(&bytes)))
+        })
+        .bench_function("simd", |b| {
+            b.iter(|| ISCSI_SIMD.checksum(black_box(&bytes)))
         });
 
     c.benchmark_group("crc64")

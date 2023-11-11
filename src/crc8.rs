@@ -4,6 +4,7 @@ use crc_catalog::Algorithm;
 mod bytewise;
 mod default;
 mod nolookup;
+mod simd;
 mod slice16;
 
 const fn init(algorithm: &Algorithm<u8>, initial: u8) -> u8 {
@@ -88,7 +89,7 @@ const fn update_slice16(mut crc: u8, table: &[[u8; 256]; 16], bytes: &[u8]) -> u
 
 #[cfg(test)]
 mod test {
-    use crate::{Bytewise, Crc, Implementation, NoTable, Slice16};
+    use crate::{Bytewise, Crc, Implementation, NoTable, Simd, Slice16};
     use crc_catalog::{Algorithm, CRC_8_BLUETOOTH};
 
     #[test]
@@ -212,17 +213,23 @@ mod test {
             for data in data {
                 let crc_slice16 = Crc::<Slice16<u8>>::new(alg);
                 let crc_nolookup = Crc::<NoTable<u8>>::new(alg);
+                let crc_simd: Crc<Simd<u8>> = Crc::<Simd<u8>>::new(alg);
                 let expected = Crc::<Bytewise<u8>>::new(alg).checksum(data.as_bytes());
 
                 // Check that doing all at once works as expected
                 assert_eq!(crc_slice16.checksum(data.as_bytes()), expected);
                 assert_eq!(crc_nolookup.checksum(data.as_bytes()), expected);
+                assert_eq!(crc_simd.checksum(data.as_bytes()), expected);
 
                 let mut digest = crc_slice16.digest();
                 digest.update(data.as_bytes());
                 assert_eq!(digest.finalize(), expected);
 
                 let mut digest = crc_nolookup.digest();
+                digest.update(data.as_bytes());
+                assert_eq!(digest.finalize(), expected);
+
+                let mut digest = crc_simd.digest();
                 digest.update(data.as_bytes());
                 assert_eq!(digest.finalize(), expected);
 
@@ -236,6 +243,10 @@ mod test {
                     digest.update(data2);
                     assert_eq!(digest.finalize(), expected);
                     let mut digest = crc_nolookup.digest();
+                    digest.update(data1);
+                    digest.update(data2);
+                    assert_eq!(digest.finalize(), expected);
+                    let mut digest = crc_simd.digest();
                     digest.update(data1);
                     digest.update(data2);
                     assert_eq!(digest.finalize(), expected);

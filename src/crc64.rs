@@ -154,7 +154,7 @@ const fn update_slice16(
 
 #[cfg(test)]
 mod test {
-    use crate::{Bytewise, Crc, Implementation, NoTable, Slice16};
+    use crate::{Bytewise, Crc, Implementation, NoTable, Simd, Slice16};
     use crc_catalog::{Algorithm, CRC_64_ECMA_182};
 
     #[test]

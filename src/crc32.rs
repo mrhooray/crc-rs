@@ -1,9 +1,11 @@
+use crate::simd::{SimdValue, SimdValueOps};
 use crate::util::crc32;
 use crc_catalog::Algorithm;
 
 mod bytewise;
 mod default;
 mod nolookup;
+mod simd;
 mod slice16;
 
 // init is shared between all impls
@@ -150,9 +152,45 @@ const fn update_slice16(
     crc
 }
 
+#[target_feature(enable = "sse2", enable = "sse4.1", enable = "pclmulqdq")]
+pub(crate) unsafe fn update_simd(
+    crc: u32,
+    coefficients: &[SimdValue; 4],
+    first_chunk: &[SimdValue; 4],
+    chunks: &[[SimdValue; 4]],
+) -> u32 {
+    let mut x4 = *first_chunk;
+
+    // Apply initial crc value
+    x4[0] = x4[0].xor(crc as u64);
+
+    // Iteratively Fold by 4:
+    let k1_k2 = coefficients[0];
+    for chunk in chunks {
+        for (x, value) in x4.iter_mut().zip(chunk.iter()) {
+            *x = x.fold_16(k1_k2, *value)
+        }
+    }
+
+    // Iteratively Fold by 1:
+    let k3_k4 = coefficients[1];
+    let mut x = x4[0].fold_16(k3_k4, x4[1]);
+    x = x.fold_16(k3_k4, x4[2]);
+    x = x.fold_16(k3_k4, x4[3]);
+
+    // Final Reduction of 128-bits
+    let k5_k6 = coefficients[2];
+    x = x.fold_8(k3_k4);
+    x = x.fold_4(k5_k6);
+
+    // Barret Reduction
+    let px_u = coefficients[3];
+    x.barret_reduction_32(px_u)
+}
+
 #[cfg(test)]
 mod test {
-    use crate::{Bytewise, Crc, Implementation, NoTable, Slice16};
+    use crate::{Bytewise, Crc, Implementation, NoTable, Simd, Slice16};
     use crc_catalog::{Algorithm, CRC_32_ISCSI};
 
     #[test]
@@ -250,14 +288,14 @@ mod test {
     #[test]
     fn correctness() {
         let data: &[&str] = &[
-        "",
-        "1",
-        "1234",
-        "123456789",
-        "0123456789ABCDE",
-        "01234567890ABCDEFGHIJK",
-        "01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK",
-    ];
+            "",
+            "1",
+            "1234",
+            "123456789",
+            "0123456789A",
+            "01234567890ABCDEFGHIJK",
+            "01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK",
+        ];
 
         pub const CRC_32_ISCSI_NONREFLEX: Algorithm<u32> = Algorithm {
             width: 32,
@@ -277,17 +315,23 @@ mod test {
             for data in data {
                 let crc_slice16 = Crc::<Slice16<u32>>::new(alg);
                 let crc_nolookup = Crc::<NoTable<u32>>::new(alg);
+                let crc_simd = Crc::<Simd<u32>>::new(alg);
                 let expected = Crc::<Bytewise<u32>>::new(alg).checksum(data.as_bytes());
 
                 // Check that doing all at once works as expected
                 assert_eq!(crc_slice16.checksum(data.as_bytes()), expected);
                 assert_eq!(crc_nolookup.checksum(data.as_bytes()), expected);
+                assert_eq!(crc_simd.checksum(data.as_bytes()), expected);
 
                 let mut digest = crc_slice16.digest();
                 digest.update(data.as_bytes());
                 assert_eq!(digest.finalize(), expected);
 
                 let mut digest = crc_nolookup.digest();
+                digest.update(data.as_bytes());
+                assert_eq!(digest.finalize(), expected);
+
+                let mut digest = crc_simd.digest();
                 digest.update(data.as_bytes());
                 assert_eq!(digest.finalize(), expected);
 
@@ -301,6 +345,10 @@ mod test {
                     digest.update(data2);
                     assert_eq!(digest.finalize(), expected);
                     let mut digest = crc_nolookup.digest();
+                    digest.update(data1);
+                    digest.update(data2);
+                    assert_eq!(digest.finalize(), expected);
+                    let mut digest = crc_simd.digest();
                     digest.update(data1);
                     digest.update(data2);
                     assert_eq!(digest.finalize(), expected);
