@@ -58,9 +58,9 @@ See the benchmark section for hints, but do benchmarks on your target hardware t
 
 These can be used by substituting `Crc<uxxx>` with e.g. `Crc<Slice16<uxxx>>`. The flavor for `Crc<uxxx>` is chosen based on three crate features:
 
-* no-table-mem-limit: Takes precedence over "bytewise-mem-limit" and "slice16-mem-limit"
-* bytewise-mem-limit: Takes precedence over "slice16-mem-limit"
-* slice16-mem-limit: Can be overriden by setting "bytewise-mem-limit" and "slice16-mem-limit"
+* no-table-mem-limit: Takes precedence over "bytewise-mem-limit" or "slice16-mem-limit"
+* bytewise-mem-limit: Takes precedence over "slice16-mem-limit" and can be overridden by setting "no-table-mem-limit"
+* slice16-mem-limit: Can be overridden by setting "bytewise-mem-limit" or "no-table-mem-limit"
 
 If no feature is selected, the `Bytewise` flavor is used.
 
