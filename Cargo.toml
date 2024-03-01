@@ -15,16 +15,16 @@ categories = ["algorithms", "no-std"]
 edition = "2021"
 rust-version = "1.56"
 
-[features]
+# [features]
 # use the "NoTable" implementation for the default Crc<uXXX> struct, using no additional memory for a lookup table.
 # Takes precedence over "bytewise-mem-limit" and "slice16-mem-limit"
-no-table-mem-limit = []
+# no-table-mem-limit = []
 # use the "Bytewise" implementation for the default Crc<uXXX> struct, using 256 entries of the respective width for a lookup table.
 # Takes precedence over "slice16-mem-limit" and is used if no feature is selected
-bytewise-mem-limit = []
+# bytewise-mem-limit = []
 # use the "Slice16" implementation for the default Crc<uXXX> struct, using 256 * 16 entries of the respective width for a lookup table.
 # Can be overriden by setting "bytewise-mem-limit" and "slice16-mem-limit"
-slice16-mem-limit = []
+# slice16-mem-limit = []
 
 [dependencies]
 crc-catalog = "2.4.0"
