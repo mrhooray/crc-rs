@@ -1,247 +1,84 @@
 use crate::util::*;
 
-pub(crate) const fn crc8_table(width: u8, poly: u8, reflect: bool) -> [u8; 256] {
-    let poly = if reflect {
-        let poly = poly.reverse_bits();
-        poly >> (8u8 - width)
-    } else {
-        poly << (8u8 - width)
-    };
+macro_rules! impl_crc_table {
+    ($name: ident, $ty: ty, $base: path) => {
+        pub(crate) const fn $name(width: u8, poly: $ty, reflect: bool) -> [$ty; 256] {
+            const BITS: usize = ::core::mem::size_of::<$ty>() * 8;
 
-    let mut table = [0u8; 256];
-    let mut i = 0;
-    while i < table.len() {
-        table[i] = crc8(poly, reflect, i as u8);
-        i += 1;
-    }
-    table
-}
-
-pub(crate) const fn crc8_table_slice_16(width: u8, poly: u8, reflect: bool) -> [[u8; 256]; 16] {
-    let poly = if reflect {
-        let poly = poly.reverse_bits();
-        poly >> (8u8 - width)
-    } else {
-        poly << (8u8 - width)
-    };
-
-    let mut table = [[0u8; 256]; 16];
-    let mut i = 0;
-    while i < 256 {
-        table[0][i] = crc8(poly, reflect, i as u8);
-        i += 1;
-    }
-
-    let mut i = 0;
-    while i < 256 {
-        let mut e = 1;
-        while e < 16 {
-            let one_lower = table[e - 1][i];
-            table[e][i] = table[0][one_lower as usize];
-            e += 1;
-        }
-        i += 1;
-    }
-    table
-}
-
-pub(crate) const fn crc16_table(width: u8, poly: u16, reflect: bool) -> [u16; 256] {
-    let poly = if reflect {
-        let poly = poly.reverse_bits();
-        poly >> (16u8 - width)
-    } else {
-        poly << (16u8 - width)
-    };
-
-    let mut table = [0u16; 256];
-    let mut i = 0;
-    while i < table.len() {
-        table[i] = crc16(poly, reflect, i as u16);
-        i += 1;
-    }
-    table
-}
-
-pub(crate) const fn crc16_table_slice_16(width: u8, poly: u16, reflect: bool) -> [[u16; 256]; 16] {
-    let poly = if reflect {
-        let poly = poly.reverse_bits();
-        poly >> (16u8 - width)
-    } else {
-        poly << (16u8 - width)
-    };
-
-    let mut table = [[0u16; 256]; 16];
-    let mut i = 0;
-    while i < 256 {
-        table[0][i] = crc16(poly, reflect, i as u16);
-        i += 1;
-    }
-
-    let mut i = 0;
-    while i < 256 {
-        let mut e = 1;
-        while e < 16 {
-            let one_lower = table[e - 1][i];
-            if reflect {
-                table[e][i] = (one_lower >> 8) ^ table[0][(one_lower & 0xFF) as usize];
+            let poly = if reflect {
+                let poly = poly.reverse_bits();
+                poly >> (BITS - width as usize)
             } else {
-                table[e][i] = (one_lower << 8) ^ table[0][((one_lower >> 8) & 0xFF) as usize];
+                poly << (BITS - width as usize)
+            };
+
+            let mut table = [0 as $ty; 256];
+            let mut i = 0;
+            while i < table.len() {
+                table[i] = $base(poly, reflect, i as $ty);
+                i += 1;
             }
-            e += 1;
+            table
         }
-        i += 1;
-    }
-    table
-}
-
-pub(crate) const fn crc32_table(width: u8, poly: u32, reflect: bool) -> [u32; 256] {
-    let poly = if reflect {
-        let poly = poly.reverse_bits();
-        poly >> (32u8 - width)
-    } else {
-        poly << (32u8 - width)
     };
-
-    let mut table = [0u32; 256];
-    let mut i = 0;
-    while i < 256 {
-        table[i] = crc32(poly, reflect, i as u32);
-        i += 1;
-    }
-
-    table
 }
+macro_rules! impl_crc_slice_table {
+    ($name: ident, $ty: ty, $slices: expr, $base: path) => {
+        pub(crate) const fn $name(width: u8, poly: $ty, reflect: bool) -> [[$ty; 256]; $slices] {
+            const BITS: usize = ::core::mem::size_of::<$ty>() * 8;
+            // to avoid compiler arithmetic_overflow error
+            const SHIFT: usize = if BITS > 8 { 8 } else { 0 };
 
-pub(crate) const fn crc32_table_slice_16(width: u8, poly: u32, reflect: bool) -> [[u32; 256]; 16] {
-    let poly = if reflect {
-        let poly = poly.reverse_bits();
-        poly >> (32u8 - width)
-    } else {
-        poly << (32u8 - width)
-    };
-
-    let mut table = [[0u32; 256]; 16];
-    let mut i = 0;
-    while i < 256 {
-        table[0][i] = crc32(poly, reflect, i as u32);
-        i += 1;
-    }
-
-    let mut i = 0;
-    while i < 256 {
-        let mut e = 1;
-        while e < 16 {
-            let one_lower = table[e - 1][i];
-            if reflect {
-                table[e][i] = (one_lower >> 8) ^ table[0][(one_lower & 0xFF) as usize];
+            let poly = if reflect {
+                let poly = poly.reverse_bits();
+                poly >> (BITS - width as usize)
             } else {
-                table[e][i] = (one_lower << 8) ^ table[0][((one_lower >> 24) & 0xFF) as usize];
+                poly << (BITS - width as usize)
+            };
+
+            let mut table = [[0 as $ty; 256]; $slices];
+            let mut i = 0;
+            while i < 256 {
+                table[0][i] = $base(poly, reflect, i as $ty);
+                i += 1;
             }
-            e += 1;
-        }
-        i += 1;
-    }
-    table
-}
 
-pub(crate) const fn crc64_table(width: u8, poly: u64, reflect: bool) -> [u64; 256] {
-    let poly = if reflect {
-        let poly = poly.reverse_bits();
-        poly >> (64u8 - width)
-    } else {
-        poly << (64u8 - width)
-    };
+            let mut i = 0;
+            while i < 256 {
+                let mut e = 1;
+                while e < $slices {
+                    let one_lower = table[e - 1][i];
 
-    let mut table = [0u64; 256];
-    let mut i = 0;
-    while i < table.len() {
-        table[i] = crc64(poly, reflect, i as u64);
-        i += 1;
-    }
-    table
-}
+                    if reflect {
+                        table[e][i] = table[0][(one_lower & 0xFF) as usize];
 
-pub(crate) const fn crc64_table_slice_16(width: u8, poly: u64, reflect: bool) -> [[u64; 256]; 16] {
-    let poly = if reflect {
-        let poly = poly.reverse_bits();
-        poly >> (64u8 - width)
-    } else {
-        poly << (64u8 - width)
-    };
+                        if BITS > 8 {
+                            table[e][i] ^= (one_lower >> SHIFT);
+                        }
+                    } else {
+                        table[e][i] = table[0][((one_lower >> (BITS - 8)) & 0xFF) as usize];
 
-    let mut table = [[0u64; 256]; 16];
-    let mut i = 0;
-    while i < 256 {
-        table[0][i] = crc64(poly, reflect, i as u64);
-        i += 1;
-    }
-
-    let mut i = 0;
-    while i < 256 {
-        let mut e = 1;
-        while e < 16 {
-            let one_lower = table[e - 1][i];
-            if reflect {
-                table[e][i] = (one_lower >> 8) ^ table[0][(one_lower & 0xFF) as usize];
-            } else {
-                table[e][i] = (one_lower << 8) ^ table[0][((one_lower >> 56) & 0xFF) as usize];
+                        if BITS > 8 {
+                            table[e][i] ^= (one_lower << SHIFT);
+                        }
+                    }
+                    e += 1;
+                }
+                i += 1;
             }
-            e += 1;
+            table
         }
-        i += 1;
-    }
-    table
-}
-
-pub(crate) const fn crc128_table(width: u8, poly: u128, reflect: bool) -> [u128; 256] {
-    let poly = if reflect {
-        let poly = poly.reverse_bits();
-        poly >> (128u8 - width)
-    } else {
-        poly << (128u8 - width)
     };
-
-    let mut table = [0u128; 256];
-    let mut i = 0;
-    while i < table.len() {
-        table[i] = crc128(poly, reflect, i as u128);
-        i += 1;
-    }
-    table
 }
 
-pub(crate) const fn crc128_table_slice_16(
-    width: u8,
-    poly: u128,
-    reflect: bool,
-) -> [[u128; 256]; 16] {
-    let poly = if reflect {
-        let poly = poly.reverse_bits();
-        poly >> (128u8 - width)
-    } else {
-        poly << (128u8 - width)
-    };
+impl_crc_table!(crc8_table, u8, crc8);
+impl_crc_table!(crc16_table, u16, crc16);
+impl_crc_table!(crc32_table, u32, crc32);
+impl_crc_table!(crc64_table, u64, crc64);
+impl_crc_table!(crc128_table, u128, crc128);
 
-    let mut table = [[0u128; 256]; 16];
-    let mut i = 0;
-    while i < 256 {
-        table[0][i] = crc128(poly, reflect, i as u128);
-        i += 1;
-    }
-
-    let mut i = 0;
-    while i < 256 {
-        let mut e = 1;
-        while e < 16 {
-            let one_lower = table[e - 1][i];
-            if reflect {
-                table[e][i] = (one_lower >> 8) ^ table[0][(one_lower & 0xFF) as usize];
-            } else {
-                table[e][i] = (one_lower << 8) ^ table[0][((one_lower >> 120) & 0xFF) as usize];
-            }
-            e += 1;
-        }
-        i += 1;
-    }
-    table
-}
+impl_crc_slice_table!(crc8_table_slice_16, u8, 16, crc8);
+impl_crc_slice_table!(crc16_table_slice_16, u16, 16, crc16);
+impl_crc_slice_table!(crc32_table_slice_16, u32, 16, crc32);
+impl_crc_slice_table!(crc64_table_slice_16, u64, 16, crc64);
+impl_crc_slice_table!(crc128_table_slice_16, u128, 16, crc128);
