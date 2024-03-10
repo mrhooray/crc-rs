@@ -43,29 +43,21 @@ assert_eq!(digest.finalize(), 0xaee7);
 
 ### Minimum supported Rust version (MSRV)
 
-This crate's MSRV is 1.56.
+This crate's MSRV is 1.65.
 
 At a minimum, the MSRV will be <= the oldest stable release in the last 12 months. MSRV may be bumped in minor version releases.
 
-### Lookup table flavors
+### Implementations
 
-This crate offers three flavors of lookup tables providing a tradeoff between computation speed and used memory.
-See the benchmark section for hints, but do benchmarks on your target hardware to decide if the tradeoff is worth it to you.
+This crate has several pluggable implementations:
 
-1. `NoTable` provides an implementation that uses no additional memory
-2. `Bytewise` provides an implementation that uses a lookup table that uses 256 entries of the used width (e.g. for u32 thats 256 * 4 bytes)
-3. `Slice16` provides an implementation that uses a lookup table that uses 16 * 256 entries of the used width (e.g. for u32 thats 16 * 256 * 4 bytes)
+1. `NoTable` doesn't use a lookup table, and thus minimizes binary size and memory usage.
+2. `Table<1>` uses a lookup table with 256 entries (e.g. for u32 thats 256 * 4 bytes).
+3. `Table<16>` uses a lookup table with 16 * 256 entries (e.g. for u32 thats 16 * 256 * 4 bytes).
 
-These can be used by substituting `Crc<uxxx>` with e.g. `Crc<Slice16<uxxx>>`. The flavor for `Crc<uxxx>` is chosen based on three crate features:
+`Table<1>` is the default implementation, but this can be overridden by specifying `I` in `Crc<W, I>`. E.g.: `Crc<u32, NoTable>`, `Crc<u64, Table<16>>`, ...
 
-* no-table-mem-limit: Takes precedence over "bytewise-mem-limit" or "slice16-mem-limit"
-* bytewise-mem-limit: Takes precedence over "slice16-mem-limit" and can be overridden by setting "no-table-mem-limit"
-* slice16-mem-limit: Can be overridden by setting "bytewise-mem-limit" or "no-table-mem-limit"
-
-If no feature is selected, the `Bytewise` flavor is used.
-
-Note that these tables can bloat your binary size if you precalculate them at compiletime (this happens in `Crc::new`). 
-Choosing a crate like oncecell or lazystatic to compute them once at runtime may be preferable where binary size is a concern.
+NOTE: Lookup tables will increase binary size if they're generated at compile-time. Wrapping `Crc` initialization in a `std::cell::OnceCell` may be preferable if binary size is a concern.
 
 ### Benchmark
 

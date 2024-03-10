@@ -39,53 +39,38 @@ mod crc8;
 mod table;
 mod util;
 
-/// Implementation using a 16 * 256 entry lookup table. Use it with `Crc<Slice16<W>>`
-pub struct Slice16<W: Width>(core::marker::PhantomData<W>);
-
-/// Implementation using a 256 entry lookup table. Use it with `Crc<Bytewise<W>>`
-pub struct Bytewise<W: Width>(core::marker::PhantomData<W>);
-
-/// Implementation using no lookup table. Use it with `Crc<NoTable<W>>`
-pub struct NoTable<W: Width>(core::marker::PhantomData<W>);
-
-impl<W: Width> crate::private::Sealed for Slice16<W> {}
-impl<W: Width> crate::private::Sealed for Bytewise<W> {}
-impl<W: Width> crate::private::Sealed for NoTable<W> {}
-
-impl<W: Width> crate::Implementation for Slice16<W> {
-    type Width = W;
-    type Table = [[W; 256]; 16];
+/// A trait for CRC implementations.
+pub trait Implementation: private::Sealed {
+    /// Associated data necessary for the implementation (e.g. lookup tables).
+    type Data<W>;
 }
 
-impl<W: Width> crate::Implementation for Bytewise<W> {
-    type Width = W;
-    type Table = [W; 256];
-}
+/// A table-based implementation of the CRC algorithm, with `L` lanes.
+/// The number of entries in the lookup table is `L * 256`.
+pub struct Table<const L: usize> {}
 
-impl<W: Width> crate::Implementation for NoTable<W> {
-    type Width = W;
-    type Table = ();
+/// An implementation of the CRC algorithm with no lookup table.
+pub type NoTable = Table<0>;
+
+type DefaultImpl = Table<1>;
+
+impl<const L: usize> Implementation for Table<L> {
+    type Data<W> = [[W; 256]; L];
 }
 
 mod private {
     pub trait Sealed {}
-    impl<W: super::Width> Sealed for W {}
+    impl<const L: usize> Sealed for super::Table<L> {}
 }
 
-pub trait Implementation: private::Sealed {
-    type Width: Width;
-    type Table;
-}
-
-/// Crc with pluggable implementations ([NoTable], [Bytewise], [Slice16]).
-/// To choose the default implementation, use the [Width] directly (e.g. `Crc<u32>`).
-pub struct Crc<I: Implementation> {
-    pub algorithm: &'static Algorithm<I::Width>,
-    table: I::Table,
+/// Crc instance with a specific width, algorithm, and implementation.
+pub struct Crc<W: Width, I: Implementation = DefaultImpl> {
+    pub algorithm: &'static Algorithm<W>,
+    data: I::Data<W>,
 }
 
 #[derive(Clone)]
-pub struct Digest<'a, I: Implementation> {
-    crc: &'a Crc<I>,
-    value: I::Width,
+pub struct Digest<'a, W: Width, I: Implementation = DefaultImpl> {
+    crc: &'a Crc<W, I>,
+    value: W,
 }
