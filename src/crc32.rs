@@ -2,7 +2,6 @@ use crate::util::crc32;
 use crc_catalog::Algorithm;
 
 mod bytewise;
-mod default;
 mod nolookup;
 mod slice16;
 
@@ -152,99 +151,8 @@ const fn update_slice16(
 
 #[cfg(test)]
 mod test {
-    use crate::{Bytewise, Crc, Implementation, NoTable, Slice16};
+    use crate::*;
     use crc_catalog::{Algorithm, CRC_32_ISCSI};
-
-    #[test]
-    fn default_table_size() {
-        const TABLE_SIZE: usize = core::mem::size_of::<<u32 as Implementation>::Table>();
-        const BYTES_PER_ENTRY: usize = 4;
-        #[cfg(all(
-            feature = "no-table-mem-limit",
-            feature = "bytewise-mem-limit",
-            feature = "slice16-mem-limit"
-        ))]
-        {
-            const EXPECTED: usize = 0;
-            let _ = EXPECTED;
-            const _: () = assert!(EXPECTED == TABLE_SIZE);
-        }
-        #[cfg(all(
-            feature = "no-table-mem-limit",
-            feature = "bytewise-mem-limit",
-            not(feature = "slice16-mem-limit")
-        ))]
-        {
-            const EXPECTED: usize = 0;
-            let _ = EXPECTED;
-            const _: () = assert!(EXPECTED == TABLE_SIZE);
-        }
-        #[cfg(all(
-            feature = "no-table-mem-limit",
-            not(feature = "bytewise-mem-limit"),
-            feature = "slice16-mem-limit"
-        ))]
-        {
-            const EXPECTED: usize = 0;
-            let _ = EXPECTED;
-            const _: () = assert!(EXPECTED == TABLE_SIZE);
-        }
-        #[cfg(all(
-            feature = "no-table-mem-limit",
-            not(feature = "bytewise-mem-limit"),
-            not(feature = "slice16-mem-limit")
-        ))]
-        {
-            const EXPECTED: usize = 0;
-            let _ = EXPECTED;
-            const _: () = assert!(EXPECTED == TABLE_SIZE);
-        }
-
-        #[cfg(all(
-            not(feature = "no-table-mem-limit"),
-            feature = "bytewise-mem-limit",
-            feature = "slice16-mem-limit"
-        ))]
-        {
-            const EXPECTED: usize = 256 * BYTES_PER_ENTRY;
-            let _ = EXPECTED;
-            const _: () = assert!(EXPECTED == TABLE_SIZE);
-        }
-        #[cfg(all(
-            not(feature = "no-table-mem-limit"),
-            feature = "bytewise-mem-limit",
-            not(feature = "slice16-mem-limit")
-        ))]
-        {
-            const EXPECTED: usize = 256 * BYTES_PER_ENTRY;
-            let _ = EXPECTED;
-            const _: () = assert!(EXPECTED == TABLE_SIZE);
-        }
-
-        #[cfg(all(
-            not(feature = "no-table-mem-limit"),
-            not(feature = "bytewise-mem-limit"),
-            feature = "slice16-mem-limit"
-        ))]
-        {
-            const EXPECTED: usize = 256 * 16 * BYTES_PER_ENTRY;
-            let _ = EXPECTED;
-            const _: () = assert!(EXPECTED == TABLE_SIZE);
-        }
-
-        #[cfg(all(
-            not(feature = "no-table-mem-limit"),
-            not(feature = "bytewise-mem-limit"),
-            not(feature = "slice16-mem-limit")
-        ))]
-        {
-            const EXPECTED: usize = 256 * BYTES_PER_ENTRY;
-            let _ = EXPECTED;
-            const _: () = assert!(EXPECTED == TABLE_SIZE);
-        }
-        let _ = TABLE_SIZE;
-        let _ = BYTES_PER_ENTRY;
-    }
 
     /// Test this optimized version against the well known implementation to ensure correctness
     #[test]
@@ -275,9 +183,9 @@ mod test {
 
         for alg in algs_to_test {
             for data in data {
-                let crc_slice16 = Crc::<Slice16<u32>>::new(alg);
-                let crc_nolookup = Crc::<NoTable<u32>>::new(alg);
-                let expected = Crc::<Bytewise<u32>>::new(alg).checksum(data.as_bytes());
+                let crc_slice16 = Crc::<u32, Table<16>>::new(alg);
+                let crc_nolookup = Crc::<u32, NoTable>::new(alg);
+                let expected = Crc::<u32, Table<1>>::new(alg).checksum(data.as_bytes());
 
                 // Check that doing all at once works as expected
                 assert_eq!(crc_slice16.checksum(data.as_bytes()), expected);
