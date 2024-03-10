@@ -1,4 +1,4 @@
-set -ex
+#!/bin/sh -ex
 
 cargo test
 cargo test --no-default-features
