@@ -291,7 +291,10 @@ mod test {
 
         // Check if the baseline is as expected.
         for alg in algs_to_test {
-            assert_eq!(Crc::<Bytewise<u128>>::new(alg).checksum("123456789".as_bytes()), alg.check);
+            assert_eq!(
+                Crc::<Bytewise<u128>>::new(alg).checksum("123456789".as_bytes()),
+                alg.check
+            );
         }
 
         for alg in algs_to_test {
