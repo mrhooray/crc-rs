@@ -144,54 +144,6 @@ pub(crate) const fn crc32_table_slice_16(width: u8, poly: u32, reflect: bool) ->
     table
 }
 
-pub(crate) const fn crc32_simd_coefficients(width: u8, poly: u32) -> [u64; 8] {
-    const fn xt_mod_px(mut t: u32, px: u64) -> u64 {
-        if t < 32 {
-            return 0;
-        }
-        t -= 31;
-
-        let mut n = 0x80000000;
-        let mut i = 0;
-        while i < t {
-            n <<= 1;
-            if n & 0x100000000 != 0 {
-                n ^= px;
-            }
-            i += 1;
-        }
-        n << 32
-    }
-
-    const fn u(px: u64) -> u64 {
-        let mut q = 0;
-        let mut n = 0x100000000;
-        let mut i = 0;
-        while i < 33 {
-            q <<= 1;
-            if n & 0x100000000 != 0 {
-                q |= 1;
-                n ^= px;
-            }
-            n <<= 1;
-            i += 1;
-        }
-        q
-    }
-
-    let px = (poly as u64) << (u32::BITS as u8 - width);
-    [
-        xt_mod_px(4 * 128 + 32, px).reverse_bits() << 1,
-        xt_mod_px(4 * 128 - 32, px).reverse_bits() << 1,
-        xt_mod_px(128 + 32, px).reverse_bits() << 1,
-        xt_mod_px(128 - 32, px).reverse_bits() << 1,
-        xt_mod_px(64, px).reverse_bits() << 1,
-        xt_mod_px(32, px).reverse_bits() << 1,
-        px.reverse_bits() >> 31,
-        u(px).reverse_bits() >> 31,
-    ]
-}
-
 pub(crate) const fn crc64_table(width: u8, poly: u64, reflect: bool) -> [u64; 256] {
     let poly = if reflect {
         let poly = poly.reverse_bits();

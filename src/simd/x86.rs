@@ -10,12 +10,6 @@ use core::mem;
 pub struct SimdValue(arch::__m128i);
 
 impl SimdValueOps for SimdValue {
-    fn is_supported() -> bool {
-        cfg!(target_feature = "pclmulqdq")
-            && cfg!(target_feature = "sse2")
-            && cfg!(target_feature = "sse4.1")
-    }
-
     #[inline]
     #[target_feature(enable = "sse2")]
     unsafe fn xor(self, value: u64) -> Self {

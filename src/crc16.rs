@@ -4,6 +4,11 @@ use crc_catalog::Algorithm;
 mod bytewise;
 mod default;
 mod nolookup;
+#[cfg(all(
+    target_feature = "sse2",
+    target_feature = "sse4.1",
+    target_feature = "pclmulqdq"
+))]
 mod simd;
 mod slice16;
 
@@ -143,7 +148,7 @@ const fn update_slice16(
 #[cfg(test)]
 mod test {
     use crate::{Bytewise, Crc, Implementation, NoTable, Simd, Slice16};
-    use crc_catalog::{Algorithm, CRC_16_IBM_SDLC};
+    use crc_catalog::*;
 
     #[test]
     fn default_table_size() {
@@ -249,18 +254,57 @@ mod test {
             "01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK",
         ];
 
-        pub const CRC_16_IBM_SDLC_NONREFLEX: Algorithm<u16> = Algorithm {
-            width: 16,
-            poly: 0x1021,
-            init: 0xffff,
-            refin: false,
-            refout: true,
-            xorout: 0xffff,
-            check: 0x906e,
-            residue: 0xf0b8,
-        };
+        let algs_to_test = &[
+            CRC_10_ATM,
+            CRC_10_CDMA2000,
+            CRC_10_GSM,
+            CRC_11_FLEXRAY,
+            CRC_11_UMTS,
+            CRC_12_CDMA2000,
+            CRC_12_DECT,
+            CRC_12_GSM,
+            CRC_12_UMTS,
+            CRC_13_BBC,
+            CRC_14_DARC,
+            CRC_14_GSM,
+            CRC_15_CAN,
+            CRC_15_MPT1327,
+            CRC_16_ARC,
+            CRC_16_CDMA2000,
+            CRC_16_CMS,
+            CRC_16_DDS_110,
+            CRC_16_DECT_R,
+            CRC_16_DECT_X,
+            CRC_16_DNP,
+            CRC_16_EN_13757,
+            CRC_16_GENIBUS,
+            CRC_16_GSM,
+            CRC_16_IBM_3740,
+            CRC_16_IBM_SDLC,
+            CRC_16_ISO_IEC_14443_3_A,
+            CRC_16_KERMIT,
+            CRC_16_LJ1200,
+            CRC_16_MAXIM_DOW,
+            CRC_16_MCRF4XX,
+            CRC_16_MODBUS,
+            CRC_16_NRSC_5,
+            CRC_16_OPENSAFETY_A,
+            CRC_16_OPENSAFETY_B,
+            CRC_16_PROFIBUS,
+            CRC_16_RIELLO,
+            CRC_16_SPI_FUJITSU,
+            CRC_16_T10_DIF,
+            CRC_16_TELEDISK,
+            CRC_16_TMS37157,
+            CRC_16_UMTS,
+            CRC_16_USB,
+            CRC_16_XMODEM,
+        ];
 
-        let algs_to_test = [&CRC_16_IBM_SDLC, &CRC_16_IBM_SDLC_NONREFLEX];
+        // Check if the baseline is as expected.
+        for alg in algs_to_test {
+            assert_eq!(Crc::<Bytewise<u16>>::new(alg).checksum("123456789".as_bytes()), alg.check);
+        }
 
         for alg in algs_to_test {
             for data in data {

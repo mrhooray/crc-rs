@@ -1,6 +1,5 @@
-use crate::crc32::update_simd;
-use crate::simd::{SimdValue, SimdValueOps};
-use crate::table::{crc16_table_slice_16, crc32_simd_coefficients};
+use crate::simd::{crc32_simd_coefficients, crc32_update_refin, SimdValue};
+use crate::table::crc16_table_slice_16;
 use crate::{Algorithm, Crc, Digest, Simd};
 
 use super::{finalize, init, update_slice16};
@@ -12,7 +11,7 @@ impl Crc<Simd<u16>> {
             table: (
                 crc16_table_slice_16(algorithm.width, algorithm.poly, algorithm.refin),
                 unsafe {
-                    // SAFETY: SimdValue is the same as u64x2 and this only changes the representation of 8*u64 to 4*u64x2.
+                    // SAFETY: Both represent numbers.
                     core::mem::transmute(crc32_simd_coefficients(
                         algorithm.width,
                         algorithm.poly as u32,
@@ -29,15 +28,18 @@ impl Crc<Simd<u16>> {
     }
 
     fn update(&self, mut crc: u16, bytes: &[u8]) -> u16 {
-        if !SimdValue::is_supported() || !self.algorithm.refin {
+        if !self.algorithm.refin {
             return update_slice16(crc, self.algorithm.refin, &self.table.0, bytes);
         }
 
+        // SAFETY: Both represent numbers.
         let (bytes_before, chunks, bytes_after) = unsafe { bytes.align_to::<[SimdValue; 4]>() };
         crc = update_slice16(crc, self.algorithm.refin, &self.table.0, bytes_before);
         if let Some(first_chunk) = chunks.first() {
-            // SAFETY: All required features are supported, by checking SimdValue::is_supported.
-            crc = unsafe { update_simd(crc as u32, &self.table.1, first_chunk, chunks) } as u16;
+            // SAFETY: All features are supported as the program has been compiled with all required target features set.
+            crc =
+                unsafe { crc32_update_refin(crc as u32, &self.table.1, first_chunk, &chunks[1..]) }
+                    as u16;
         }
         update_slice16(crc, self.algorithm.refin, &self.table.0, bytes_after)
     }

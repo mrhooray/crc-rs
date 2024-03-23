@@ -1,10 +1,14 @@
-use crate::simd::{SimdValue, SimdValueOps};
 use crate::util::crc32;
 use crc_catalog::Algorithm;
 
 mod bytewise;
 mod default;
 mod nolookup;
+#[cfg(all(
+    target_feature = "sse2",
+    target_feature = "sse4.1",
+    target_feature = "pclmulqdq"
+))]
 mod simd;
 mod slice16;
 
@@ -152,46 +156,10 @@ const fn update_slice16(
     crc
 }
 
-#[target_feature(enable = "sse2", enable = "sse4.1", enable = "pclmulqdq")]
-pub(crate) unsafe fn update_simd(
-    crc: u32,
-    coefficients: &[SimdValue; 4],
-    first_chunk: &[SimdValue; 4],
-    chunks: &[[SimdValue; 4]],
-) -> u32 {
-    let mut x4 = *first_chunk;
-
-    // Apply initial crc value
-    x4[0] = x4[0].xor(crc as u64);
-
-    // Iteratively Fold by 4:
-    let k1_k2 = coefficients[0];
-    for chunk in chunks {
-        for (x, value) in x4.iter_mut().zip(chunk.iter()) {
-            *x = x.fold_16(k1_k2, *value)
-        }
-    }
-
-    // Iteratively Fold by 1:
-    let k3_k4 = coefficients[1];
-    let mut x = x4[0].fold_16(k3_k4, x4[1]);
-    x = x.fold_16(k3_k4, x4[2]);
-    x = x.fold_16(k3_k4, x4[3]);
-
-    // Final Reduction of 128-bits
-    let k5_k6 = coefficients[2];
-    x = x.fold_8(k3_k4);
-    x = x.fold_4(k5_k6);
-
-    // Barret Reduction
-    let px_u = coefficients[3];
-    x.barret_reduction_32(px_u)
-}
-
 #[cfg(test)]
 mod test {
     use crate::{Bytewise, Crc, Implementation, NoTable, Simd, Slice16};
-    use crc_catalog::{Algorithm, CRC_32_ISCSI};
+    use crc_catalog::*;
 
     #[test]
     fn default_table_size() {
@@ -292,24 +260,41 @@ mod test {
             "1",
             "1234",
             "123456789",
-            "0123456789A",
+            "0123456789ABCDE",
             "01234567890ABCDEFGHIJK",
             "01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK",
         ];
 
-        pub const CRC_32_ISCSI_NONREFLEX: Algorithm<u32> = Algorithm {
-            width: 32,
-            poly: 0x1edc6f41,
-            init: 0xffffffff,
-            // This is the only flag that affects the optimized code path
-            refin: false,
-            refout: true,
-            xorout: 0xffffffff,
-            check: 0xe3069283,
-            residue: 0xb798b438,
-        };
+        let algs_to_test = &[
+            CRC_17_CAN_FD,
+            CRC_21_CAN_FD,
+            CRC_24_BLE,
+            CRC_24_FLEXRAY_A,
+            CRC_24_FLEXRAY_B,
+            CRC_24_INTERLAKEN,
+            CRC_24_LTE_A,
+            CRC_24_LTE_B,
+            CRC_24_OPENPGP,
+            CRC_24_OS_9,
+            CRC_30_CDMA,
+            CRC_31_PHILIPS,
+            CRC_32_AIXM,
+            CRC_32_AUTOSAR,
+            CRC_32_BASE91_D,
+            CRC_32_BZIP2,
+            CRC_32_CD_ROM_EDC,
+            CRC_32_CKSUM,
+            CRC_32_ISCSI,
+            CRC_32_ISO_HDLC,
+            CRC_32_JAMCRC,
+            CRC_32_MPEG_2,
+            CRC_32_XFER,
+        ];
 
-        let algs_to_test = [&CRC_32_ISCSI, &CRC_32_ISCSI_NONREFLEX];
+        // Check if the baseline is as expected.
+        for alg in algs_to_test {
+            assert_eq!(Crc::<Bytewise<u32>>::new(alg).checksum("123456789".as_bytes()), alg.check);
+        }
 
         for alg in algs_to_test {
             for data in data {
