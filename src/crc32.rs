@@ -4,6 +4,12 @@ use crc_catalog::Algorithm;
 mod bytewise;
 mod default;
 mod nolookup;
+#[cfg(all(
+    target_feature = "sse2",
+    target_feature = "sse4.1",
+    target_feature = "pclmulqdq"
+))]
+mod simd;
 mod slice16;
 
 // init is shared between all impls
@@ -152,8 +158,8 @@ const fn update_slice16(
 
 #[cfg(test)]
 mod test {
-    use crate::{Bytewise, Crc, Implementation, NoTable, Slice16};
-    use crc_catalog::{Algorithm, CRC_32_ISCSI};
+    use crate::{Bytewise, Crc, Implementation, NoTable, Simd, Slice16};
+    use crc_catalog::*;
 
     #[test]
     fn default_table_size() {
@@ -250,44 +256,70 @@ mod test {
     #[test]
     fn correctness() {
         let data: &[&str] = &[
-        "",
-        "1",
-        "1234",
-        "123456789",
-        "0123456789ABCDE",
-        "01234567890ABCDEFGHIJK",
-        "01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK",
-    ];
+            "",
+            "1",
+            "1234",
+            "123456789",
+            "0123456789ABCDE",
+            "01234567890ABCDEFGHIJK",
+            "01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK",
+        ];
 
-        pub const CRC_32_ISCSI_NONREFLEX: Algorithm<u32> = Algorithm {
-            width: 32,
-            poly: 0x1edc6f41,
-            init: 0xffffffff,
-            // This is the only flag that affects the optimized code path
-            refin: false,
-            refout: true,
-            xorout: 0xffffffff,
-            check: 0xe3069283,
-            residue: 0xb798b438,
-        };
+        let algs_to_test = &[
+            CRC_17_CAN_FD,
+            CRC_21_CAN_FD,
+            CRC_24_BLE,
+            CRC_24_FLEXRAY_A,
+            CRC_24_FLEXRAY_B,
+            CRC_24_INTERLAKEN,
+            CRC_24_LTE_A,
+            CRC_24_LTE_B,
+            CRC_24_OPENPGP,
+            CRC_24_OS_9,
+            CRC_30_CDMA,
+            CRC_31_PHILIPS,
+            CRC_32_AIXM,
+            CRC_32_AUTOSAR,
+            CRC_32_BASE91_D,
+            CRC_32_BZIP2,
+            CRC_32_CD_ROM_EDC,
+            CRC_32_CKSUM,
+            CRC_32_ISCSI,
+            CRC_32_ISO_HDLC,
+            CRC_32_JAMCRC,
+            CRC_32_MPEG_2,
+            CRC_32_XFER,
+        ];
 
-        let algs_to_test = [&CRC_32_ISCSI, &CRC_32_ISCSI_NONREFLEX];
+        // Check if the baseline is as expected.
+        for alg in algs_to_test {
+            assert_eq!(
+                Crc::<Bytewise<u32>>::new(alg).checksum("123456789".as_bytes()),
+                alg.check
+            );
+        }
 
         for alg in algs_to_test {
             for data in data {
                 let crc_slice16 = Crc::<Slice16<u32>>::new(alg);
                 let crc_nolookup = Crc::<NoTable<u32>>::new(alg);
+                let crc_simd = Crc::<Simd<u32>>::new(alg);
                 let expected = Crc::<Bytewise<u32>>::new(alg).checksum(data.as_bytes());
 
                 // Check that doing all at once works as expected
                 assert_eq!(crc_slice16.checksum(data.as_bytes()), expected);
                 assert_eq!(crc_nolookup.checksum(data.as_bytes()), expected);
+                assert_eq!(crc_simd.checksum(data.as_bytes()), expected);
 
                 let mut digest = crc_slice16.digest();
                 digest.update(data.as_bytes());
                 assert_eq!(digest.finalize(), expected);
 
                 let mut digest = crc_nolookup.digest();
+                digest.update(data.as_bytes());
+                assert_eq!(digest.finalize(), expected);
+
+                let mut digest = crc_simd.digest();
                 digest.update(data.as_bytes());
                 assert_eq!(digest.finalize(), expected);
 
@@ -301,6 +333,10 @@ mod test {
                     digest.update(data2);
                     assert_eq!(digest.finalize(), expected);
                     let mut digest = crc_nolookup.digest();
+                    digest.update(data1);
+                    digest.update(data2);
+                    assert_eq!(digest.finalize(), expected);
+                    let mut digest = crc_simd.digest();
                     digest.update(data1);
                     digest.update(data2);
                     assert_eq!(digest.finalize(), expected);

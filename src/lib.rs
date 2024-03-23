@@ -26,7 +26,7 @@
 //! assert_eq!(digest.finalize(), 0xaee7);
 //! ```
 #![no_std]
-#![forbid(unsafe_code)]
+//#![forbid(unsafe_code)]
 
 pub use crc_catalog::algorithm::*;
 pub use crc_catalog::{Algorithm, Width};
@@ -36,6 +36,12 @@ mod crc16;
 mod crc32;
 mod crc64;
 mod crc8;
+#[cfg(all(
+    target_feature = "sse2",
+    target_feature = "sse4.1",
+    target_feature = "pclmulqdq"
+))]
+mod simd;
 mod table;
 mod util;
 
@@ -48,9 +54,29 @@ pub struct Bytewise<W: Width>(core::marker::PhantomData<W>);
 /// Implementation using no lookup table. Use it with `Crc<NoTable<W>>`
 pub struct NoTable<W: Width>(core::marker::PhantomData<W>);
 
+/// Implementation using platform-specific simd instructions. Use it with `Crc<Simd<W>>`
+#[cfg(all(
+    target_feature = "sse2",
+    target_feature = "sse4.1",
+    target_feature = "pclmulqdq"
+))]
+pub struct Simd<W: Width>(core::marker::PhantomData<W>);
+#[cfg(not(all(
+    target_feature = "sse2",
+    target_feature = "sse4.1",
+    target_feature = "pclmulqdq"
+)))]
+pub type Simd<W> = Slice16<W>;
+
 impl<W: Width> crate::private::Sealed for Slice16<W> {}
 impl<W: Width> crate::private::Sealed for Bytewise<W> {}
 impl<W: Width> crate::private::Sealed for NoTable<W> {}
+#[cfg(all(
+    target_feature = "sse2",
+    target_feature = "sse4.1",
+    target_feature = "pclmulqdq"
+))]
+impl<W: Width> crate::private::Sealed for Simd<W> {}
 
 impl<W: Width> crate::Implementation for Slice16<W> {
     type Width = W;
@@ -65,6 +91,16 @@ impl<W: Width> crate::Implementation for Bytewise<W> {
 impl<W: Width> crate::Implementation for NoTable<W> {
     type Width = W;
     type Table = ();
+}
+
+#[cfg(all(
+    target_feature = "sse2",
+    target_feature = "sse4.1",
+    target_feature = "pclmulqdq"
+))]
+impl<W: Width> crate::Implementation for Simd<W> {
+    type Width = W;
+    type Table = ([[W; 256]; 16], [simd::SimdValue; 4]);
 }
 
 mod private {
