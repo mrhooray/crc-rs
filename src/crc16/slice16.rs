@@ -1,6 +1,6 @@
 use crate::crc16::{finalize, init, update_slice16};
 use crate::table::crc16_table_slice_16;
-use crate::{Algorithm, Crc, Digest, Table};
+use crate::*;
 
 impl Crc<u16, Table<16>> {
     pub const fn new(algorithm: &'static Algorithm<u16>) -> Self {
@@ -30,6 +30,10 @@ impl Crc<u16, Table<16>> {
     pub const fn digest_with_initial(&self, initial: u16) -> Digest<u16, Table<16>> {
         let value = init(self.algorithm, initial);
         Digest::new(self, value)
+    }
+
+    pub const fn table(&self) -> &<Table<16> as Implementation>::Data<u16> {
+        &self.data
     }
 }
 
