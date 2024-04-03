@@ -154,33 +154,35 @@ const fn update_slice16(
 #[cfg(test)]
 mod test {
     use crate::*;
-    use crc_catalog::{Algorithm, CRC_64_ECMA_182};
 
     /// Test this optimized version against the well known implementation to ensure correctness
     #[test]
     fn correctness() {
         let data: &[&str] = &[
-        "",
-        "1",
-        "1234",
-        "123456789",
-        "0123456789ABCDE",
-        "01234567890ABCDEFGHIJK",
-        "01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK",
-    ];
+            "",
+            "1",
+            "1234",
+            "123456789",
+            "0123456789ABCDE",
+            "01234567890ABCDEFGHIJK",
+            "01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK",
+        ];
 
-        pub const CRC_64_ECMA_182_REFLEX: Algorithm<u64> = Algorithm {
-            width: 64,
-            poly: 0x42f0e1eba9ea3693,
-            init: 0x0000000000000000,
-            refin: true,
-            refout: false,
-            xorout: 0x0000000000000000,
-            check: 0x6c40df5f0b497347,
-            residue: 0x0000000000000000,
-        };
+        let algs_to_test = &[
+            CRC_40_GSM,
+            CRC_64_ECMA_182,
+            CRC_64_GO_ISO,
+            CRC_64_WE,
+            CRC_64_XZ,
+        ];
 
-        let algs_to_test = [&CRC_64_ECMA_182, &CRC_64_ECMA_182_REFLEX];
+        // Check if the baseline is as expected.
+        for alg in algs_to_test {
+            assert_eq!(
+                Crc::<u64, Table<1>>::new(alg).checksum("123456789".as_bytes()),
+                alg.check
+            );
+        }
 
         for alg in algs_to_test {
             for data in data {

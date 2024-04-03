@@ -169,20 +169,19 @@ const fn update_slice16(
 #[cfg(test)]
 mod test {
     use crate::*;
-    use crc_catalog::{Algorithm, CRC_82_DARC};
 
     /// Test this optimized version against the well known implementation to ensure correctness
     #[test]
     fn correctness() {
         let data: &[&str] = &[
-        "",
-        "1",
-        "1234",
-        "123456789",
-        "0123456789ABCDE",
-        "01234567890ABCDEFGHIJK",
-        "01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK",
-    ];
+            "",
+            "1",
+            "1234",
+            "123456789",
+            "0123456789ABCDE",
+            "01234567890ABCDEFGHIJK",
+            "01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK",
+        ];
 
         pub const CRC_82_DARC_NONREFLEX: Algorithm<u128> = Algorithm {
             width: 82,
@@ -191,11 +190,19 @@ mod test {
             refin: false,
             refout: true,
             xorout: 0x000000000000000000000,
-            check: 0x09ea83f625023801fd612,
+            check: 0x12e0b19fa447c0bf627ac,
             residue: 0x000000000000000000000,
         };
 
         let algs_to_test = [&CRC_82_DARC, &CRC_82_DARC_NONREFLEX];
+
+        // Check if the baseline is as expected.
+        for alg in algs_to_test {
+            assert_eq!(
+                Crc::<u128, Table<1>>::new(alg).checksum("123456789".as_bytes()),
+                alg.check
+            );
+        }
 
         for alg in algs_to_test {
             for data in data {

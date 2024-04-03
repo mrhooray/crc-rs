@@ -26,7 +26,7 @@
 //! assert_eq!(digest.finalize(), 0xaee7);
 //! ```
 #![no_std]
-#![forbid(unsafe_code)]
+//#![forbid(unsafe_code)]
 
 pub use crc_catalog::algorithm::*;
 pub use crc_catalog::{Algorithm, Width};
@@ -39,6 +39,13 @@ mod crc8;
 mod table;
 mod util;
 
+#[cfg(all(
+    target_feature = "sse2",
+    target_feature = "sse4.1",
+    target_feature = "pclmulqdq"
+))]
+mod clmul;
+
 /// A trait for CRC implementations.
 pub trait Implementation: private::Sealed {
     /// Associated data necessary for the implementation (e.g. lookup tables).
@@ -49,6 +56,26 @@ pub trait Implementation: private::Sealed {
 /// The number of entries in the lookup table is `L * 256`.
 pub struct Table<const L: usize> {}
 
+/// A carry-less multiplication based implementation of the CRC algorithm,
+/// which can run in lanes, and only requires 8 coefficients
+/// and for fallback reasons a 256-entry lookup table.
+#[cfg(any(
+    doc,
+    all(
+        target_feature = "sse2",
+        target_feature = "sse4.1",
+        target_feature = "pclmulqdq"
+    )
+))]
+pub struct Clmul {}
+
+#[cfg(not(all(
+    target_feature = "sse2",
+    target_feature = "sse4.1",
+    target_feature = "pclmulqdq"
+)))]
+pub type Clmul = DefaultImpl;
+
 /// An implementation of the CRC algorithm with no lookup table.
 pub type NoTable = Table<0>;
 
@@ -58,9 +85,25 @@ impl<const L: usize> Implementation for Table<L> {
     type Data<W> = [[W; 256]; L];
 }
 
+#[cfg(all(
+    target_feature = "sse2",
+    target_feature = "sse4.1",
+    target_feature = "pclmulqdq"
+))]
+impl Implementation for Clmul {
+    type Data<W> = ([W; 256], [clmul::Value; 4]);
+}
+
 mod private {
     pub trait Sealed {}
     impl<const L: usize> Sealed for super::Table<L> {}
+
+    #[cfg(all(
+        target_feature = "sse2",
+        target_feature = "sse4.1",
+        target_feature = "pclmulqdq"
+    ))]
+    impl Sealed for super::Clmul {}
 }
 
 /// Crc instance with a specific width, algorithm, and implementation.
