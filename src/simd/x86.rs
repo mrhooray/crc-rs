@@ -1,4 +1,4 @@
-use crate::clmul::ValueOps;
+use crate::simd::ValueOps;
 
 #[cfg(target_arch = "x86")]
 use core::arch::x86 as arch;

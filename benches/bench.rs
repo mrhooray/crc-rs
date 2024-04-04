@@ -5,17 +5,17 @@ pub const BLUETOOTH: Crc<u8> = Crc::<u8>::new(&CRC_8_BLUETOOTH);
 pub const BLUETOOTH_SLICE16: Crc<u8, Table<16>> = Crc::<u8, Table<16>>::new(&CRC_8_BLUETOOTH);
 pub const BLUETOOTH_BYTEWISE: Crc<u8, Table<1>> = Crc::<u8, Table<1>>::new(&CRC_8_BLUETOOTH);
 pub const BLUETOOTH_NOLOOKUP: Crc<u8, NoTable> = Crc::<u8, NoTable>::new(&CRC_8_BLUETOOTH);
-pub const BLUETOOTH_CLMUL: Crc<u8, Clmul> = Crc::<u8, Clmul>::new(&CRC_8_BLUETOOTH);
+pub const BLUETOOTH_SIMD: Crc<u8, Simd> = Crc::<u8, Simd>::new(&CRC_8_BLUETOOTH);
 pub const X25: Crc<u16> = Crc::<u16>::new(&CRC_16_IBM_SDLC);
 pub const X25_SLICE16: Crc<u16, Table<16>> = Crc::<u16, Table<16>>::new(&CRC_16_IBM_SDLC);
 pub const X25_BYTEWISE: Crc<u16, Table<1>> = Crc::<u16, Table<1>>::new(&CRC_16_IBM_SDLC);
 pub const X25_NOLOOKUP: Crc<u16, NoTable> = Crc::<u16, NoTable>::new(&CRC_16_IBM_SDLC);
-pub const X25_CLMUL: Crc<u16, Clmul> = Crc::<u16, Clmul>::new(&CRC_16_IBM_SDLC);
+pub const X25_SIMD: Crc<u16, Simd> = Crc::<u16, Simd>::new(&CRC_16_IBM_SDLC);
 pub const ISCSI: Crc<u32> = Crc::<u32>::new(&CRC_32_ISCSI);
 pub const ISCSI_SLICE16: Crc<u32, Table<16>> = Crc::<u32, Table<16>>::new(&CRC_32_ISCSI);
 pub const ISCSI_BYTEWISE: Crc<u32, Table<1>> = Crc::<u32, Table<1>>::new(&CRC_32_ISCSI);
 pub const ISCSI_NOLOOKUP: Crc<u32, NoTable> = Crc::<u32, NoTable>::new(&CRC_32_ISCSI);
-pub const ISCSI_CLMUL: Crc<u32, Clmul> = Crc::<u32, Clmul>::new(&CRC_32_ISCSI);
+pub const ISCSI_SIMD: Crc<u32, Simd> = Crc::<u32, Simd>::new(&CRC_32_ISCSI);
 pub const GSM_40: Crc<u64> = Crc::<u64>::new(&CRC_40_GSM);
 pub const ECMA: Crc<u64> = Crc::<u64>::new(&CRC_64_ECMA_182);
 pub const ECMA_SLICE16: Crc<u64, Table<16>> = Crc::<u64, Table<16>>::new(&CRC_64_ECMA_182);
@@ -55,8 +55,8 @@ fn checksum(c: &mut Criterion) {
         .bench_function("slice16", |b| {
             b.iter(|| BLUETOOTH_SLICE16.checksum(black_box(&bytes)))
         })
-        .bench_function("clmul", |b| {
-            b.iter(|| BLUETOOTH_CLMUL.checksum(black_box(&bytes)))
+        .bench_function("simd", |b| {
+            b.iter(|| BLUETOOTH_SIMD.checksum(black_box(&bytes)))
         });
 
     c.benchmark_group("crc16")
@@ -71,9 +71,7 @@ fn checksum(c: &mut Criterion) {
         .bench_function("slice16", |b| {
             b.iter(|| X25_SLICE16.checksum(black_box(&bytes)))
         })
-        .bench_function("clmul", |b| {
-            b.iter(|| X25_CLMUL.checksum(black_box(&bytes)))
-        });
+        .bench_function("simd", |b| b.iter(|| X25_SIMD.checksum(black_box(&bytes))));
 
     c.benchmark_group("crc32")
         .throughput(Throughput::Bytes(size as u64))
@@ -87,8 +85,8 @@ fn checksum(c: &mut Criterion) {
         .bench_function("slice16", |b| {
             b.iter(|| ISCSI_SLICE16.checksum(black_box(&bytes)))
         })
-        .bench_function("clmul", |b| {
-            b.iter(|| ISCSI_CLMUL.checksum(black_box(&bytes)))
+        .bench_function("simd", |b| {
+            b.iter(|| ISCSI_SIMD.checksum(black_box(&bytes)))
         });
 
     c.benchmark_group("crc64")

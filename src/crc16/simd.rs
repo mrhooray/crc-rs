@@ -1,27 +1,26 @@
+use crate::crc16::{finalize, init, update_bytewise};
 use crate::*;
-use crate::{clmul::crc32_clmul_coeff, table::crc32_table};
+use crate::{simd::crc32_coeff, table::crc16_table};
 
-use crate::crc32::{finalize, init, update_bytewise};
+use self::simd::{crc32_update_refin, Value};
 
-use self::clmul::{crc32_update_refin, Value};
-
-impl Crc<u32, Clmul> {
-    pub const fn new(algorithm: &'static Algorithm<u32>) -> Self {
-        let table = crc32_table(algorithm.width, algorithm.poly, algorithm.refin);
-        let coeff = crc32_clmul_coeff(algorithm.width, algorithm.poly);
+impl Crc<u16, Simd> {
+    pub const fn new(algorithm: &'static Algorithm<u16>) -> Self {
+        let table = crc16_table(algorithm.width, algorithm.poly, algorithm.refin);
+        let coeff = crc32_coeff(algorithm.width, algorithm.poly as u32);
         Self {
             algorithm,
             data: (table, coeff),
         }
     }
 
-    pub fn checksum(&self, bytes: &[u8]) -> u32 {
+    pub fn checksum(&self, bytes: &[u8]) -> u16 {
         let mut crc = init(self.algorithm, self.algorithm.init);
         crc = self.update(crc, bytes);
         finalize(self.algorithm, crc)
     }
 
-    fn update(&self, mut crc: u32, bytes: &[u8]) -> u32 {
+    fn update(&self, mut crc: u16, bytes: &[u8]) -> u16 {
         if !self.algorithm.refin {
             return update_bytewise(crc, self.algorithm.refin, &self.data.0, bytes);
         }
@@ -32,12 +31,12 @@ impl Crc<u32, Clmul> {
         let (bytes_before, chunks, bytes_after) = unsafe { bytes.align_to::<[Value; 4]>() };
         crc = update_bytewise(crc, self.algorithm.refin, &self.data.0, bytes_before);
         if let Some(first_chunk) = chunks.first() {
-            crc = crc32_update_refin(crc, &self.data.1, first_chunk, &chunks[1..]);
+            crc = crc32_update_refin(crc as u32, &self.data.1, first_chunk, &chunks[1..]) as u16;
         }
         update_bytewise(crc, self.algorithm.refin, &self.data.0, bytes_after)
     }
 
-    pub const fn digest(&self) -> Digest<u32, Clmul> {
+    pub const fn digest(&self) -> Digest<u16, Simd> {
         self.digest_with_initial(self.algorithm.init)
     }
 
@@ -46,14 +45,14 @@ impl Crc<u32, Clmul> {
     /// This overrides the initial value specified by the algorithm.
     /// The effects of the algorithm's properties `refin` and `width`
     /// are applied to the custom initial value.
-    pub const fn digest_with_initial(&self, initial: u32) -> Digest<u32, Clmul> {
+    pub const fn digest_with_initial(&self, initial: u16) -> Digest<u16, Simd> {
         let value = init(self.algorithm, initial);
         Digest::new(self, value)
     }
 }
 
-impl<'a> Digest<'a, u32, Clmul> {
-    const fn new(crc: &'a Crc<u32, Clmul>, value: u32) -> Self {
+impl<'a> Digest<'a, u16, Simd> {
+    const fn new(crc: &'a Crc<u16, Simd>, value: u16) -> Self {
         Digest { crc, value }
     }
 
@@ -61,7 +60,7 @@ impl<'a> Digest<'a, u32, Clmul> {
         self.value = self.crc.update(self.value, bytes);
     }
 
-    pub const fn finalize(self) -> u32 {
+    pub const fn finalize(self) -> u16 {
         finalize(self.crc.algorithm, self.value)
     }
 }

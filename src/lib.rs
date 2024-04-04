@@ -44,7 +44,7 @@ mod util;
     target_feature = "sse4.1",
     target_feature = "pclmulqdq"
 ))]
-mod clmul;
+mod simd;
 
 /// A trait for CRC implementations.
 pub trait Implementation: private::Sealed {
@@ -67,14 +67,14 @@ pub struct Table<const L: usize> {}
         target_feature = "pclmulqdq"
     )
 ))]
-pub struct Clmul {}
+pub struct Simd {}
 
 #[cfg(not(all(
     target_feature = "sse2",
     target_feature = "sse4.1",
     target_feature = "pclmulqdq"
 )))]
-pub type Clmul = DefaultImpl;
+pub type Simd = DefaultImpl;
 
 /// An implementation of the CRC algorithm with no lookup table.
 pub type NoTable = Table<0>;
@@ -90,8 +90,8 @@ impl<const L: usize> Implementation for Table<L> {
     target_feature = "sse4.1",
     target_feature = "pclmulqdq"
 ))]
-impl Implementation for Clmul {
-    type Data<W> = ([W; 256], [clmul::Value; 4]);
+impl Implementation for Simd {
+    type Data<W> = ([W; 256], [simd::Value; 4]);
 }
 
 mod private {
@@ -103,7 +103,7 @@ mod private {
         target_feature = "sse4.1",
         target_feature = "pclmulqdq"
     ))]
-    impl Sealed for super::Clmul {}
+    impl Sealed for super::Simd {}
 }
 
 /// Crc instance with a specific width, algorithm, and implementation.

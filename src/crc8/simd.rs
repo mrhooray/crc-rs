@@ -1,13 +1,13 @@
 use crate::crc8::{finalize, init, update_bytewise};
 use crate::*;
-use crate::{clmul::crc32_clmul_coeff, table::crc8_table};
+use crate::{simd::crc32_coeff, table::crc8_table};
 
-use self::clmul::{crc32_update_refin, Value};
+use self::simd::{crc32_update_refin, Value};
 
-impl Crc<u8, Clmul> {
+impl Crc<u8, Simd> {
     pub const fn new(algorithm: &'static Algorithm<u8>) -> Self {
         let table = crc8_table(algorithm.width, algorithm.poly, algorithm.refin);
-        let coeff = crc32_clmul_coeff(algorithm.width, algorithm.poly as u32);
+        let coeff = crc32_coeff(algorithm.width, algorithm.poly as u32);
         Self {
             algorithm,
             data: (table, coeff),
@@ -36,7 +36,7 @@ impl Crc<u8, Clmul> {
         update_bytewise(crc, &self.data.0, bytes_after)
     }
 
-    pub const fn digest(&self) -> Digest<u8, Clmul> {
+    pub const fn digest(&self) -> Digest<u8, Simd> {
         self.digest_with_initial(self.algorithm.init)
     }
 
@@ -45,14 +45,14 @@ impl Crc<u8, Clmul> {
     /// This overrides the initial value specified by the algorithm.
     /// The effects of the algorithm's properties `refin` and `width`
     /// are applied to the custom initial value.
-    pub const fn digest_with_initial(&self, initial: u8) -> Digest<u8, Clmul> {
+    pub const fn digest_with_initial(&self, initial: u8) -> Digest<u8, Simd> {
         let value = init(self.algorithm, initial);
         Digest::new(self, value)
     }
 }
 
-impl<'a> Digest<'a, u8, Clmul> {
-    const fn new(crc: &'a Crc<u8, Clmul>, value: u8) -> Self {
+impl<'a> Digest<'a, u8, Simd> {
+    const fn new(crc: &'a Crc<u8, Simd>, value: u8) -> Self {
         Digest { crc, value }
     }
 

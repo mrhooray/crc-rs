@@ -10,7 +10,7 @@ mod slice16;
     target_feature = "sse4.1",
     target_feature = "pclmulqdq",
 ))]
-mod clmul;
+mod simd;
 
 // init is shared between all impls
 const fn init(algorithm: &Algorithm<u32>, initial: u32) -> u32 {
@@ -211,7 +211,7 @@ mod test {
             for data in data {
                 let crc_slice16 = Crc::<u32, Table<16>>::new(alg);
                 let crc_nolookup = Crc::<u32, NoTable>::new(alg);
-                let crc_clmul = Crc::<u32, Clmul>::new(alg);
+                let crc_clmul = Crc::<u32, Simd>::new(alg);
                 let expected = Crc::<u32, Table<1>>::new(alg).checksum(data.as_bytes());
 
                 // Check that doing all at once works as expected

@@ -24,7 +24,7 @@ trait ValueOps {
     fn barret_reduction_32(self, px_u: Self) -> u32;
 }
 
-pub(crate) const fn crc32_clmul_coeff(width: u8, poly: u32) -> [Value; 4] {
+pub(crate) const fn crc32_coeff(width: u8, poly: u32) -> [Value; 4] {
     const fn xt_mod_px(mut t: u32, px: u64) -> u64 {
         if t < 32 {
             return 0;
@@ -78,7 +78,7 @@ pub(crate) const fn crc32_clmul_coeff(width: u8, poly: u32) -> [Value; 4] {
 
 pub(crate) fn crc32_update_refin(
     crc: u32,
-    coefficients: &[Value; 4],
+    coeff: &[Value; 4],
     first_chunk: &[Value; 4],
     chunks: &[[Value; 4]],
 ) -> u32 {
@@ -88,7 +88,7 @@ pub(crate) fn crc32_update_refin(
     x4[0] = x4[0].xor(crc as u64);
 
     // Iteratively Fold by 4:
-    let k1_k2 = coefficients[0];
+    let k1_k2 = coeff[0];
     for chunk in chunks {
         for (x, value) in x4.iter_mut().zip(chunk.iter()) {
             *x = x.fold_16(k1_k2, *value)
@@ -96,17 +96,17 @@ pub(crate) fn crc32_update_refin(
     }
 
     // Iteratively Fold by 1:
-    let k3_k4 = coefficients[1];
+    let k3_k4 = coeff[1];
     let mut x = x4[0].fold_16(k3_k4, x4[1]);
     x = x.fold_16(k3_k4, x4[2]);
     x = x.fold_16(k3_k4, x4[3]);
 
     // Final Reduction of 128-bits
-    let k5_k6 = coefficients[2];
+    let k5_k6 = coeff[2];
     x = x.fold_8(k3_k4);
     x = x.fold_4(k5_k6);
 
     // Barret Reduction
-    let px_u = coefficients[3];
+    let px_u = coeff[3];
     x.barret_reduction_32(px_u)
 }

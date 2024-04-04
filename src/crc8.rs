@@ -10,7 +10,7 @@ mod slice16;
     target_feature = "sse4.1",
     target_feature = "pclmulqdq",
 ))]
-mod clmul;
+mod simd;
 
 const fn init(algorithm: &Algorithm<u8>, initial: u8) -> u8 {
     if algorithm.refin {
@@ -158,7 +158,7 @@ mod test {
             for data in data {
                 let crc_slice16 = Crc::<u8, Table<16>>::new(alg);
                 let crc_nolookup = Crc::<u8, NoTable>::new(alg);
-                let crc_clmul = Crc::<u8, Clmul>::new(alg);
+                let crc_clmul = Crc::<u8, Simd>::new(alg);
                 let expected = Crc::<u8, Table<1>>::new(alg).checksum(data.as_bytes());
 
                 // Check that doing all at once works as expected
