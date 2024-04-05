@@ -48,11 +48,7 @@ impl ValueOps for Value {
         // SAFETY: This is only implemented if the target supports sse2, sse4.1, and pclmulqdq
         unsafe {
             Self(arch::_mm_xor_si128(
-                arch::_mm_clmulepi64_si128(
-                    arch::_mm_and_si128(self.0, mem::transmute((1u128 << 32) - 1)),
-                    x_mod_p.0,
-                    0x00,
-                ),
+                arch::_mm_clmulepi64_si128(arch::_mm_and_si128(self.0, MASK), x_mod_p.0, 0x00),
                 arch::_mm_srli_si128(self.0, 4),
             ))
         }
@@ -62,17 +58,11 @@ impl ValueOps for Value {
     fn barret_reduction_32(self, px_u: Self) -> u32 {
         // SAFETY: This is only implemented if the target supports sse2, sse4.1, and pclmulqdq
         unsafe {
-            let t1 = arch::_mm_clmulepi64_si128(
-                arch::_mm_and_si128(self.0, mem::transmute((1u128 << 32) - 1)),
-                px_u.0,
-                0x10,
-            );
-            let t2 = arch::_mm_clmulepi64_si128(
-                arch::_mm_and_si128(t1, mem::transmute((1u128 << 32) - 1)),
-                px_u.0,
-                0x00,
-            );
+            let t1 = arch::_mm_clmulepi64_si128(arch::_mm_and_si128(self.0, MASK), px_u.0, 0x10);
+            let t2 = arch::_mm_clmulepi64_si128(arch::_mm_and_si128(t1, MASK), px_u.0, 0x00);
             arch::_mm_extract_epi32(arch::_mm_xor_si128(self.0, t2), 1) as u32
         }
     }
 }
+
+const MASK: arch::__m128i = unsafe { mem::transmute((1u128 << 32) - 1) };
