@@ -35,6 +35,10 @@ impl Crc<u128, Table<1>> {
         let value = init(self.algorithm, initial);
         Digest::new(self, value)
     }
+
+    pub const fn table(&self) -> &<Table<1> as Implementation>::Data<u128> {
+        &self.data
+    }
 }
 
 impl<'a> Digest<'a, u128, Table<1>> {
