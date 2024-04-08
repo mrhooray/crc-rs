@@ -12,7 +12,7 @@ Rust implementation of CRC.
 Add `crc` to `Cargo.toml`
 ```toml
 [dependencies]
-crc = "3.2.0"
+crc = "3.2.1"
 ```
 
 ### Examples
