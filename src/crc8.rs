@@ -5,6 +5,13 @@ mod bytewise;
 mod nolookup;
 mod slice16;
 
+#[cfg(all(
+    target_feature = "sse2",
+    target_feature = "sse4.1",
+    target_feature = "pclmulqdq",
+))]
+mod simd;
+
 const fn init(algorithm: &Algorithm<u8>, initial: u8) -> u8 {
     if algorithm.refin {
         initial.reverse_bits() >> (8u8 - algorithm.width)
@@ -88,7 +95,6 @@ const fn update_slice16(mut crc: u8, table: &[[u8; 256]; 16], bytes: &[u8]) -> u
 #[cfg(test)]
 mod test {
     use crate::*;
-    use crc_catalog::{Algorithm, CRC_8_BLUETOOTH};
 
     /// Test this optimized version against the well known implementation to ensure correctness
     #[test]
@@ -103,34 +109,72 @@ mod test {
             "01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK01234567890ABCDEFGHIJK",
         ];
 
-        pub const CRC_8_BLUETOOTH_NONREFLEX: Algorithm<u8> = Algorithm {
-            width: 8,
-            poly: 0xa7,
-            init: 0x00,
-            refin: false,
-            refout: true,
-            xorout: 0x00,
-            check: 0x26,
-            residue: 0x00,
-        };
+        let algs_to_test = &[
+            CRC_3_GSM,
+            CRC_3_ROHC,
+            CRC_4_G_704,
+            CRC_4_INTERLAKEN,
+            CRC_5_EPC_C1G2,
+            CRC_5_G_704,
+            CRC_5_USB,
+            CRC_6_CDMA2000_A,
+            CRC_6_CDMA2000_B,
+            CRC_6_DARC,
+            CRC_6_G_704,
+            CRC_6_GSM,
+            CRC_7_MMC,
+            CRC_7_ROHC,
+            CRC_7_UMTS,
+            CRC_8_AUTOSAR,
+            CRC_8_BLUETOOTH,
+            CRC_8_CDMA2000,
+            CRC_8_DARC,
+            CRC_8_DVB_S2,
+            CRC_8_GSM_A,
+            CRC_8_GSM_B,
+            CRC_8_I_432_1,
+            CRC_8_I_CODE,
+            CRC_8_LTE,
+            CRC_8_MAXIM_DOW,
+            CRC_8_MIFARE_MAD,
+            CRC_8_NRSC_5,
+            CRC_8_OPENSAFETY,
+            CRC_8_ROHC,
+            CRC_8_SAE_J1850,
+            CRC_8_SMBUS,
+            CRC_8_TECH_3250,
+            CRC_8_WCDMA,
+        ];
 
-        let algs_to_test = [&CRC_8_BLUETOOTH, &CRC_8_BLUETOOTH_NONREFLEX];
+        // Check if the baseline is as expected.
+        for alg in algs_to_test {
+            assert_eq!(
+                Crc::<u8, Table<1>>::new(alg).checksum("123456789".as_bytes()),
+                alg.check
+            );
+        }
 
         for alg in algs_to_test {
             for data in data {
                 let crc_slice16 = Crc::<u8, Table<16>>::new(alg);
                 let crc_nolookup = Crc::<u8, NoTable>::new(alg);
+                let crc_clmul = Crc::<u8, Simd>::new(alg);
                 let expected = Crc::<u8, Table<1>>::new(alg).checksum(data.as_bytes());
 
                 // Check that doing all at once works as expected
                 assert_eq!(crc_slice16.checksum(data.as_bytes()), expected);
                 assert_eq!(crc_nolookup.checksum(data.as_bytes()), expected);
+                assert_eq!(crc_clmul.checksum(data.as_bytes()), expected);
 
                 let mut digest = crc_slice16.digest();
                 digest.update(data.as_bytes());
                 assert_eq!(digest.finalize(), expected);
 
                 let mut digest = crc_nolookup.digest();
+                digest.update(data.as_bytes());
+                assert_eq!(digest.finalize(), expected);
+
+                let mut digest = crc_clmul.digest();
                 digest.update(data.as_bytes());
                 assert_eq!(digest.finalize(), expected);
 
@@ -144,6 +188,10 @@ mod test {
                     digest.update(data2);
                     assert_eq!(digest.finalize(), expected);
                     let mut digest = crc_nolookup.digest();
+                    digest.update(data1);
+                    digest.update(data2);
+                    assert_eq!(digest.finalize(), expected);
+                    let mut digest = crc_clmul.digest();
                     digest.update(data1);
                     digest.update(data2);
                     assert_eq!(digest.finalize(), expected);
