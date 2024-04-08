@@ -47,6 +47,7 @@ pub trait Implementation: private::Sealed {
 
 /// A table-based implementation of the CRC algorithm, with `L` lanes.
 /// The number of entries in the lookup table is `L * 256`.
+#[derive(Copy, Clone)]
 pub struct Table<const L: usize> {}
 
 /// An implementation of the CRC algorithm with no lookup table.
@@ -64,6 +65,7 @@ mod private {
 }
 
 /// Crc instance with a specific width, algorithm, and implementation.
+#[derive(Clone)]
 pub struct Crc<W: Width, I: Implementation = DefaultImpl> {
     pub algorithm: &'static Algorithm<W>,
     data: I::Data<W>,
@@ -73,4 +75,15 @@ pub struct Crc<W: Width, I: Implementation = DefaultImpl> {
 pub struct Digest<'a, W: Width, I: Implementation = DefaultImpl> {
     crc: &'a Crc<W, I>,
     value: W,
+}
+
+#[cfg(test)]
+mod test {
+    use super::{Crc, CRC_32_ISCSI};
+
+    #[test]
+    fn test_clone() {
+        const CRC: Crc<u32> = Crc::<u32>::new(&CRC_32_ISCSI);
+        let _crc = CRC.clone();
+    }
 }
