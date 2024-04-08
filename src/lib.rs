@@ -84,6 +84,8 @@ mod test {
     #[test]
     fn test_clone() {
         const CRC: Crc<u32> = Crc::<u32>::new(&CRC_32_ISCSI);
-        let _crc = CRC.clone();
+        let crc = CRC.clone();
+        let digest = crc.digest();
+        let _digest = digest.clone();
     }
 }
