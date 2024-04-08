@@ -69,10 +69,13 @@ pub struct Table<const L: usize> {}
 ))]
 pub struct Simd {}
 
-#[cfg(not(all(
-    target_feature = "sse2",
-    target_feature = "sse4.1",
-    target_feature = "pclmulqdq"
+#[cfg(not(any(
+    doc,
+    all(
+        target_feature = "sse2",
+        target_feature = "sse4.1",
+        target_feature = "pclmulqdq"
+    )
 )))]
 pub type Simd = DefaultImpl;
 
