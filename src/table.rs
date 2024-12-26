@@ -1,5 +1,6 @@
 use crate::util::*;
 
+#[cfg(feature = "crc8")]
 pub(crate) const fn crc8_table(width: u8, poly: u8, reflect: bool) -> [u8; 256] {
     let poly = if reflect {
         let poly = poly.reverse_bits();
@@ -17,6 +18,7 @@ pub(crate) const fn crc8_table(width: u8, poly: u8, reflect: bool) -> [u8; 256] 
     table
 }
 
+#[cfg(feature = "crc8")]
 pub(crate) const fn crc8_table_slice_16(width: u8, poly: u8, reflect: bool) -> [[u8; 256]; 16] {
     let poly = if reflect {
         let poly = poly.reverse_bits();
@@ -45,6 +47,7 @@ pub(crate) const fn crc8_table_slice_16(width: u8, poly: u8, reflect: bool) -> [
     table
 }
 
+#[cfg(feature = "crc16")]
 pub(crate) const fn crc16_table(width: u8, poly: u16, reflect: bool) -> [u16; 256] {
     let poly = if reflect {
         let poly = poly.reverse_bits();
@@ -62,6 +65,7 @@ pub(crate) const fn crc16_table(width: u8, poly: u16, reflect: bool) -> [u16; 25
     table
 }
 
+#[cfg(feature = "crc16")]
 pub(crate) const fn crc16_table_slice_16(width: u8, poly: u16, reflect: bool) -> [[u16; 256]; 16] {
     let poly = if reflect {
         let poly = poly.reverse_bits();
@@ -94,6 +98,7 @@ pub(crate) const fn crc16_table_slice_16(width: u8, poly: u16, reflect: bool) ->
     table
 }
 
+#[cfg(feature = "crc32")]
 pub(crate) const fn crc32_table(width: u8, poly: u32, reflect: bool) -> [u32; 256] {
     let poly = if reflect {
         let poly = poly.reverse_bits();
@@ -112,6 +117,7 @@ pub(crate) const fn crc32_table(width: u8, poly: u32, reflect: bool) -> [u32; 25
     table
 }
 
+#[cfg(feature = "crc32")]
 pub(crate) const fn crc32_table_slice_16(width: u8, poly: u32, reflect: bool) -> [[u32; 256]; 16] {
     let poly = if reflect {
         let poly = poly.reverse_bits();
@@ -144,6 +150,7 @@ pub(crate) const fn crc32_table_slice_16(width: u8, poly: u32, reflect: bool) ->
     table
 }
 
+#[cfg(feature = "crc64")]
 pub(crate) const fn crc64_table(width: u8, poly: u64, reflect: bool) -> [u64; 256] {
     let poly = if reflect {
         let poly = poly.reverse_bits();
@@ -161,6 +168,7 @@ pub(crate) const fn crc64_table(width: u8, poly: u64, reflect: bool) -> [u64; 25
     table
 }
 
+#[cfg(feature = "crc64")]
 pub(crate) const fn crc64_table_slice_16(width: u8, poly: u64, reflect: bool) -> [[u64; 256]; 16] {
     let poly = if reflect {
         let poly = poly.reverse_bits();
@@ -193,6 +201,7 @@ pub(crate) const fn crc64_table_slice_16(width: u8, poly: u64, reflect: bool) ->
     table
 }
 
+#[cfg(feature = "crc128")]
 pub(crate) const fn crc128_table(width: u8, poly: u128, reflect: bool) -> [u128; 256] {
     let poly = if reflect {
         let poly = poly.reverse_bits();
@@ -210,6 +219,7 @@ pub(crate) const fn crc128_table(width: u8, poly: u128, reflect: bool) -> [u128;
     table
 }
 
+#[cfg(feature = "crc128")]
 pub(crate) const fn crc128_table_slice_16(
     width: u8,
     poly: u128,
