@@ -18,6 +18,11 @@ rust-version = "1.65"
 [dependencies]
 crc-catalog = "2.4.0"
 
+[features]
+default = ["crc128", "crc64"]
+crc128 = []
+crc64 = []
+
 [dev-dependencies]
 criterion = { version = "0.4" }
 

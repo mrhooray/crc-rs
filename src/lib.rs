@@ -31,9 +31,11 @@
 pub use crc_catalog::algorithm::*;
 pub use crc_catalog::{Algorithm, Width};
 
+#[cfg(feature = "crc128")]
 mod crc128;
 mod crc16;
 mod crc32;
+#[cfg(feature = "crc64")]
 mod crc64;
 mod crc8;
 mod table;
