@@ -52,6 +52,7 @@ pub(crate) const fn crc32(poly: u32, reflect: bool, mut value: u32) -> u32 {
     value
 }
 
+#[cfg(feature = "crc64")]
 pub(crate) const fn crc64(poly: u64, reflect: bool, mut value: u64) -> u64 {
     if reflect {
         let mut i = 0;
@@ -71,6 +72,7 @@ pub(crate) const fn crc64(poly: u64, reflect: bool, mut value: u64) -> u64 {
     value
 }
 
+#[cfg(feature = "crc128")]
 pub(crate) const fn crc128(poly: u128, reflect: bool, mut value: u128) -> u128 {
     if reflect {
         let mut i = 0;
