@@ -44,14 +44,6 @@ fn bench_baseline(b: &mut Bencher) {
 
 // CRC-8 benchmarks
 #[bench]
-fn bench_crc8_default(b: &mut Bencher) {
-    let size = 16 * KB;
-    let bytes = vec![0u8; size];
-    b.bytes = size as u64;
-    b.iter(|| BLUETOOTH.checksum(black_box(&bytes)));
-}
-
-#[bench]
 fn bench_crc8_nolookup(b: &mut Bencher) {
     let size = 16 * KB;
     let bytes = vec![0u8; size];
@@ -76,14 +68,6 @@ fn bench_crc8_slice16(b: &mut Bencher) {
 }
 
 // CRC-16 benchmarks
-#[bench]
-fn bench_crc16_default(b: &mut Bencher) {
-    let size = 16 * KB;
-    let bytes = vec![0u8; size];
-    b.bytes = size as u64;
-    b.iter(|| X25.checksum(black_box(&bytes)));
-}
-
 #[bench]
 fn bench_crc16_nolookup(b: &mut Bencher) {
     let size = 16 * KB;
@@ -110,14 +94,6 @@ fn bench_crc16_slice16(b: &mut Bencher) {
 
 // CRC-32 benchmarks
 #[bench]
-fn bench_crc32_default(b: &mut Bencher) {
-    let size = 16 * KB;
-    let bytes = vec![0u8; size];
-    b.bytes = size as u64;
-    b.iter(|| ISCSI.checksum(black_box(&bytes)));
-}
-
-#[bench]
 fn bench_crc32_nolookup(b: &mut Bencher) {
     let size = 16 * KB;
     let bytes = vec![0u8; size];
@@ -143,14 +119,6 @@ fn bench_crc32_slice16(b: &mut Bencher) {
 
 // CRC-64 benchmarks
 #[bench]
-fn bench_crc64_default(b: &mut Bencher) {
-    let size = 16 * KB;
-    let bytes = vec![0u8; size];
-    b.bytes = size as u64;
-    b.iter(|| ECMA.checksum(black_box(&bytes)));
-}
-
-#[bench]
 fn bench_crc64_nolookup(b: &mut Bencher) {
     let size = 16 * KB;
     let bytes = vec![0u8; size];
@@ -175,14 +143,6 @@ fn bench_crc64_slice16(b: &mut Bencher) {
 }
 
 // CRC-82 benchmarks
-#[bench]
-fn bench_crc82_default(b: &mut Bencher) {
-    let size = 16 * KB;
-    let bytes = vec![0u8; size];
-    b.bytes = size as u64;
-    b.iter(|| DARC.checksum(black_box(&bytes)));
-}
-
 #[bench]
 fn bench_crc82_nolookup(b: &mut Bencher) {
     let size = 16 * KB;
