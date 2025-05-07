@@ -1,4 +1,3 @@
-#[cfg(feature = "crc8")]
 pub(crate) const fn crc8(poly: u8, reflect: bool, mut value: u8) -> u8 {
     let mut i = 0;
     if reflect {
@@ -15,7 +14,6 @@ pub(crate) const fn crc8(poly: u8, reflect: bool, mut value: u8) -> u8 {
     value
 }
 
-#[cfg(feature = "crc16")]
 pub(crate) const fn crc16(poly: u16, reflect: bool, mut value: u16) -> u16 {
     if reflect {
         let mut i = 0;
@@ -35,7 +33,6 @@ pub(crate) const fn crc16(poly: u16, reflect: bool, mut value: u16) -> u16 {
     value
 }
 
-#[cfg(feature = "crc32")]
 pub(crate) const fn crc32(poly: u32, reflect: bool, mut value: u32) -> u32 {
     if reflect {
         let mut i = 0;
@@ -55,7 +52,6 @@ pub(crate) const fn crc32(poly: u32, reflect: bool, mut value: u32) -> u32 {
     value
 }
 
-#[cfg(feature = "crc64")]
 pub(crate) const fn crc64(poly: u64, reflect: bool, mut value: u64) -> u64 {
     if reflect {
         let mut i = 0;
@@ -75,7 +71,6 @@ pub(crate) const fn crc64(poly: u64, reflect: bool, mut value: u64) -> u64 {
     value
 }
 
-#[cfg(feature = "crc128")]
 pub(crate) const fn crc128(poly: u128, reflect: bool, mut value: u128) -> u128 {
     if reflect {
         let mut i = 0;
