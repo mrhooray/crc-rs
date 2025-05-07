@@ -40,7 +40,7 @@ mod table;
 mod util;
 
 /// A trait for CRC implementations.
-pub trait Implementation: private::Sealed {
+pub trait Implementation {
     /// Associated data necessary for the implementation (e.g. lookup tables).
     type Data<W>;
 }
@@ -61,7 +61,9 @@ impl<const L: usize> Implementation for Table<L> {
 
 mod private {
     pub trait Sealed {}
-    impl<const L: usize> Sealed for super::Table<L> {}
+    impl Sealed for super::Table<0> {}
+    impl Sealed for super::Table<1> {}
+    impl Sealed for super::Table<16> {}
 }
 
 /// Crc instance with a specific width, algorithm, and implementation.
