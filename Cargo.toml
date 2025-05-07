@@ -1,6 +1,6 @@
 [package]
 name = "crc"
-version = "3.2.1"
+version = "3.3.0"
 authors = ["Rui Hu <code@mrhooray.com>", "Akhil Velagapudi <4@4khil.com>"]
 license = "MIT OR Apache-2.0"
 readme = "README.md"
