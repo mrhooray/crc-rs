@@ -51,11 +51,22 @@ where
         Digest { crc, value }
     }
 
-    pub const fn update(&mut self, bytes: &[u8]) {
+    pub const fn finalize(self) -> u128 {
+        finalize(self.crc.algorithm, self.value)
+    }
+}
+
+impl<'a, const L: usize> DigestOps for Digest<'a, u128, Table<L>>
+where
+    Table<L>: private::Sealed,
+{
+    type Width = u128;
+
+    fn update(&mut self, bytes: &[u8]) {
         self.value = self.crc.update(self.value, bytes);
     }
 
-    pub const fn finalize(self) -> u128 {
+    fn finalize(self) -> Self::Width {
         finalize(self.crc.algorithm, self.value)
     }
 }
