@@ -10,6 +10,8 @@
 //!
 //! Using a custom algorithm:
 //! ```rust
+//! use crc::DigestOps;
+//!
 //! const CUSTOM_ALG: crc::Algorithm<u16> = crc::Algorithm {
 //!     width: 16,
 //!     poly: 0x8005,
@@ -77,6 +79,13 @@ pub struct Crc<W: Width, I: Implementation = DefaultImpl> {
 pub struct Digest<'a, W: Width, I: Implementation = DefaultImpl> {
     crc: &'a Crc<W, I>,
     value: W,
+}
+
+pub trait DigestOps {
+    type Width: Width;
+
+    fn update(&mut self, bytes: &[u8]);
+    fn finalize(self) -> Self::Width;
 }
 
 #[cfg(test)]
