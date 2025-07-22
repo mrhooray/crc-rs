@@ -51,7 +51,7 @@ where
         Digest { crc, value }
     }
 
-    pub fn update(&mut self, bytes: &[u8]) {
+    pub const fn update(&mut self, bytes: &[u8]) {
         self.value = self.crc.update(self.value, bytes);
     }
 
