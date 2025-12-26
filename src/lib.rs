@@ -28,6 +28,8 @@
 #![no_std]
 #![forbid(unsafe_code)]
 
+use core::fmt::Debug;
+
 pub use crc_catalog::algorithm::*;
 pub use crc_catalog::{Algorithm, Width};
 
@@ -77,6 +79,14 @@ pub struct Crc<W: Width, I: Implementation = DefaultImpl> {
 pub struct Digest<'a, W: Width, I: Implementation = DefaultImpl> {
     crc: &'a Crc<W, I>,
     value: W,
+}
+
+impl<'a, W: Width + Debug, I: Implementation> Debug for Digest<'a, W, I> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_struct("Digest")
+            .field("value", &self.value)
+            .finish()
+    }
 }
 
 #[cfg(test)]
