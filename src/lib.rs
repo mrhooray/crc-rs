@@ -81,7 +81,7 @@ pub struct Digest<'a, W: Width, I: Implementation = DefaultImpl> {
     value: W,
 }
 
-impl<'a, W: Width + Debug, I: Implementation> Debug for Digest<'a, W, I> {
+impl<W: Width + Debug, I: Implementation> Debug for Digest<'_, W, I> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         let width = "0x".len() + size_of::<W>() * 2 as usize;
         let value = &self.value;
