@@ -83,7 +83,7 @@ pub struct Digest<'a, W: Width, I: Implementation = DefaultImpl> {
 
 impl<W: Width + Debug, I: Implementation> Debug for Digest<'_, W, I> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        let width = "0x".len() + size_of::<W>() * 2 as usize;
+        let width = "0x".len() + size_of::<W>() * 2;
         let value = &self.value;
         f.debug_struct("Digest")
             .field("value", &format_args!("{value:#0width$x?}"))
